@@ -28,16 +28,39 @@ project("aws-rds-odbc")
 cmake_minimum_required(VERSION 3.30 FATAL_ERROR)
 set(CMAKE_CXX_STANDARD 17)
 
+# Configure compiler for multi-threading runtime libraries
+if (MSVC)
+    if (DEBUG)
+        add_compile_options(/MTd)
+    else()
+        add_compile_options(/MT)
+    endif()
+endif()
+
 #-----------------------------------------------------
 
-add_library(${project_name} STATIC
+include_directories("${CMAKE_SOURCE_DIR}/src/failover")
+set(FAILOVER_SRC
+  src/failover/cluster_topology_info.cc
+  src/failover/host_info.cc
+)
+
+set(FAILOVER_INC
+  src/failover/cluster_topology_info.h
+  src/failover/host_info.h
+)
+
+add_library(${PROJECT_NAME} STATIC
+  ${FAILOVER_SRC} ${FAILOVER_INC}
 )
 
 #-----------------------------------------------------
 
-if(ENABLE_UNIT_TESTS)
-  add_definitions(-DUNIT_TEST_BUILD)
-endif(ENABLE_UNIT_TESTS)
+if(ENABLE_INTEGRATION_TESTS AND NOT ENABLE_UNIT_TESTS)
+    add_subdirectory(test/integration_test)
+elseif(ENABLE_UNIT_TESTS AND NOT ENABLE_INTEGRATION_TESTS)
+    add_subdirectory(test/unit_test)
+endif()
 
 #-----------------------------------------------------
 
@@ -49,7 +72,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(ctpl)
 
 #-----------------------------------------------------
-
+# Path for script built AWS SDK
+LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/aws_sdk/install")
+# Path for system built AWS SDK
 string(REPLACE ";" "/aws-cpp-sdk-all;" SYSTEM_MODULE_PATH "${CMAKE_SYSTEM_PREFIX_PATH}/aws-cpp-sdk-all")
 list(APPEND CMAKE_PREFIX_PATH ${SYSTEM_MODULE_PATH})
 
