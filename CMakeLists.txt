@@ -24,34 +24,35 @@
 # 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 ##########################################################################
 
-project("aws-rds-odbc")
 cmake_minimum_required(VERSION 3.30 FATAL_ERROR)
-set(CMAKE_CXX_STANDARD 17)
-
-# Configure compiler for multi-threading runtime libraries
-if (MSVC)
-    if (DEBUG)
-        add_compile_options(/MTd)
-    else()
-        add_compile_options(/MT)
-    endif()
-endif()
+project("aws-rds-odbc")
+set(CMAKE_CXX_STANDARD 20)
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build as static libraries")
 
 #-----------------------------------------------------
 
 include_directories("${CMAKE_SOURCE_DIR}/src/failover")
-set(FAILOVER_SRC
+include_directories("${CMAKE_SOURCE_DIR}/src/util")
+set(SRC
+  # Util
+  src/util/logger_wrapper.cc
+
+  # Failover
   src/failover/cluster_topology_info.cc
   src/failover/host_info.cc
 )
 
-set(FAILOVER_INC
+set(INC
+  # Util
+  src/util/logger_wrapper.h
+
+  # Failover
   src/failover/cluster_topology_info.h
   src/failover/host_info.h
 )
 
 add_library(${PROJECT_NAME} STATIC
-  ${FAILOVER_SRC} ${FAILOVER_INC}
+  ${SRC} ${INC}
 )
 
 #-----------------------------------------------------
@@ -73,7 +74,9 @@ FetchContent_MakeAvailable(ctpl)
 
 #-----------------------------------------------------
 # Path for script built AWS SDK
+
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/aws_sdk/install")
+
 # Path for system built AWS SDK
 string(REPLACE ";" "/aws-cpp-sdk-all;" SYSTEM_MODULE_PATH "${CMAKE_SYSTEM_PREFIX_PATH}/aws-cpp-sdk-all")
 list(APPEND CMAKE_PREFIX_PATH ${SYSTEM_MODULE_PATH})
@@ -84,5 +87,16 @@ target_link_libraries(${PROJECT_NAME} ${AWSSDK_LINK_LIBRARIES})
 
 #-----------------------------------------------------
 
-include_directories(${CMAKE_SOURCE_DIR})
+set(LOG4CPLUS_SOURCE_DIR "${CMAKE_BINARY_DIR}/third_party/log4cplus")
+FetchContent_Declare(
+  log4cplus
+  GIT_REPOSITORY https://github.com/log4cplus/log4cplus.git
+)
+FetchContent_MakeAvailable(log4cplus)
+target_link_libraries(${PROJECT_NAME} log4cplus::log4cplus)
+
+#-----------------------------------------------------
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
 include_directories(${ctpl_SOURCE_DIR})
+include_directories(${log4cplus_SOURCE_DIR})

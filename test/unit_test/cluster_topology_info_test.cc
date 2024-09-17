@@ -52,10 +52,19 @@ class ClusterTopologyInfoTest : public testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(ClusterTopologyInfoTest, getNextReader) {
-  std::shared_ptr<HOST_INFO> host_info = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, true);
+TEST_F(ClusterTopologyInfoTest, getNextWriter) {
+  std::shared_ptr<HOST_INFO> writer_host_info = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, true);
+  std::shared_ptr<HOST_INFO> reader_host_info_a = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false);
+  std::shared_ptr<HOST_INFO> reader_host_info_b = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false);
   std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
-  cluster_topology_info->add_host(host_info);
-  std::shared_ptr<HOST_INFO> writer_host_info = cluster_topology_info->get_writer();
-  EXPECT_EQ(host_info, writer_host_info);
+  cluster_topology_info->add_host(writer_host_info);
+  cluster_topology_info->add_host(reader_host_info_a);
+  cluster_topology_info->add_host(reader_host_info_b);
+  std::shared_ptr<HOST_INFO> host_info = cluster_topology_info->get_writer();
+  EXPECT_EQ(writer_host_info, host_info);
+}
+
+TEST_F(ClusterTopologyInfoTest, getNextWriter_empty) {
+  std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
+  EXPECT_THROW(cluster_topology_info->get_writer(), std::runtime_error);
 }

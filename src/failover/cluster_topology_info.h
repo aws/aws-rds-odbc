@@ -32,6 +32,8 @@
 
 #include "host_info.h"
 
+#include "../util/logger_wrapper.h"
+
 #include <ctime>
 #include <set>
 #include <vector>
@@ -60,6 +62,8 @@ public:
     std::vector<std::shared_ptr<HOST_INFO>> get_readers();
 
 private:
+    std::shared_ptr<LOGGER_WRAPPER> logger;
+
     int current_reader = -1;
     std::time_t last_updated;
     std::set<std::string> down_hosts; // maybe not needed, HOST_INFO has is_host_down() method

@@ -30,6 +30,8 @@
 #ifndef __HOSTINFO_H__
 #define __HOSTINFO_H__
 
+#include "../util/logger_wrapper.h"
+
 #include <memory>
 #include <string>
 

@@ -1,7 +1,9 @@
 project(unit_test)
 
 cmake_minimum_required(VERSION 3.30 FATAL_ERROR)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+
+#-----------------------------------------------------
 
 # External
 ## GoogleTest
@@ -18,9 +20,11 @@ include(GoogleTest)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
+#-----------------------------------------------------
+
 add_executable(
   # Executable Name
-  unit_test
+  ${PROJECT_NAME}
 
   # Runner / Utility 
   main.cc
@@ -31,15 +35,23 @@ add_executable(
   host_info_test.cc
 )
 
-include_directories("${CMAKE_SOURCE_DIR}/src/failover")
+#-----------------------------------------------------
 
 target_link_libraries(
-  unit_test
+  # Name
+  ${PROJECT_NAME}
+
+  # External Libaries
   gtest_main
   gmock_main
+  log4cplus::log4cplus
+
+  # Source Libaries
   aws-rds-odbc
 )
 
-add_test(NAME unit_test COMMAND unit_test)
-set_target_properties(unit_test PROPERTIES
+#-----------------------------------------------------
+
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
