@@ -67,3 +67,43 @@ jobs:
         shell: bash
         run: |
           ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+  build-mac:
+    name: macOS
+    runs-on: macos-14
+    env:
+      CMAKE_GENERATOR: Unix Makefiles
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Cache AWS SDK libraries
+        id: cache-dynamic-aws-sdk
+        uses: actions/cache@v4
+        if: always() && steps.cache-dynamic-aws-sdk.outputs.cache-hit != 'true'
+        with:
+          path: |
+            aws_sdk
+          key: ${{ runner.os }}-aws-sdk-dynamic-lib
+
+      - name: Build and install AWS SDK C++
+        working-directory: ./scripts
+        if: steps.cache-dynamic-aws-sdk.outputs.cache-hit != 'true'
+        run: |
+          ./build_aws_sdk_unix.sh $BUILD_TYPE
+
+      - name: Create build environment
+        run: cmake -E make_directory ${{ github.workspace }}/build
+
+      - name: Configure CMake
+        run: cmake -S . -B build
+          -G "$CMAKE_GENERATOR"
+          -DENABLE_UNIT_TESTS=TRUE
+
+      - name: Build Project
+        run: cmake --build build --config $BUILD_TYPE
+
+      - name: Run unit tests
+        if: success()
+        working-directory: ./build/test/unit_test
+        run: |
+          ctest -C $BUILD_TYPE --output-on-failure
