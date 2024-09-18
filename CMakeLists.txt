@@ -87,16 +87,17 @@ target_link_libraries(${PROJECT_NAME} ${AWSSDK_LINK_LIBRARIES})
 
 #-----------------------------------------------------
 
-set(LOG4CPLUS_SOURCE_DIR "${CMAKE_BINARY_DIR}/third_party/log4cplus")
+set("BUILD_TESTING" OFF CACHE INTERNAL "Skip GLOG Tests")
 FetchContent_Declare(
-  log4cplus
-  GIT_REPOSITORY https://github.com/log4cplus/log4cplus.git
+    glog
+    GIT_REPOSITORY https://github.com/google/glog.git
+    GIT_TAG        v0.7.0
 )
-FetchContent_MakeAvailable(log4cplus)
-target_link_libraries(${PROJECT_NAME} log4cplus::log4cplus)
+FetchContent_MakeAvailable(glog)
+target_link_libraries(${PROJECT_NAME} glog::glog)
 
 #-----------------------------------------------------
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
 include_directories(${ctpl_SOURCE_DIR})
-include_directories(${log4cplus_SOURCE_DIR})
+include_directories(${glog_SOURCE_DIR})

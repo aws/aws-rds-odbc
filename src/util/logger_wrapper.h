@@ -30,39 +30,33 @@
 #ifndef __LOGGERWRAPPER_H__
 #define __LOGGERWRAPPER_H__
 
-#include <log4cplus/consoleappender.h>
-#include <log4cplus/configurator.h>
-#include <log4cplus/fileappender.h>
-#include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
-#include <log4cplus/layout.h>
-#include <log4cplus/helpers/property.h>
-#include <log4cplus/initializer.h>
+#include <glog/logging.h>
 
 #include <format>
 #include <filesystem>
 
 namespace LOGGER_CONFIG {
-    const long MAX_FILE_SIZE = 5 * 1024 * 1024;
-    const int MAX_BACKUP_SIZE = 5;
-    const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append("aws-rds-odbc.log").string();
+    const std::string PROGRAM_NAME = "aws-rds-odbc";
+    const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append("aws-rds-odbc").string();
 }  // namespace LOGGER_CONFIG
 
-class LOGGER_WRAPPER : public log4cplus::Logger {
+// Initializes glog once
+class LOGGER_WRAPPER {
 public:
-    LOGGER_WRAPPER(std::string name, log4cplus::LogLevel level = log4cplus::INFO_LOG_LEVEL);
-    ~LOGGER_WRAPPER();
+    static void initialize();
 
-    void info(std::string msg);
-    void debug(std::string msg);
-    void warn(std::string msg);
-    void error(std::string msg);
-    void fatal(std::string msg);
+    // Prevent copy constructors
+    LOGGER_WRAPPER(const LOGGER_WRAPPER&) = delete;
+    LOGGER_WRAPPER(LOGGER_WRAPPER&&) = delete;
+    LOGGER_WRAPPER& operator=(const LOGGER_WRAPPER&) = delete;
+    LOGGER_WRAPPER& operator=(LOGGER_WRAPPER&&) = delete;
+
+protected:
+    LOGGER_WRAPPER() = default;
 
 private:
-    log4cplus::Logger _logger;
-
-    void configure(log4cplus::LogLevel logLevel);
+    void set_log_directory(std::string directory_path);
+    bool init = false;
 };
 
 #endif /* __LOGGERWRAPPER_H__ */

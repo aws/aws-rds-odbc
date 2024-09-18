@@ -29,49 +29,21 @@
 
 #include "logger_wrapper.h"
 
-LOGGER_WRAPPER::LOGGER_WRAPPER(std::string name, log4cplus::LogLevel logLevel) {
-    log4cplus::initialize();
-    _logger = log4cplus::Logger::getInstance(LOG4CPLUS_C_STR_TO_TSTRING(name.c_str()));
-    configure(logLevel);
+void LOGGER_WRAPPER::initialize() {
+    static LOGGER_WRAPPER instance;
+    if (!instance.init) {
+        FLAGS_stderrthreshold = 4; // Disable console output
+        FLAGS_timestamp_in_logfile_name = false;
+        FLAGS_log_file_header = false;
+        instance.set_log_directory(LOGGER_CONFIG::LOG_LOCATION);
+        google::InitGoogleLogging(LOGGER_CONFIG::PROGRAM_NAME.c_str());
+        instance.init = true;
+    }
 }
 
-LOGGER_WRAPPER::~LOGGER_WRAPPER() {
-    log4cplus::Logger::shutdown();
-}
-
-void LOGGER_WRAPPER::configure(log4cplus::LogLevel logLevel) {
-    log4cplus::Logger rootLogger = log4cplus::Logger::getRoot();
-    rootLogger.setLogLevel(logLevel);
-
-    log4cplus::SharedFileAppenderPtr sharedFileAppender(
-        new log4cplus::RollingFileAppender(
-            LOG4CPLUS_C_STR_TO_TSTRING(LOGGER_CONFIG::LOG_LOCATION), 
-            LOGGER_CONFIG::MAX_FILE_SIZE, LOGGER_CONFIG::MAX_BACKUP_SIZE,
-            false, true
-    ));
-
-    log4cplus::tstring pattern = LOG4CPLUS_TEXT("%D{%m/%d/%y %H:%M:%S,%Q} [%t] %-5p %c{2} - %m [%l]%n");
-    sharedFileAppender->setLayout(std::unique_ptr<log4cplus::Layout>(new log4cplus::PatternLayout(pattern)));
-
-    rootLogger.addAppender(log4cplus::SharedAppenderPtr(sharedFileAppender.get()));
-}
-
-void LOGGER_WRAPPER::info(std::string msg) {
-    LOG4CPLUS_INFO(_logger, LOG4CPLUS_C_STR_TO_TSTRING(msg.c_str()));
-}
-
-void LOGGER_WRAPPER::debug(std::string msg) {
-    LOG4CPLUS_DEBUG(_logger, LOG4CPLUS_C_STR_TO_TSTRING(msg.c_str()));
-}
-
-void LOGGER_WRAPPER::warn(std::string msg) {
-    LOG4CPLUS_WARN(_logger, LOG4CPLUS_C_STR_TO_TSTRING(msg.c_str()));
-}
-
-void LOGGER_WRAPPER::error(std::string msg) {
-    LOG4CPLUS_ERROR(_logger, LOG4CPLUS_C_STR_TO_TSTRING(msg.c_str()));
-}
-
-void LOGGER_WRAPPER::fatal(std::string msg) {
-    LOG4CPLUS_FATAL(_logger, LOG4CPLUS_C_STR_TO_TSTRING(msg.c_str()));
+void LOGGER_WRAPPER::set_log_directory(std::string directory_path) {
+    if (!std::filesystem::exists(directory_path)) {
+        std::filesystem::create_directory(directory_path);
+    }
+    FLAGS_log_dir = directory_path;
 }
