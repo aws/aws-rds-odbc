@@ -1,0 +1,9 @@
+{
+  "analyze": [
+    "--no-missing-checker-error",
+    "--disable=security.insecureAPI.rand",
+    "--disable=clang-diagnostic-reserved-macro-identifier",
+    "--disable=clang-diagnostic-string-plus-int",
+    "--disable=clang-diagnostic-sign-compare"
+  ]
+}

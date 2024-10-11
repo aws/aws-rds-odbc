@@ -1,0 +1,70 @@
+name: Run Static Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '*'
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.jpg'
+      - '**/README.txt'
+      - '**/LICENSE.txt'
+      - 'docs/**'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  static-analysis:
+    name: Static Analysis
+    runs-on: macos-14
+    env:
+      CMAKE_GENERATOR: Unix Makefiles
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install llvm cppcheck
+          python3.9 -m venv ./venv
+          source ./venv/bin/activate
+          python3.9 -m pip install codechecker
+
+      - name: Cache AWS SDK libraries
+        id: cache-dynamic-aws-sdk
+        uses: actions/cache@v4
+        if: always() && steps.cache-dynamic-aws-sdk.outputs.cache-hit != 'true'
+        with:
+          path: |
+            aws_sdk
+          key: ${{ runner.os }}-aws-sdk-dynamic-lib
+
+      - name: Build and install AWS SDK C++
+        if: steps.cache-dynamic-aws-sdk.outputs.cache-hit != 'true'
+        run: |
+          ./scripts/build_aws_sdk_unix.sh $BUILD_TYPE
+
+      - name: Create build environment
+        run: cmake -E make_directory ./build
+
+      - name: Configure CMake
+        run: cmake -S . -B build
+          -G "$CMAKE_GENERATOR"
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
+      - name: Create skip file
+        run: echo "-*/build/_deps/*" > ./skipfile
+
+      - name: Run static analysis
+        run: |
+          export PATH="$PATH:$(brew --cellar)/llvm/19.1.1/bin"
+          whereis clang-tidy
+          source ./venv/bin/activate
+          CodeChecker analyze ./build/compile_commands.json -i ./skipfile --config codechecker.json -o ./reports
+
+      - name: Print static analysis
+        run: |
+          source ./venv/bin/activate
+          CodeChecker parse --print-steps ./reports

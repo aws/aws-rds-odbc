@@ -442,3 +442,8 @@ aws_sdk/
 
 # Build output directory
 build
+
+# CodeChecker static analysis reports directory
+reports
+skipfile
+venv
