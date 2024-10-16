@@ -31,8 +31,6 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build as static libraries")
 
 #-----------------------------------------------------
 
-include_directories("${CMAKE_SOURCE_DIR}/src/failover")
-include_directories("${CMAKE_SOURCE_DIR}/src/util")
 set(SRC
   # Util
   src/util/logger_wrapper.cc
@@ -51,19 +49,31 @@ set(INC
   src/failover/host_info.h
 )
 
-add_library(${PROJECT_NAME} STATIC
-  ${SRC} ${INC}
-)
+add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories("${CMAKE_SOURCE_DIR}/src/failover")
+include_directories("${CMAKE_SOURCE_DIR}/src/util")
 
 #-----------------------------------------------------
 
 if(ENABLE_INTEGRATION_TESTS AND NOT ENABLE_UNIT_TESTS)
-    add_subdirectory(test/integration_test)
+  add_subdirectory(test/integration_test)
 elseif(ENABLE_UNIT_TESTS AND NOT ENABLE_INTEGRATION_TESTS)
-    add_subdirectory(test/unit_test)
+  add_subdirectory(test/unit_test)
 endif()
 
 #-----------------------------------------------------
+# macOS specific configuration
+
+if(APPLE)
+  #-----------------------------------------------------
+  # ZLIB needs to be explicity required
+
+  find_package(ZLIB REQUIRED)
+endif()
+
+#-----------------------------------------------------
+# CTPL: Modern and efficient C++ Thread Pool Library
 
 include(FetchContent)
 FetchContent_Declare(
@@ -71,21 +81,52 @@ FetchContent_Declare(
   URL https://github.com/vit-vit/CTPL/archive/refs/tags/ctpl_v.0.0.2.zip
 )
 FetchContent_MakeAvailable(ctpl)
+include_directories(${ctpl_SOURCE_DIR})
 
 #-----------------------------------------------------
-# Path for script built AWS SDK
+# AWS SDK for C++
 
-LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/aws_sdk/install")
-
-# Path for system built AWS SDK
+# Paths to search when attempting to find the AWS SDK
+set(AWS_SDK_DIR "${CMAKE_SOURCE_DIR}/aws_sdk/install")
+list(APPEND CMAKE_PREFIX_PATH ${AWS_SDK_DIR})
 string(REPLACE ";" "/aws-cpp-sdk-all;" SYSTEM_MODULE_PATH "${CMAKE_SYSTEM_PREFIX_PATH}/aws-cpp-sdk-all")
 list(APPEND CMAKE_PREFIX_PATH ${SYSTEM_MODULE_PATH})
 
-set(SERVICE_COMPONENTS rds secretsmanager)
-find_package(AWSSDK REQUIRED COMPONENTS ${SERVICE_COMPONENTS})
+find_package(AWSSDK REQUIRED COMPONENTS core rds secretsmanager sts)
+include_directories(${AWSSDK_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${AWSSDK_LINK_LIBRARIES})
 
+set(
+  AWS_SDK_LIBS
+  "aws-c-auth"
+  "aws-c-cal"
+  "aws-c-common"
+  "aws-c-compression"
+  "aws-c-event-stream"
+  "aws-c-http"
+  "aws-c-io"
+  "aws-c-mqtt"
+  "aws-c-s3"
+  "aws-c-sdkutils"
+  "aws-checksums"
+  "aws-crt-cpp"
+  "aws-cpp-sdk-core"
+  "aws-cpp-sdk-sts"
+  "aws-cpp-sdk-rds"
+)
+set(AWS_SDK_LIBRARIES_EXPANDED "")
+foreach(lib ${AWS_SDK_LIBS})
+  if(APPLE)
+    list(APPEND AWS_SDK_LIBRARIES_EXPANDED ${AWS_SDK_DIR}/lib/lib${lib}.a)
+  endif()
+  if(WIN32)
+    list(APPEND AWS_SDK_LIBRARIES_EXPANDED ${AWS_SDK_DIR}/lib/${lib}.lib)
+  endif()
+endforeach()
+message(STATUS "AWS_SDK_LIBRARIES_EXPANDED: ${AWS_SDK_LIBRARIES_EXPANDED}")
+
 #-----------------------------------------------------
+# Google logging library
 
 set("BUILD_TESTING" OFF CACHE INTERNAL "Skip GLOG Tests")
 FetchContent_Declare(
@@ -94,10 +135,26 @@ FetchContent_Declare(
     GIT_TAG        v0.7.0
 )
 FetchContent_MakeAvailable(glog)
+include_directories(${glog_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} glog::glog)
 
 #-----------------------------------------------------
+# Combine static libraries into the target static library
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
-include_directories(${ctpl_SOURCE_DIR})
-include_directories(${glog_SOURCE_DIR})
+if(APPLE)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Combining static libraries into $<TARGET_FILE:${PROJECT_NAME}>"
+    COMMAND libtool -static -o $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:glog::glog>
+  )
+endif()
+
+if(WIN32)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND lib /OUT:$<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:glog::glog> ${AWS_SDK_LIBRARIES_EXPANDED}
+    COMMENT "Packaging additional .lib files into $<TARGET_FILE:${PROJECT_NAME}>"
+)
+endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

@@ -44,7 +44,6 @@ target_link_libraries(
   # External Libaries
   gtest_main
   gmock_main
-  glog::glog
 
   # Source Libaries
   aws-rds-odbc
