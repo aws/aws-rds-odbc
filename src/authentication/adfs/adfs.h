@@ -26,37 +26,43 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
- 
-#include "gtest/gtest.h"
 
-#include <logger_wrapper.h>
+#ifndef __ADFS_H__
+#define __ADFS_H__
 
-int main(int argc, char** argv) {
+#include "../authentication_provider.h"
+#include "../federation.h"
 
-  LOGGER_WRAPPER::initialize();
+#include <map>
+#include <string>
 
-#ifdef WIN32
-#ifdef _DEBUG
-  // Enable CRT for detecting memory leaks
-  _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_FILE);
-  _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
-  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-#endif
-#ifdef __APPLE__
-  // Enable malloc logging for detecting memory leaks.
-  system("export MallocStackLogging=1");
-#endif
-  testing::internal::CaptureStdout();
-  ::testing::InitGoogleTest(&argc, argv);
-  int failures = RUN_ALL_TESTS();
-  std::string output = testing::internal::GetCapturedStdout();
-  std::cout << output << std::endl;
-  std::cout << (failures ? "Not all tests passed." : "All tests passed")
-            << std::endl;
-#ifdef __APPLE__
-  // Disable malloc logging
-  system("unset MallocStackLogging");
-#endif
-  return failures;
-}
+class AdfsCredentialsProvider : public FederationCredentialProvider {
+public:
+    AdfsCredentialsProvider(
+        const FederatedAuthConfig& config,
+        std::shared_ptr<Aws::Http::HttpClient> httpClient,
+        std::shared_ptr<Aws::STS::STSClient> stsClient
+    ): FederationCredentialProvider(config.iam_idp_arn, config.iam_role_arn, httpClient, stsClient), cfg(config) {}
+
+    // constant pattern strings 
+    static const std::string FORM_ACTION_PATTERN;
+    static const std::string SAML_RESPONSE_PATTERN;
+    static const std::string URL_PATTERN;
+    static const std::string INPUT_TAG_PATTERN;
+
+protected:
+    virtual std::string GetSAMLAssertion(std::string& errInfo);
+
+private:
+    std::string getSignInPageUrl();
+    bool validateUrl(const std::string& url);
+    std::string escapeHtmlEntity(const std::string& html);
+    std::vector<std::string> getInputTagsFromHTML(const std::string& body);
+    std::string getValueByKey(const std::string& input, const std::string& key);
+    std::map<std::string, std::string> getParametersFromHtmlBody(std::string& body);
+    std::string getFormActionBody(std::string& url, std::map<std::string, std::string>& params);
+
+    FederatedAuthConfig cfg;
+};
+
+#endif  //__ADFS_H__

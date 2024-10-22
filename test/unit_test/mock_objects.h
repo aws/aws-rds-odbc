@@ -32,6 +32,53 @@
 
 #include <gmock/gmock.h>
 
+#include "federation.h"
+
 // Note that we inherit from the real class and mock only virtual functions.
+
+class MOCK_HTTP_RESP : public Aws::Http::HttpResponse {
+public:
+    MOCK_HTTP_RESP() : Aws::Http::HttpResponse(nullptr){}
+    ~MOCK_HTTP_RESP() override {}
+
+    MOCK_METHOD(Aws::Http::HttpResponseCode, GetResponseCode, (), (const));
+    MOCK_METHOD(std::shared_ptr<Aws::Http::HttpResponse>, MakeRequest, (
+        const std::shared_ptr<Aws::Http::HttpRequest>&), (const));
+    MOCK_METHOD(Aws::IOStream&, GetResponseBody, (), (const));
+    MOCK_METHOD(bool, HasClientError, (), (const));
+    MOCK_METHOD(Aws::String&, GetClientErrorMessage, (), (const));
+
+    // Not used in test, required to instantiate abstract class
+    MOCK_METHOD(Aws::Http::HttpRequest&, GetOriginatingRequest, (), (const));
+    MOCK_METHOD(void, SetOriginatingRequest, (const std::shared_ptr<const Aws::Http::HttpRequest>&), ());
+    MOCK_METHOD(Aws::Http::HeaderValueCollection, GetHeaders, (), (const));
+    MOCK_METHOD(bool, HasHeader, (const char* headerName), (const));
+    MOCK_METHOD(Aws::String&, GetHeader, (const Aws::String& headerName), (const));
+    MOCK_METHOD(void, SetResponseCode, (Aws::Http::HttpResponseCode httpResponseCode), (const));
+    MOCK_METHOD(Aws::String&, GetContentType, (), (const));
+    MOCK_METHOD(Aws::Utils::Stream::ResponseStream&&, SwapResponseStreamOwnership, (), ());
+    MOCK_METHOD(void, AddHeader, (const Aws::String&, const Aws::String&), ());
+    MOCK_METHOD(void, AddHeader, (const Aws::String&, const Aws::String&&), ());
+    MOCK_METHOD(void, SetContentType, (const Aws::String&), ());
+};
+
+class MOCK_HTTP_CLIENT : public Aws::Http::HttpClient {
+public:
+    MOCK_METHOD(std::shared_ptr<Aws::Http::HttpResponse>, MakeRequest, (
+        const std::shared_ptr<Aws::Http::HttpRequest>&), (const));
+
+    // Not used in test, required to instantiate abstract class
+    MOCK_METHOD(std::shared_ptr<Aws::Http::HttpResponse>, MakeRequest, (
+        const std::shared_ptr<Aws::Http::HttpRequest>&,
+        Aws::Utils::RateLimits::RateLimiterInterface*,
+        Aws::Utils::RateLimits::RateLimiterInterface*), (const));
+    MOCK_METHOD(bool, SupportsChunkedTransferEncoding, (), (const));
+};
+
+class MOCK_STS_CLIENT : public Aws::STS::STSClient {
+public:
+    MOCK_METHOD(Aws::STS::Model::AssumeRoleWithSAMLOutcome, AssumeRoleWithSAML, (const Aws::STS::Model::AssumeRoleWithSAMLRequest&), (const));
+    MOCK_METHOD(bool, SupportsChunkedTransferEncoding, (), (const));
+};
 
 #endif /* __MOCKOBJECTS_H__ */

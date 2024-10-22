@@ -31,6 +31,8 @@ add_executable(
   mock_objects.h
 
   # Test Suites
+  adfs_test.cc
+  authentication_provider_test.cc
   cluster_topology_info_test.cc
   host_info_test.cc
 )

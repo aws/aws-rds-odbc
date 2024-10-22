@@ -26,37 +26,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
- 
-#include "gtest/gtest.h"
 
-#include <logger_wrapper.h>
+#ifndef __FEDERATION_H__
+#define __FEDERATION_H__
 
-int main(int argc, char** argv) {
+#include <aws/core/Aws.h>
+#include <aws/core/auth/AWSCredentials.h>
+#include <aws/core/http/HttpClient.h>
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
+#include <aws/sts/STSClient.h>
 
-  LOGGER_WRAPPER::initialize();
+class FederationCredentialProvider {
+public:
+    FederationCredentialProvider(const std::string& idpArn, const std::string& roleArn,
+        std::shared_ptr<Aws::Http::HttpClient> httpClient, std::shared_ptr<Aws::STS::STSClient> stsClient)
+        : idpArn(idpArn), roleArn(roleArn), httpClient(httpClient), stsClient(stsClient) {}
 
-#ifdef WIN32
-#ifdef _DEBUG
-  // Enable CRT for detecting memory leaks
-  _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_FILE);
-  _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
-  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-#endif
-#ifdef __APPLE__
-  // Enable malloc logging for detecting memory leaks.
-  system("export MallocStackLogging=1");
-#endif
-  testing::internal::CaptureStdout();
-  ::testing::InitGoogleTest(&argc, argv);
-  int failures = RUN_ALL_TESTS();
-  std::string output = testing::internal::GetCapturedStdout();
-  std::cout << output << std::endl;
-  std::cout << (failures ? "Not all tests passed." : "All tests passed")
-            << std::endl;
-#ifdef __APPLE__
-  // Disable malloc logging
-  system("unset MallocStackLogging");
-#endif
-  return failures;
-}
+    bool GetAWSCredentials(Aws::Auth::AWSCredentials& credentials);
+
+protected:
+    virtual std::string GetSAMLAssertion(std::string& errInfo) = 0;
+
+    bool FetchCredentialsWithSAMLAssertion(Aws::STS::Model::AssumeRoleWithSAMLRequest& samlRequest,
+        Aws::Auth::AWSCredentials& credentials);
+
+    std::string idpArn;
+    std::string roleArn;
+    std::shared_ptr<Aws::Http::HttpClient> httpClient;
+    std::shared_ptr<Aws::STS::STSClient> stsClient;
+};
+
+#endif  //__FEDERATION_H__

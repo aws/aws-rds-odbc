@@ -38,6 +38,12 @@ set(SRC
   # Failover
   src/failover/cluster_topology_info.cc
   src/failover/host_info.cc
+
+  # Authentication
+  src/authentication/authentication_provider.cc
+  src/authentication/federation.cc
+  # ADFS
+  src/authentication/adfs/adfs.cc
 )
 
 set(INC
@@ -47,10 +53,17 @@ set(INC
   # Failover
   src/failover/cluster_topology_info.h
   src/failover/host_info.h
+
+  # Authentication
+  src/authentication/authentication_provider.h
+  src/authentication/federation.h
+  # ADFS
+  src/authentication/adfs/adfs.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories("${CMAKE_SOURCE_DIR}/src/authentication")
 include_directories("${CMAKE_SOURCE_DIR}/src/failover")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")
 
