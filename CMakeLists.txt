@@ -158,7 +158,7 @@ if(APPLE)
   add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E echo "Combining static libraries into $<TARGET_FILE:${PROJECT_NAME}>"
-    COMMAND libtool -static -o $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:glog::glog>
+    COMMAND libtool -static -o $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:glog::glog> ${AWS_SDK_LIBRARIES_EXPANDED}
   )
 endif()
 

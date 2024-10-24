@@ -34,7 +34,6 @@ void LOGGER_WRAPPER::initialize() {
     if (!instance.init) {
         FLAGS_stderrthreshold = 4; // Disable console output
         FLAGS_timestamp_in_logfile_name = false;
-        FLAGS_log_file_header = false;
         instance.set_log_directory(LOGGER_CONFIG::LOG_LOCATION);
         google::InitGoogleLogging(LOGGER_CONFIG::PROGRAM_NAME.c_str());
         instance.init = true;

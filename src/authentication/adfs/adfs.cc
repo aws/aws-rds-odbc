@@ -29,7 +29,9 @@
 
 #include "adfs.h"
 
+#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
+#endif
 
 #include <regex>
 #include <unordered_set>
@@ -41,7 +43,9 @@ const std::string AdfsCredentialsProvider::INPUT_TAG_PATTERN = "<input id=(.*)";
 
 std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& errInfo) {
     std::string url = getSignInPageUrl();
+    #ifndef XCODE_BUILD
     LOG(INFO) << "Got ADFS URL: " << url;
+    #endif
 
     std::shared_ptr<Aws::Http::HttpRequest> req = Aws::Http::CreateHttpRequest(url, Aws::Http::HttpMethod::HTTP_GET, Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
     std::shared_ptr<Aws::Http::HttpResponse> response = httpClient->MakeRequest(req);
@@ -49,7 +53,9 @@ std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& errInfo) {
     std::string retval("");
     // check response code
     if (response->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
+        #ifndef XCODE_BUILD
         LOG(WARNING) << "ADFS request returned bad HTTP response code: " << response->GetResponseCode();
+        #endif
         errInfo = "Adfs signOnPageRequest failed.";
         if (response->HasClientError()) {
             errInfo += "Client error: '" + response->GetClientErrorMessage() + "'.";
@@ -59,7 +65,9 @@ std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& errInfo) {
 
     std::istreambuf_iterator<char> eos;
     std::string body(std::istreambuf_iterator<char>(response->GetResponseBody().rdbuf()), eos);
+    #ifndef XCODE_BUILD
     DLOG(INFO) << "Signout response body: " << body;
+    #endif
 
     // retrieve SAMLResponse value
     std::smatch matches;
@@ -78,16 +86,22 @@ std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& errInfo) {
         url += std::string(cfg.idp_port);
         url += action;
     }
+    #ifndef XCODE_BUILD
     DLOG(INFO) << "Updated URL [" << url << "] using Action [" << action << "]";
+    #endif
 
     std::map<std::string, std::string> params = getParametersFromHtmlBody(body);
     std::string content = getFormActionBody(url, params);
 
     if (std::regex_search(content, matches, std::regex(SAML_RESPONSE_PATTERN))) {
+        #ifndef XCODE_BUILD
         DLOG(INFO) << "SAML Response: " << matches.str(1);
+        #endif
         return matches.str(1);
     } else {
+        #ifndef XCODE_BUILD
         LOG(WARNING) << "Failed SAML Asesertion";
+        #endif
         return retval;
     }
 }
@@ -106,15 +120,19 @@ bool AdfsCredentialsProvider::validateUrl(const std::string& url) {
     std::regex pattern(URL_PATTERN);
 
     if (!regex_match(url, pattern)) {
+        #ifndef XCODE_BUILD
         LOG(WARNING) << "Invalid URL, failed to match ADFS URL pattern";
-        return false; 
+        #endif
+        return false;
     }
     return true;
 }
 
 std::string AdfsCredentialsProvider::escapeHtmlEntity(const std::string& html) {
     std::string retval("");
+    #ifndef XCODE_BUILD
     DLOG(INFO) << "Before HTML escape modification: " << html;
+    #endif
     int i = 0;
     int length = html.length();
     while (i < length) {
@@ -145,7 +163,9 @@ std::string AdfsCredentialsProvider::escapeHtmlEntity(const std::string& html) {
             ++i;
         }
     }
+    #ifndef XCODE_BUILD
     DLOG(INFO) << "After HTML escape modification: " << html;
+    #endif
     return retval;
 }
 
@@ -159,20 +179,26 @@ std::vector<std::string> AdfsCredentialsProvider::getInputTagsFromHTML(const std
     while (std::regex_search(source,matches,pattern)) {
         std::string tag = matches.str(0);
         std::string tagName = getValueByKey(tag, std::string("name"));
+        #ifndef XCODE_BUILD
         DLOG(INFO) << "Tag [" << tag << "], Tag Name [" << tagName << "]";
+        #endif
         std::transform(tagName.begin(), tagName.end(), tagName.begin(), [](unsigned char c) {
             return std::tolower(c);
         });
         if (!tagName.empty() && hashSet.find(tagName) == hashSet.end()) {
             hashSet.insert(tagName);
             retval.push_back(tag);
+            #ifndef XCODE_BUILD
             DLOG(INFO) << "Saved inputTag: " << tag;
+            #endif
         }
 
         source = matches.suffix().str();
     }
 
+    #ifndef XCODE_BUILD
 	DLOG(INFO) << "Input tags vector size: " << retval.size();
+    #endif
     return retval;
 }
 
@@ -194,7 +220,9 @@ std::map<std::string, std::string> AdfsCredentialsProvider::getParametersFromHtm
     for (auto& inputTag : getInputTagsFromHTML(body)) {
         std::string name = getValueByKey(inputTag, std::string("name"));
         std::string value = getValueByKey(inputTag, std::string("value"));
+        #ifndef XCODE_BUILD
         DLOG(INFO) << "Input Tag [" << inputTag << "], Name [" << name << "], Value [" << value << "]";
+        #endif
         std::string nameLower = name;
         std::transform(nameLower.begin(), nameLower.end(), nameLower.begin(), [](unsigned char c) {
             return std::tolower(c);
@@ -213,10 +241,12 @@ std::map<std::string, std::string> AdfsCredentialsProvider::getParametersFromHtm
         }
     }
 
+    #ifndef XCODE_BUILD
     DLOG(INFO) << "parameters size: " << parameters.size();
     for (auto& itr : parameters) {
         DLOG(INFO) << "Parameter Key [" << itr.first << "], Value Size [" << itr.second.size() << "]";
     }
+    #endif
 
     return parameters;
 }
@@ -245,9 +275,13 @@ std::string AdfsCredentialsProvider::getFormActionBody(std::string& url, std::ma
     // check response code
     std::shared_ptr< Aws::Http::HttpResponse > response = httpClient->MakeRequest(req);
     if (response->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
+        #ifndef XCODE_BUILD
         LOG(WARNING) << "ADFS request returned bad HTTP response code: " << response->GetResponseCode();
+        #endif
         if (response->HasClientError()) {
+            #ifndef XCODE_BUILD
             LOG(WARNING) << "HTTP Client Error: " << response->GetClientErrorMessage();
+            #endif
         }
         return "";
     }

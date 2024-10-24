@@ -89,15 +89,13 @@ jobs:
         working-directory: ./scripts
         if: steps.cache-static-aws-sdk.outputs.cache-hit != 'true'
         run: |
-          ./build_aws_sdk_unix.sh $BUILD_TYPE
+          ./build_aws_sdk_macos Release
 
       - name: Create build environment
         run: cmake -E make_directory ${{ github.workspace }}/build
 
       - name: Configure CMake
-        run: cmake -S . -B build
-          -G "$CMAKE_GENERATOR"
-          -DENABLE_UNIT_TESTS=TRUE
+        run: cmake -S . -B build -DENABLE_UNIT_TESTS=TRUE
 
       - name: Build Project
         run: cmake --build build --config $BUILD_TYPE

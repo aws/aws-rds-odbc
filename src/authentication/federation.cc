@@ -29,7 +29,9 @@
 
 #include "federation.h"
 
+#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
+#endif
 
 bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
     Aws::STS::Model::AssumeRoleWithSAMLRequest& samlRequest,
@@ -41,8 +43,9 @@ bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
     if (outcome.IsSuccess()) {
         const Aws::STS::Model::Credentials& credentials = outcome.GetResult().GetCredentials();
 
-        LOG(INFO) << "Access key is " << credentials.GetAccessKeyId().c_str() <<
-            ", secret key length is " << credentials.GetSecretAccessKey().size();
+        #ifndef XCODE_BUILD
+        LOG(INFO) << "Access key is " << credentials.GetAccessKeyId().c_str() << ", secret key length is " << credentials.GetSecretAccessKey().size();
+        #endif
 
         awsCredentials.SetAWSAccessKeyId(credentials.GetAccessKeyId());
         awsCredentials.SetAWSSecretKey(credentials.GetSecretAccessKey());
@@ -53,7 +56,9 @@ bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
         auto error = outcome.GetError();
         std::string errInfo = "Failed to fetch credentials, ERROR: " + error.GetExceptionName()
             + ": " + error.GetMessage();
+        #ifndef XCODE_BUILD
         LOG(ERROR) << "errInfo in FetchCredentialsWithSAMLAssertion is " << errInfo.c_str();
+        #endif
     }
 
     return retval;
@@ -65,9 +70,13 @@ bool FederationCredentialProvider::GetAWSCredentials(Aws::Auth::AWSCredentials& 
 
     bool retval = false;
     if (samlAsseration.empty()) {
+        #ifndef XCODE_BUILD
         LOG(ERROR) << "errInfo in GetAWSCredentials is " << errInfo.c_str();
+        #endif
     } else {
+        #ifndef XCODE_BUILD
         LOG(INFO) << "samlAsseration is " << samlAsseration.c_str();
+        #endif
 
         Aws::STS::Model::AssumeRoleWithSAMLRequest samlRequest;
         samlRequest.WithRoleArn(roleArn)

@@ -77,7 +77,7 @@ class AdfsTest : public testing::Test {
     }
     void TearDown() override {}
 
-    void GetStdAdfsCfg(FederatedAuthConfig cfg) {
+    void GetStdAdfsCfg(FederatedAuthConfig& cfg) {
         strcpy(cfg.idp_endpoint, idp_endpoint);
         strcpy(cfg.idp_port, idp_port);
         strcpy(cfg.relaying_party_id, relaying_party_id);
@@ -189,7 +189,7 @@ TEST_F(AdfsTest, GetAWSCredentials_BadRequest_ActionBody) {
 // Disabling for now. 
 // Fails on GH Actions on both Windows & MacOs
 // Passes locally
-TEST_F(AdfsTest, DISABLED_GetAWSCredentials_BadSamlResponse) {
+TEST_F(AdfsTest, GetAWSCredentials_BadSamlResponse) {
     std::shared_ptr<MOCK_HTTP_RESP> resp;
     resp = std::make_shared<MOCK_HTTP_RESP>();
     EXPECT_CALL(*resp, GetResponseCode())

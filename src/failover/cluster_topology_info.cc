@@ -42,8 +42,10 @@ int get_random_number() {
 }
 
 CLUSTER_TOPOLOGY_INFO::CLUSTER_TOPOLOGY_INFO() {
+    #ifndef XCODE_BUILD
     LOGGER_WRAPPER::initialize();
     DLOG(INFO) << "Constructor";
+    #endif
     update_time();
 }
 
@@ -61,7 +63,9 @@ CLUSTER_TOPOLOGY_INFO::CLUSTER_TOPOLOGY_INFO(const CLUSTER_TOPOLOGY_INFO& src_in
 }
 
 CLUSTER_TOPOLOGY_INFO::~CLUSTER_TOPOLOGY_INFO() {
+    #ifndef XCODE_BUILD
     DLOG(INFO) << "Deconstructor";
+    #endif
     for (auto p : writers) {
         p.reset();
     }
@@ -76,9 +80,9 @@ CLUSTER_TOPOLOGY_INFO::~CLUSTER_TOPOLOGY_INFO() {
 void CLUSTER_TOPOLOGY_INFO::add_host(std::shared_ptr<HOST_INFO> host_info) {
     host_info->is_host_writer() ? writers.push_back(host_info) : readers.push_back(host_info);
     update_time();
-    DLOG(INFO) << (host_info->is_host_writer() ? "Writer" : "Reader" )
-        << ", " << host_info->get_host_port_pair() 
-        << " added to cluster topology.";
+    #ifndef XCODE_BUILD
+    DLOG(INFO) << (host_info->is_host_writer() ? "Writer" : "Reader" ) << ", " << host_info->get_host_port_pair() << " added to cluster topology.";
+    #endif
 }
 
 size_t CLUSTER_TOPOLOGY_INFO::total_hosts() {
@@ -100,7 +104,9 @@ void CLUSTER_TOPOLOGY_INFO::update_time() {
 
 std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_writer() {
     if (writers.empty()) {
+        #ifndef XCODE_BUILD
         LOG(ERROR) << "No writer available in cluster topology.";
+        #endif
         throw std::runtime_error("No writer available");
     }
 
@@ -110,7 +116,9 @@ std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_writer() {
 std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_next_reader() {
     size_t num_readers = readers.size();
     if (readers.empty()) {
+        #ifndef XCODE_BUILD
         LOG(ERROR) << "No reader available in cluster topology.";
+        #endif
         throw std::runtime_error("No reader available");
     }
 

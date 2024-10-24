@@ -29,11 +29,15 @@
  
 #include "gtest/gtest.h"
 
+#ifndef XCODE_BUILD
 #include <logger_wrapper.h>
+#endif
 
 int main(int argc, char** argv) {
 
+  #ifndef XCODE_BUILD
   LOGGER_WRAPPER::initialize();
+  #endif
 
 #ifdef WIN32
 #ifdef _DEBUG

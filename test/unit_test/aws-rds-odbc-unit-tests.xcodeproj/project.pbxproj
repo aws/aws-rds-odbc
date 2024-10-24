@@ -1,0 +1,393 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		734B1D382CC97CF900FB6683 /* libaws-rds-odbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D372CC97C4400FB6683 /* libaws-rds-odbc.a */; };
+		734B1D412CC97FA800FB6683 /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3C2CC97FA800FB6683 /* authentication_provider_test.cc */; };
+		734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3E2CC97FA800FB6683 /* host_info_test.cc */; };
+		734B1D432CC97FA800FB6683 /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3D2CC97FA800FB6683 /* cluster_topology_info_test.cc */; };
+		734B1D442CC97FA800FB6683 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3F2CC97FA800FB6683 /* main.cc */; };
+		734B1D452CC97FA800FB6683 /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3B2CC97FA800FB6683 /* adfs_test.cc */; };
+		734B1D4C2CC994FA00FB6683 /* libgmock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D4A2CC994FA00FB6683 /* libgmock.a */; };
+		734B1D4D2CC994FA00FB6683 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D4B2CC994FA00FB6683 /* libgtest.a */; };
+		734B1D562CCA68D900FB6683 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D462CC994B200FB6683 /* libz.tbd */; };
+		734B1D572CCA68E100FB6683 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D482CC994B800FB6683 /* libcurl.tbd */; };
+		73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */; };
+		73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9EF2CC92FD5005B92C0 /* Security.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		734B1D362CC97C4400FB6683 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 73D7880E2CC915A60028B42F;
+			remoteInfo = "aws-rds-odbc";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		73BD677A2CC92229000817A9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "../../aws-rds-odbc.xcodeproj"; sourceTree = "<group>"; };
+		734B1D3B2CC97FA800FB6683 /* adfs_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs_test.cc; sourceTree = "<group>"; };
+		734B1D3C2CC97FA800FB6683 /* authentication_provider_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = authentication_provider_test.cc; sourceTree = "<group>"; };
+		734B1D3D2CC97FA800FB6683 /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
+		734B1D3E2CC97FA800FB6683 /* host_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = host_info_test.cc; sourceTree = "<group>"; };
+		734B1D3F2CC97FA800FB6683 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		734B1D402CC97FA800FB6683 /* mock_objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mock_objects.h; sourceTree = "<group>"; };
+		734B1D462CC994B200FB6683 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		734B1D482CC994B800FB6683 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
+		734B1D4A2CC994FA00FB6683 /* libgmock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgmock.a; path = ../../../../../../../../../opt/homebrew/Cellar/googletest/1.15.2/lib/libgmock.a; sourceTree = "<group>"; };
+		734B1D4B2CC994FA00FB6683 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = ../../../../../../../../../opt/homebrew/Cellar/googletest/1.15.2/lib/libgtest.a; sourceTree = "<group>"; };
+		734B1D5B2CCA709300FB6683 /* libglog.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglog.a; path = ../../../../../glog/build/libglog.a; sourceTree = "<group>"; };
+		73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "aws-rds-odbc-unit-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
+		73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		73CFD9EF2CC92FD5005B92C0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		73BD67792CC92229000817A9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */,
+				73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */,
+				734B1D382CC97CF900FB6683 /* libaws-rds-odbc.a in Frameworks */,
+				734B1D562CCA68D900FB6683 /* libz.tbd in Frameworks */,
+				734B1D572CCA68E100FB6683 /* libcurl.tbd in Frameworks */,
+				734B1D4D2CC994FA00FB6683 /* libgtest.a in Frameworks */,
+				734B1D4C2CC994FA00FB6683 /* libgmock.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		734B1D332CC97C4400FB6683 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				734B1D372CC97C4400FB6683 /* libaws-rds-odbc.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		73BD67732CC92229000817A9 = {
+			isa = PBXGroup;
+			children = (
+				734B1D3B2CC97FA800FB6683 /* adfs_test.cc */,
+				734B1D3C2CC97FA800FB6683 /* authentication_provider_test.cc */,
+				734B1D3D2CC97FA800FB6683 /* cluster_topology_info_test.cc */,
+				734B1D3E2CC97FA800FB6683 /* host_info_test.cc */,
+				734B1D3F2CC97FA800FB6683 /* main.cc */,
+				734B1D402CC97FA800FB6683 /* mock_objects.h */,
+				73CFD9EC2CC92FA0005B92C0 /* Frameworks */,
+				73BD677D2CC92229000817A9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		73BD677D2CC92229000817A9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		73CFD9EC2CC92FA0005B92C0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				734B1D5B2CCA709300FB6683 /* libglog.a */,
+				734B1D4A2CC994FA00FB6683 /* libgmock.a */,
+				734B1D4B2CC994FA00FB6683 /* libgtest.a */,
+				734B1D482CC994B800FB6683 /* libcurl.tbd */,
+				734B1D462CC994B200FB6683 /* libz.tbd */,
+				734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */,
+				73CFD9EF2CC92FD5005B92C0 /* Security.framework */,
+				73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		73BD677B2CC92229000817A9 /* aws-rds-odbc-unit-tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 73BD67832CC92229000817A9 /* Build configuration list for PBXNativeTarget "aws-rds-odbc-unit-tests" */;
+			buildPhases = (
+				73BD67782CC92229000817A9 /* Sources */,
+				73BD67792CC92229000817A9 /* Frameworks */,
+				73BD677A2CC92229000817A9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "aws-rds-odbc-unit-tests";
+			packageProductDependencies = (
+			);
+			productName = "aws-rds-odbc-unit-tests";
+			productReference = 73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		73BD67742CC92229000817A9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					73BD677B2CC92229000817A9 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 73BD67772CC92229000817A9 /* Build configuration list for PBXProject "aws-rds-odbc-unit-tests" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 73BD67732CC92229000817A9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 73BD677D2CC92229000817A9 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 734B1D332CC97C4400FB6683 /* Products */;
+					ProjectRef = 734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				73BD677B2CC92229000817A9 /* aws-rds-odbc-unit-tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		734B1D372CC97C4400FB6683 /* libaws-rds-odbc.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libaws-rds-odbc.a";
+			remoteRef = 734B1D362CC97C4400FB6683 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXSourcesBuildPhase section */
+		73BD67782CC92229000817A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				734B1D412CC97FA800FB6683 /* authentication_provider_test.cc in Sources */,
+				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
+				734B1D432CC97FA800FB6683 /* cluster_topology_info_test.cc in Sources */,
+				734B1D442CC97FA800FB6683 /* main.cc in Sources */,
+				734B1D452CC97FA800FB6683 /* adfs_test.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		73BD67812CC92229000817A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		73BD67822CC92229000817A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		73BD67842CC92229000817A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GCC_PREPROCESSOR_DEFINITIONS = XCODE_BUILD;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/**",
+					"$(SRCROOT)/../../aws_sdk/install/include",
+					/opt/homebrew/opt/glog/include,
+					/opt/homebrew/opt/gflags/include,
+					/opt/homebrew/opt/googletest/include,
+				);
+				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/googletest/lib;
+				OBJROOT = "$(SRCROOT)/xcode-build";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "$(SRCROOT)/xcode-build";
+			};
+			name = Debug;
+		};
+		73BD67852CC92229000817A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GCC_PREPROCESSOR_DEFINITIONS = XCODE_BUILD;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/**",
+					"$(SRCROOT)/../../aws_sdk/install/include",
+					/opt/homebrew/opt/glog/include,
+					/opt/homebrew/opt/gflags/include,
+					/opt/homebrew/opt/googletest/include,
+				);
+				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/googletest/lib;
+				OBJROOT = "$(SRCROOT)/xcode-build";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "$(SRCROOT)/xcode-build";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		73BD67772CC92229000817A9 /* Build configuration list for PBXProject "aws-rds-odbc-unit-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73BD67812CC92229000817A9 /* Debug */,
+				73BD67822CC92229000817A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		73BD67832CC92229000817A9 /* Build configuration list for PBXNativeTarget "aws-rds-odbc-unit-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73BD67842CC92229000817A9 /* Debug */,
+				73BD67852CC92229000817A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 73BD67742CC92229000817A9 /* Project object */;
+}

@@ -31,7 +31,9 @@
 
 #include "adfs/adfs.h"
 
+#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
+#endif
 
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
@@ -79,8 +81,10 @@ Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig
     switch (type) {
         case ADFS: {
             if (!ValidateAdfsConf(config)) {
+                #ifndef XCODE_BUILD
                 LOG(ERROR) << "Configuration for " << FEDERATEDAUTHTYPE_STRING[type] << " is invalid/incomplete.";
-                return nullptr;                
+                #endif
+                return nullptr;
             };
             Aws::Client::ClientConfiguration httpClientCfg;
             httpClientCfg.requestTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 3000;
@@ -90,7 +94,9 @@ Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig
             std::shared_ptr<Aws::STS::STSClient> stsClient = std::make_shared<Aws::STS::STSClient>();
             AdfsCredentialsProvider adfs(config, httpClient, stsClient);
             if (!adfs.GetAWSCredentials(credentials)) {
+                #ifndef XCODE_BUILD
                 LOG(ERROR) << FEDERATEDAUTHTYPE_STRING[type] << " provider failed to get valid credentials.";
+                #endif
                 return nullptr;
             }
             break;
@@ -103,7 +109,9 @@ Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig
         case OKTA:
             // Fallthru, not implemented
         default:
+            #ifndef XCODE_BUILD
             LOG(ERROR) << FEDERATEDAUTHTYPE_STRING[type] << " is not a valid authentication type.";
+            #endif
             return nullptr;
     }
     Aws::RDS::RDSClientConfiguration rdsClientCfg;
@@ -141,7 +149,9 @@ void GenKeyAndTime(const char* dbHostName, const char* dbRegion, const char* por
 bool UpdateTokenValue(char* token, const int maxSize, const char* newValue) {
     int newTokenSize = strlen(newValue);
     if (maxSize - 1 < newTokenSize) {
+        #ifndef XCODE_BUILD
         LOG(WARNING) << "New token does not fit into allocated token";
+        #endif
         return false;
     }
 
@@ -172,11 +182,15 @@ bool GetCachedToken(char* token, const int maxSize, const char* dbHostName, cons
 
     auto itr = cachedTokens.find(key);
     if (itr == cachedTokens.end() || currentTimeInSeconds > itr->second.expiration) {
+        #ifndef XCODE_BUILD
         LOG(WARNING) << "No cached token";
+        #endif
         return false;
     } else {
         int tokenSize = itr->second.token.size();
+        #ifndef XCODE_BUILD
         LOG(INFO) << "Token size is " << tokenSize;
+        #endif
         return UpdateTokenValue(token, maxSize, itr->second.token.c_str());
     }
 }
@@ -194,13 +208,17 @@ void UpdateCachedToken(const char* dbHostName, const char* dbRegion, const char*
 
 bool GenerateConnectAuthToken(char* token, const int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config) {
     // TODO - Need to move logger initializer to a central location
+    #ifndef XCODE_BUILD
     LOGGER_WRAPPER::initialize();
+    #endif
     if (1 == ++sdkRefCount) {
         std::lock_guard<std::mutex> lock(sdkMutex);
         Aws::InitAPI(sdkOptions);
     }
 
+    #ifndef XCODE_BUILD
     LOG(INFO) << "Generating token for " << FEDERATEDAUTHTYPE_STRING[type];
+    #endif
 
     Aws::RDS::RDSClient* client = CreateRDSClient(type, config);
     if (!client) {
@@ -212,7 +230,9 @@ bool GenerateConnectAuthToken(char* token, const int maxSize, const char* dbHost
     FreeAwsResource(client);
 
     int tokenSize = newToken.size();
-    LOG(INFO) << "RDS Client generated token length is " << tokenSize;    
+    #ifndef XCODE_BUILD
+    LOG(INFO) << "RDS Client generated token length is " << tokenSize;
+    #endif
     return UpdateTokenValue(token, maxSize, newToken.c_str());
 }
 
