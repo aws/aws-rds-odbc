@@ -145,7 +145,7 @@ set("BUILD_TESTING" OFF CACHE INTERNAL "Skip GLOG Tests")
 FetchContent_Declare(
     glog
     GIT_REPOSITORY https://github.com/google/glog.git
-    GIT_TAG        v0.7.0
+    GIT_TAG        v0.7.1
 )
 FetchContent_MakeAvailable(glog)
 include_directories(${glog_SOURCE_DIR})
