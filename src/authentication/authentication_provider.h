@@ -30,6 +30,10 @@
 #ifndef __AUTHENTICATION_PROVIDER_H__
 #define __AUTHENTICATION_PROVIDER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // TODO - Limits here are based on PgSQL
 #define LARGE_REGISTRY_LEN          4096
 #define MEDIUM_REGISTRY_LEN         1024
@@ -66,15 +70,20 @@ typedef struct {
     char ssl_insecure[SMALL_REGISTRY_LEN];
 } FederatedAuthConfig;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef struct Credentials {
+    char *username;
+    char *password;
+    unsigned int username_size;
+    unsigned int password_size;
+} Credentials;
 
 FederatedAuthType GetFedAuthTypeEnum(const char *str);
 
-bool GetCachedToken(char* token, const int maxSize, const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName);
+bool GetCachedToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName);
 void UpdateCachedToken(const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName, const char* token, const char* expirationTime);
-bool GenerateConnectAuthToken(char* token, const int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config);
+bool GenerateConnectAuthToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config);
+
+bool GetCredentialsFromSecretsManager(const char *secretId, const char *region, Credentials *credentials);
 
 #ifdef __cplusplus
 }

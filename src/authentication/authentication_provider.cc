@@ -31,6 +31,8 @@
 
 #include "adfs/adfs.h"
 
+#include "secrets_manager_helper.h"
+
 #ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
 #endif
@@ -118,16 +120,20 @@ Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig
     return new Aws::RDS::RDSClient(credentials, rdsClientCfg);
 }
 
+void ShutdownAwsAPI(void) {
+    if (0 == --sdkRefCount) {
+        std::lock_guard<std::mutex> lock(sdkMutex);
+        Aws::ShutdownAPI(sdkOptions);
+    }
+}
+
 void FreeAwsResource(Aws::RDS::RDSClient* client) {
     if (client) {
         delete static_cast<Aws::RDS::RDSClient*>(client);
     }
 
     // Shut down AWS API
-    if (0 == --sdkRefCount) {
-        std::lock_guard<std::mutex> lock(sdkMutex);
-        Aws::ShutdownAPI(sdkOptions);
-    }
+    ShutdownAwsAPI();
 }
 
 void GenKeyAndTime(const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName, std::string& key, long& currentTimeInSeconds) {
@@ -146,7 +152,7 @@ void GenKeyAndTime(const char* dbHostName, const char* dbRegion, const char* por
     currentTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(currentTimePoint.time_since_epoch()).count();
 }
 
-bool UpdateTokenValue(char* token, const int maxSize, const char* newValue) {
+bool UpdateTokenValue(char* token, const unsigned int maxSize, const char* newValue) {
     int newTokenSize = strlen(newValue);
     if (maxSize - 1 < newTokenSize) {
         #ifndef XCODE_BUILD
@@ -160,10 +166,6 @@ bool UpdateTokenValue(char* token, const int maxSize, const char* newValue) {
     return true;
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 FederatedAuthType GetFedAuthTypeEnum(const char *str) {
     std::string upperStr(str);
     std::transform(upperStr.begin(), upperStr.end(), upperStr.begin(), ::toupper);
@@ -175,7 +177,7 @@ FederatedAuthType GetFedAuthTypeEnum(const char *str) {
     return INVALID;
 }
 
-bool GetCachedToken(char* token, const int maxSize, const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName) {
+bool GetCachedToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName) {
     std::string key("");
     long currentTimeInSeconds = 0;
     GenKeyAndTime(dbHostName, dbRegion, port, dbUserName, key, currentTimeInSeconds);
@@ -206,7 +208,7 @@ void UpdateCachedToken(const char* dbHostName, const char* dbRegion, const char*
     cachedTokens[key] = ti;
 }
 
-bool GenerateConnectAuthToken(char* token, const int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config) {
+bool GenerateConnectAuthToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config) {
     // TODO - Need to move logger initializer to a central location
     #ifndef XCODE_BUILD
     LOGGER_WRAPPER::initialize();
@@ -236,6 +238,33 @@ bool GenerateConnectAuthToken(char* token, const int maxSize, const char* dbHost
     return UpdateTokenValue(token, maxSize, newToken.c_str());
 }
 
-#ifdef __cplusplus
+
+bool GetCredentialsFromSecretsManager(const char *secretId, const char *region, Credentials *credentials) {
+    if (1 == ++sdkRefCount) {
+        std::lock_guard<std::mutex> lock(sdkMutex);
+        Aws::InitAPI(sdkOptions);
+    }
+
+    std::string regionStr = region;
+    
+    if (regionStr.empty() && !SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(secretId, regionStr)) {
+        regionStr = Aws::Region::US_EAST_1;
+    }
+
+    // configure the secrets manager client according to the region determined
+    Aws::SecretsManager::SecretsManagerClientConfiguration smClientConfig;
+    smClientConfig.region = regionStr;
+    std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> smClient = std::make_shared<Aws::SecretsManager::SecretsManagerClient>(smClientConfig);
+
+    SECRETS_MANAGER_HELPER smHelper(smClient);
+    bool isSuccess = smHelper.FetchCredentials(secretId);
+    ShutdownAwsAPI(); // done using the AWS API
+
+    // don't copy any memory if there was a failure fetching the credentials
+    if (!isSuccess) {
+        return false;
+    }
+
+    return UpdateTokenValue(credentials->username, credentials->username_size, smHelper.GetUsername().c_str())
+        && UpdateTokenValue(credentials->password, credentials->password_size, smHelper.GetPassword().c_str());
 }
-#endif

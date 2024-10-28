@@ -35,6 +35,7 @@ add_executable(
 
   authentication/authentication_provider_test.cc
   authentication/adfs/adfs_test.cc
+  authentication/secrets_manager_helper_test.cc
 
   failover/cluster_topology_info_test.cc
 

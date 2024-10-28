@@ -37,6 +37,7 @@ set(SRC
   src/authentication/adfs/adfs.cc
   src/authentication/authentication_provider.cc
   src/authentication/federation.cc
+  src/authentication/secrets_manager_helper.cc
 
   src/failover/cluster_topology_info.cc
 
@@ -51,6 +52,7 @@ set(INC
   src/authentication/adfs/adfs.h
   src/authentication/authentication_provider.h
   src/authentication/federation.h
+  src/authentication/secrets_manager_helper.h
 
   src/failover/cluster_topology_info.h
 
@@ -127,6 +129,7 @@ set(
   "aws-cpp-sdk-core"
   "aws-cpp-sdk-sts"
   "aws-cpp-sdk-rds"
+  "aws-cpp-sdk-secretsmanager"
 )
 set(AWS_SDK_LIBRARIES_EXPANDED "")
 foreach(lib ${AWS_SDK_LIBS})
