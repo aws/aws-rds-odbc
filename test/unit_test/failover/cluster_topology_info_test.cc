@@ -55,17 +55,17 @@ class ClusterTopologyInfoTest : public testing::Test {
 };
 
 TEST_F(ClusterTopologyInfoTest, getNextWriter) {
-  std::shared_ptr<HOST_INFO> writer_host_info =
-    std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, true, simpleHostAvailabilityStrategy);
-  std::shared_ptr<HOST_INFO> reader_host_info_a =
-    std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
-  std::shared_ptr<HOST_INFO> reader_host_info_b =
-    std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
+  std::shared_ptr<HostInfo> writer_host_info =
+    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, true, simpleHostAvailabilityStrategy);
+  std::shared_ptr<HostInfo> reader_host_info_a =
+    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
+  std::shared_ptr<HostInfo> reader_host_info_b =
+    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
   std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
   cluster_topology_info->add_host(writer_host_info);
   cluster_topology_info->add_host(reader_host_info_a);
   cluster_topology_info->add_host(reader_host_info_b);
-  std::shared_ptr<HOST_INFO> host_info = cluster_topology_info->get_writer();
+  std::shared_ptr<HostInfo> host_info = cluster_topology_info->get_writer();
   EXPECT_EQ(writer_host_info, host_info);
 }
 

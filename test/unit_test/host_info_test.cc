@@ -47,13 +47,13 @@ class HostInfoTest : public testing::Test {
     static void TearDownTestSuite() {}
     // Runs per test case
     void SetUp() override {
-        hostInfo = new HOST_INFO(host, port, UP, false, simpleHostAvailabilityStrategy);
+        hostInfo = new HostInfo(host, port, UP, false, simpleHostAvailabilityStrategy);
     }
     void TearDown() override {
         delete hostInfo;
     }
     
-    HOST_INFO* hostInfo;
+    HostInfo* hostInfo;
 };
 
 TEST_F(HostInfoTest, get_host) {
@@ -69,13 +69,13 @@ TEST_F(HostInfoTest, get_host_port_pair) {
 }
 
 TEST_F(HostInfoTest, equal_host_port_pair) {
-  HOST_INFO hostInfoHostPortMatches(host, port, UP, false, simpleHostAvailabilityStrategy);
+  HostInfo hostInfoHostPortMatches(host, port, UP, false, simpleHostAvailabilityStrategy);
   EXPECT_TRUE(hostInfo->equal_host_port_pair(hostInfoHostPortMatches));
 
-  HOST_INFO hostInfoHostDoesNotMatch(host + "DoesNotMatch", port, UP, false, simpleHostAvailabilityStrategy);
+  HostInfo hostInfoHostDoesNotMatch(host + "DoesNotMatch", port, UP, false, simpleHostAvailabilityStrategy);
   EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoHostDoesNotMatch));
 
-  HOST_INFO hostInfoPortDoesNotMatch(host, port + 1, UP, false, simpleHostAvailabilityStrategy);
+  HostInfo hostInfoPortDoesNotMatch(host, port + 1, UP, false, simpleHostAvailabilityStrategy);
   EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoPortDoesNotMatch));
 }
 

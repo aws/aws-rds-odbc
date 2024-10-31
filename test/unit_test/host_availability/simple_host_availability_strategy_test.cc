@@ -42,17 +42,17 @@ class SimpleHostAvailabilityStrategyTest : public testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(SimpleHostAvailabilityStrategyTest, setHostAvailability) {
+TEST_F(SimpleHostAvailabilityStrategyTest, set_host_availability) {
     SimpleHostAvailabilityStrategy* simpleHostAvailabilityStrategy = new SimpleHostAvailabilityStrategy();
-    simpleHostAvailabilityStrategy->setHostAvailability(AVAILABLE);
-    // setHostAvailability does nothing so ensure it can be called
+    simpleHostAvailabilityStrategy->set_host_availability(AVAILABLE);
+    // set_host_availability does nothing so ensure it can be called
     // without throwing an exception
     SUCCEED();
     delete simpleHostAvailabilityStrategy;
 }
 
-TEST_F(SimpleHostAvailabilityStrategyTest, getHostAvailability) {
+TEST_F(SimpleHostAvailabilityStrategyTest, get_host_availability) {
     SimpleHostAvailabilityStrategy* simpleHostAvailabilityStrategy = new SimpleHostAvailabilityStrategy();
-    EXPECT_EQ(AVAILABLE, simpleHostAvailabilityStrategy->getHostAvailability(AVAILABLE));
-    EXPECT_EQ(NOT_AVAILABLE, simpleHostAvailabilityStrategy->getHostAvailability(NOT_AVAILABLE));
+    EXPECT_EQ(AVAILABLE, simpleHostAvailabilityStrategy->get_host_availability(AVAILABLE));
+    EXPECT_EQ(NOT_AVAILABLE, simpleHostAvailabilityStrategy->get_host_availability(NOT_AVAILABLE));
 }

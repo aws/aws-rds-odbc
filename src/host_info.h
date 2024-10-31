@@ -41,12 +41,12 @@
 
 enum HOST_STATE { UP, DOWN };
 
-class HOST_INFO {
+class HostInfo {
 public:
     // Default construction without any information is invalid
-    HOST_INFO() = delete;
+    HostInfo() = delete;
 
-    HOST_INFO(
+    HostInfo(
         std::string host,
         int port,
         HOST_STATE state,
@@ -54,12 +54,12 @@ public:
         const HostAvailabilityStrategy& hostAvailabilityStrategy
     );
 
-    ~HOST_INFO();
+    ~HostInfo();
 
     int get_port() const;
     const std::string get_host() const;
     const std::string get_host_port_pair() const;
-    bool equal_host_port_pair(HOST_INFO& hi) const;
+    bool equal_host_port_pair(HostInfo& hi) const;
     HOST_STATE get_host_state() const;
     void set_host_state(HOST_STATE state);
     bool is_host_up() const;

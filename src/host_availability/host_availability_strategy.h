@@ -39,8 +39,8 @@ class HostAvailabilityStrategy {
 public:
     virtual ~HostAvailabilityStrategy() = default;
 
-    virtual void setHostAvailability(HostAvailability hostAvailability) = 0;
-    virtual HostAvailability getHostAvailability(HostAvailability rawHostAvailability) = 0;
+    virtual void set_host_availability(HostAvailability hostAvailability) = 0;
+    virtual HostAvailability get_host_availability(HostAvailability rawHostAvailability) = 0;
 };
 
 #endif

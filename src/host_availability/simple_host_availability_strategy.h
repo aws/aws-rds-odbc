@@ -34,8 +34,8 @@
 
 class SimpleHostAvailabilityStrategy: public HostAvailabilityStrategy {
 public:    
-    void setHostAvailability(HostAvailability hostAvailability) override;
-    HostAvailability getHostAvailability(HostAvailability rawHostAvailability) override;
+    void set_host_availability(HostAvailability hostAvailability) override;
+    HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
 };
 
 #endif
