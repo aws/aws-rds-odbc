@@ -118,11 +118,34 @@ TEST_F(AuthenticationProviderTest, GenerateConnectAuthToken_EmptyAdfsConf) {
 }
 
 TEST_F(AuthenticationProviderTest, GenerateConnectAuthToken_MissingFieldsAdfsConf) {
-    const char* username = "GenerateConnectAuthToken_BadAdfsConf";
+    const char* username = "GenerateConnectAuthToken_MissingFieldsAdfsConf";
     Aws::Auth::AWSCredentials credentials;
     // Removed username from conf
-    FederatedAuthConfig missing_fields_conf{"endpoint", "1234", "relay", "role_arn", "idp_arn", "", "pass", "1234", "1234", "disable"};
+    FederatedAuthConfig missing_fields_conf{"endpoint", "1234", "relay", "app_id", "role_arn", "idp_arn", "", "pass", "1234", "1234", "disable"};
     bool result = GenerateConnectAuthToken(token, max_token_size, hostname, region, atol(port), username, ADFS, missing_fields_conf);
+    EXPECT_FALSE(result);
+    EXPECT_STREQ("", credentials.GetAWSAccessKeyId().c_str());
+    EXPECT_STREQ("", credentials.GetAWSSecretKey().c_str());
+    EXPECT_STREQ("", credentials.GetSessionToken().c_str());
+}
+
+TEST_F(AuthenticationProviderTest, GenerateConnectAuthToken_EmptyOktaConf) {
+    const char* username = "GenerateConnectAuthToken_EmptyOktaConf";
+    Aws::Auth::AWSCredentials credentials;
+    FederatedAuthConfig empty_conf{};
+    bool result = GenerateConnectAuthToken(token, max_token_size, hostname, region, atol(port), username, OKTA, empty_conf);
+    EXPECT_FALSE(result);
+    EXPECT_STREQ("", credentials.GetAWSAccessKeyId().c_str());
+    EXPECT_STREQ("", credentials.GetAWSSecretKey().c_str());
+    EXPECT_STREQ("", credentials.GetSessionToken().c_str());
+}
+
+TEST_F(AuthenticationProviderTest, GenerateConnectAuthToken_MissingFieldsOktaConf) {
+    const char* username = "GenerateConnectAuthToken_MissingFieldsOktaConf";
+    Aws::Auth::AWSCredentials credentials;
+    // Removed username from conf
+    FederatedAuthConfig missing_fields_conf{"endpoint", "1234", "relay", "app_id", "role_arn", "idp_arn", "", "pass", "1234", "1234", "disable"};
+    bool result = GenerateConnectAuthToken(token, max_token_size, hostname, region, atol(port), username, OKTA, missing_fields_conf);
     EXPECT_FALSE(result);
     EXPECT_STREQ("", credentials.GetAWSAccessKeyId().c_str());
     EXPECT_STREQ("", credentials.GetAWSSecretKey().c_str());

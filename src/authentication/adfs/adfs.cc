@@ -28,6 +28,7 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "adfs.h"
+#include "../html_util.h"
 
 #ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
@@ -73,7 +74,7 @@ std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& err_info) {
     std::smatch matches;
     std::string action;
     if (std::regex_search(body, matches, std::regex(FORM_ACTION_PATTERN))) {
-        action = escape_html_entity(matches.str(1));
+        action = HtmlUtil::escape_html_entity(matches.str(1));
     } else {
         err_info = "Could not extract action from the response body";
         return retval;
@@ -127,47 +128,6 @@ bool AdfsCredentialsProvider::validate_url(const std::string& url) {
     return true;
 }
 
-std::string AdfsCredentialsProvider::escape_html_entity(const std::string& html) {
-    std::string retval;
-    #ifndef XCODE_BUILD
-    DLOG(INFO) << "Before HTML escape modification: " << html;
-    #endif
-    int i = 0;
-    int length = html.length();
-    while (i < length) {
-        char c = html[i];
-        if (c != '&') {
-            retval.append(1, c);
-            i++;
-            continue;
-        }
-
-        if (html.substr(i, 4) == "&lt;") {
-            retval.append(1,'<');
-            i += 4;
-        } else if (html.substr(i, 4) == "&gt;") {
-            retval.append(1, '>');
-            i += 4;
-        } else if (html.substr(i, 5) == "&amp;") {
-            retval.append(1, '&');
-            i += 5;
-        } else if (html.substr(i, 6) == "&apos;") {
-            retval.append(1, '\'');
-            i += 6;
-        } else if (html.substr(i, 6) == "&quot;") {
-            retval.append(1, '"');
-            i += 6;
-        } else {
-            retval.append(1, c);
-            ++i;
-        }
-    }
-    #ifndef XCODE_BUILD
-    DLOG(INFO) << "After HTML escape modification: " << html;
-    #endif
-    return retval;
-}
-
 std::vector<std::string> AdfsCredentialsProvider::get_input_tags_from_html(const std::string& body) {
     std::unordered_set<std::string> hash_set;
     std::vector<std::string> retval;
@@ -208,7 +168,7 @@ std::string AdfsCredentialsProvider::get_value_by_key(const std::string& input, 
 
     std::smatch matches;
     if (std::regex_search(input, matches, std::regex(pattern))) {
-        return escape_html_entity(matches.str(2));
+        return HtmlUtil::escape_html_entity(matches.str(2));
     }
     return "";
 }

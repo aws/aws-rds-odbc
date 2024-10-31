@@ -28,7 +28,10 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "authentication_provider.h"
-#include "adfs/adfs.h"
+
+#include <adfs/adfs.h>
+#include <okta/okta.h>
+
 #include "secrets_manager_helper.h"
 
 #ifndef XCODE_BUILD
@@ -76,6 +79,16 @@ static bool ValidateAdfsConf(FederatedAuthConfig config) {
         ValidateCharArr(config.idp_password);
 }
 
+static bool ValidateOktaConf(FederatedAuthConfig config) {
+    return ValidateCharArr(config.idp_endpoint) &&
+        ValidateCharArr(config.idp_port) &&
+        ValidateCharArr(config.app_id) &&
+        ValidateCharArr(config.iam_role_arn) &&
+        ValidateCharArr(config.iam_idp_arn) &&
+        ValidateCharArr(config.idp_username) &&
+        ValidateCharArr(config.idp_password);
+}
+
 static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig config) {
     Aws::Auth::AWSCredentials credentials;
     switch (type) {
@@ -87,7 +100,7 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
                 return nullptr;
             };
             Aws::Client::ClientConfiguration http_client_cfg;
-            http_client_cfg.requestTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 3000;
+            http_client_cfg.requestTimeoutMs = config.http_client_socket_timeout ? atol(config.http_client_socket_timeout) : 3000;
             http_client_cfg.connectTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 5000;
             http_client_cfg.verifySSL = true;
             std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
@@ -106,8 +119,25 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
             credentials = cred_provider.GetAWSCredentials();
             break;
         }
-        case OKTA:
-            // Fallthru, not implemented
+        case OKTA: {
+            if (!ValidateOktaConf(config)) {
+                LOG(ERROR) << "Configuration for " << FEDERATED_AUTH_TYPE_STRING[type] << " is invalid/incomplete.";
+                return nullptr;
+            };
+            Aws::Client::ClientConfiguration http_client_cfg;
+            http_client_cfg.requestTimeoutMs = config.http_client_socket_timeout ? atol(config.http_client_socket_timeout) : 3000;
+            http_client_cfg.connectTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 5000;
+            http_client_cfg.verifySSL = true;
+            http_client_cfg.followRedirects = Aws::Client::FollowRedirectsPolicy::ALWAYS;
+            std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
+            std::shared_ptr<Aws::STS::STSClient> sts_client = std::make_shared<Aws::STS::STSClient>();
+            OktaCredentialsProvider okta(config, http_client, sts_client);
+            if (!okta.GetAWSCredentials(credentials)) {
+                LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " provider failed to get valid credentials.";
+                return nullptr;
+            }
+            break;
+        }
         default:
             #ifndef XCODE_BUILD
             LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " is not a valid authentication type.";

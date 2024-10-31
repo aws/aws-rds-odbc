@@ -37,6 +37,8 @@ set(SRC
   src/authentication/adfs/adfs.cc
   src/authentication/authentication_provider.cc
   src/authentication/federation.cc
+  src/authentication/html_util.cc
+  src/authentication/okta/okta.cc
   src/authentication/secrets_manager_helper.cc
 
   src/failover/cluster_topology_info.cc
@@ -52,6 +54,8 @@ set(INC
   src/authentication/adfs/adfs.h
   src/authentication/authentication_provider.h
   src/authentication/federation.h
+  src/authentication/html_util.h
+  src/authentication/okta/okta.h
   src/authentication/secrets_manager_helper.h
 
   src/failover/cluster_topology_info.h
