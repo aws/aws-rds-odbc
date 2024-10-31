@@ -31,7 +31,7 @@
 #define __HOSTINFO_H__
 
 #ifndef XCODE_BUILD
-#include "../util/logger_wrapper.h"
+#include "logger_wrapper.h"
 #endif
 
 #include <memory>

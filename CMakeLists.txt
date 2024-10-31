@@ -32,12 +32,13 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build as static libraries")
 #-----------------------------------------------------
 
 set(SRC
+  src/host_info.cc
+
   # Util
   src/util/logger_wrapper.cc
 
   # Failover
   src/failover/cluster_topology_info.cc
-  src/failover/host_info.cc
 
   # Authentication
   src/authentication/authentication_provider.cc
@@ -47,12 +48,13 @@ set(SRC
 )
 
 set(INC
+  src/host_info.h
+
   # Util
   src/util/logger_wrapper.h
 
   # Failover
   src/failover/cluster_topology_info.h
-  src/failover/host_info.h
 
   # Authentication
   src/authentication/authentication_provider.h
@@ -63,6 +65,7 @@ set(INC
 
 add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories("${CMAKE_SOURCE_DIR}/src")
 include_directories("${CMAKE_SOURCE_DIR}/src/authentication")
 include_directories("${CMAKE_SOURCE_DIR}/src/failover")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")

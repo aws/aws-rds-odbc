@@ -64,6 +64,8 @@
 		734B1D522CCA5D6400FB6683 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		734B1D542CCA5D6F00FB6683 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		734B1D582CCA6FCE00FB6683 /* libglog.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglog.a; path = ../../../glog/build/libglog.a; sourceTree = "<group>"; };
+		73D322E22CD3A46E002268BF /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		73D322E32CD3A46E002268BF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		73D7880E2CC915A60028B42F /* libaws-rds-odbc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libaws-rds-odbc.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73D7881C2CC919070028B42F /* adfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = adfs.h; sourceTree = "<group>"; };
 		73D7881D2CC919070028B42F /* adfs.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs.cc; sourceTree = "<group>"; };
@@ -143,6 +145,8 @@
 		73D788052CC915A60028B42F = {
 			isa = PBXGroup;
 			children = (
+				73D322E22CD3A46E002268BF /* CMakeLists.txt */,
+				73D322E32CD3A46E002268BF /* README.md */,
 				73D7882C2CC919070028B42F /* src */,
 				734B1B532CC956B100FB6683 /* Frameworks */,
 				73D7880F2CC915A60028B42F /* Products */,
@@ -183,8 +187,6 @@
 			children = (
 				73D788242CC919070028B42F /* cluster_topology_info.h */,
 				73D788252CC919070028B42F /* cluster_topology_info.cc */,
-				73D788262CC919070028B42F /* host_info.h */,
-				73D788272CC919070028B42F /* host_info.cc */,
 			);
 			path = failover;
 			sourceTree = "<group>";
@@ -204,6 +206,8 @@
 				73D788232CC919070028B42F /* authentication */,
 				73D788282CC919070028B42F /* failover */,
 				73D7882B2CC919070028B42F /* util */,
+				73D788262CC919070028B42F /* host_info.h */,
+				73D788272CC919070028B42F /* host_info.cc */,
 			);
 			path = src;
 			sourceTree = "<group>";
