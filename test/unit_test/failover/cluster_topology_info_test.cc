@@ -30,7 +30,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "mock_objects.h"
+#include "../mock_objects.h"
 
 #include "cluster_topology_info.h"
 #include "host_info.h"

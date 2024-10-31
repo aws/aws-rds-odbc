@@ -30,7 +30,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "mock_objects.h"
+#include "../../mock_objects.h"
 
 #include <adfs/adfs.h>
 
