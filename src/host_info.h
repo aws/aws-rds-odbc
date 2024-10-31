@@ -34,41 +34,43 @@
 #include "logger_wrapper.h"
 #endif
 
+#include "host_availability/host_availability_strategy.h"
+
 #include <memory>
 #include <string>
 
 enum HOST_STATE { UP, DOWN };
 
-// TODO Think about char types. Using strings for now, but should SQLCHAR *, or CHAR * be employed?
-// Most of the strings are for internal failover things
 class HOST_INFO {
 public:
-    HOST_INFO();
-    //TODO - probably choose one of the following constructors, or more precisely choose which data type they should take
-    HOST_INFO(std::string host, int port);
-    HOST_INFO(const char* host, int port);
-    HOST_INFO(std::string host, int port, HOST_STATE state, bool is_writer);
-    HOST_INFO(const char* host, int port, HOST_STATE state, bool is_writer);
+    // Default construction without any information is invalid
+    HOST_INFO() = delete;
+
+    HOST_INFO(
+        std::string host,
+        int port,
+        HOST_STATE state,
+        bool is_writer,
+        const HostAvailabilityStrategy& hostAvailabilityStrategy
+    );
+
     ~HOST_INFO();
 
-    int get_port();
-    std::string get_host();
-    std::string get_host_port_pair();
-    bool equal_host_port_pair(HOST_INFO& hi);
-    HOST_STATE get_host_state();
+    int get_port() const;
+    const std::string get_host() const;
+    const std::string get_host_port_pair() const;
+    bool equal_host_port_pair(HOST_INFO& hi) const;
+    HOST_STATE get_host_state() const;
     void set_host_state(HOST_STATE state);
-    bool is_host_up();
-    bool is_host_down();
-    bool is_host_writer();
+    bool is_host_up() const;
+    bool is_host_down() const;
+    bool is_host_writer() const;
     void mark_as_writer(bool writer);
-    static bool is_host_same(std::shared_ptr<HOST_INFO> h1, std::shared_ptr<HOST_INFO> h2);
     static constexpr int NO_PORT = -1;
 
-    // used to be properties - TODO - remove the ones that are not necessary
     std::string session_id;
     std::string last_updated;
     std::string replica_lag;
-    std::string instance_name;
 
 private:
     const std::string HOST_PORT_SEPARATOR = ":";
@@ -77,6 +79,8 @@ private:
 
     HOST_STATE host_state;
     bool is_writer;
+
+    const HostAvailabilityStrategy& hostAvailabilityStrategy;
 };
 
 #endif /* __HOSTINFO_H__ */

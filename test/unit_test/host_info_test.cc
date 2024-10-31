@@ -30,13 +30,14 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "host_info.h"
+#include <host_info.h>
+#include <simple_host_availability_strategy.h>
 
 namespace {
-  const std::string base_host_string = "hostName";
-  const char* base_host_char = "hostName";
-  const int base_port = 1234;
-  const std::string base_host_port_pair = base_host_string + ":" + std::to_string(base_port);
+  const std::string host = "hostName";
+  int port = 1234;
+  const std::string hostPortPair = host + ":" + std::to_string(port);
+  const SimpleHostAvailabilityStrategy simpleHostAvailabilityStrategy;
 }
 
 class HostInfoTest : public testing::Test {
@@ -45,24 +46,65 @@ class HostInfoTest : public testing::Test {
     static void SetUpTestSuite() {}
     static void TearDownTestSuite() {}
     // Runs per test case
-    void SetUp() override {}
-    void TearDown() override {}
+    void SetUp() override {
+        hostInfo = new HOST_INFO(host, port, UP, false, simpleHostAvailabilityStrategy);
+    }
+    void TearDown() override {
+        delete hostInfo;
+    }
+    
+    HOST_INFO* hostInfo;
 };
 
-TEST_F(HostInfoTest, getPort) {
-  HOST_INFO* hf_string = new HOST_INFO(base_host_string, base_port);
-  EXPECT_EQ(base_port, hf_string->get_port());
-  delete hf_string;
+TEST_F(HostInfoTest, get_host) {
+  EXPECT_EQ(host, hostInfo->get_host());
 }
 
-TEST_F(HostInfoTest, getHost) {
-  HOST_INFO* hf_string = new HOST_INFO(base_host_string, base_port);
-  EXPECT_EQ(base_host_string, hf_string->get_host());
-  delete hf_string;
+TEST_F(HostInfoTest, get_port) {
+  EXPECT_EQ(port, hostInfo->get_port());
 }
 
-TEST_F(HostInfoTest, getHostPortPair) {
-  HOST_INFO* hf_string = new HOST_INFO(base_host_string, base_port);
-  EXPECT_EQ(base_host_port_pair, hf_string->get_host_port_pair());
-  delete hf_string;
+TEST_F(HostInfoTest, get_host_port_pair) {
+  EXPECT_EQ(hostPortPair, hostInfo->get_host_port_pair());
+}
+
+TEST_F(HostInfoTest, equal_host_port_pair) {
+  HOST_INFO hostInfoHostPortMatches(host, port, UP, false, simpleHostAvailabilityStrategy);
+  EXPECT_TRUE(hostInfo->equal_host_port_pair(hostInfoHostPortMatches));
+
+  HOST_INFO hostInfoHostDoesNotMatch(host + "DoesNotMatch", port, UP, false, simpleHostAvailabilityStrategy);
+  EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoHostDoesNotMatch));
+
+  HOST_INFO hostInfoPortDoesNotMatch(host, port + 1, UP, false, simpleHostAvailabilityStrategy);
+  EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoPortDoesNotMatch));
+}
+
+TEST_F(HostInfoTest, get_host_state) {
+  EXPECT_EQ(UP, hostInfo->get_host_state());
+}
+
+TEST_F(HostInfoTest, set_host_state) {
+  EXPECT_EQ(UP, hostInfo->get_host_state());
+  hostInfo->set_host_state(DOWN);
+  EXPECT_EQ(DOWN, hostInfo->get_host_state());
+}
+
+TEST_F(HostInfoTest, is_host_up) {
+  EXPECT_TRUE(hostInfo->is_host_up());
+}
+
+TEST_F(HostInfoTest, is_host_down) {
+  EXPECT_FALSE(hostInfo->is_host_down());
+}
+
+TEST_F(HostInfoTest, is_host_writer) {
+  EXPECT_FALSE(hostInfo->is_host_writer());
+}
+
+TEST_F(HostInfoTest, mark_as_writer) {
+  EXPECT_FALSE(hostInfo->is_host_writer());
+  hostInfo->mark_as_writer(true);
+  EXPECT_TRUE(hostInfo->is_host_writer());
+  hostInfo->mark_as_writer(false);
+  EXPECT_FALSE(hostInfo->is_host_writer());
 }

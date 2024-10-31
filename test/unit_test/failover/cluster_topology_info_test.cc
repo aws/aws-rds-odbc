@@ -32,14 +32,16 @@
 
 #include "../mock_objects.h"
 
-#include "cluster_topology_info.h"
-#include "host_info.h"
+#include <cluster_topology_info.h>
+#include <host_info.h>
+#include <simple_host_availability_strategy.h>
 
 using ::testing::Return;
 
 namespace {
   const std::string base_host_string = "hostName";
   const int base_port = 1234;
+  const SimpleHostAvailabilityStrategy simpleHostAvailabilityStrategy;
 }
 
 class ClusterTopologyInfoTest : public testing::Test {
@@ -53,9 +55,12 @@ class ClusterTopologyInfoTest : public testing::Test {
 };
 
 TEST_F(ClusterTopologyInfoTest, getNextWriter) {
-  std::shared_ptr<HOST_INFO> writer_host_info = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, true);
-  std::shared_ptr<HOST_INFO> reader_host_info_a = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false);
-  std::shared_ptr<HOST_INFO> reader_host_info_b = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false);
+  std::shared_ptr<HOST_INFO> writer_host_info =
+    std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, true, simpleHostAvailabilityStrategy);
+  std::shared_ptr<HOST_INFO> reader_host_info_a =
+    std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
+  std::shared_ptr<HOST_INFO> reader_host_info_b =
+    std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
   std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
   cluster_topology_info->add_host(writer_host_info);
   cluster_topology_info->add_host(reader_host_info_a);
