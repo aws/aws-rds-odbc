@@ -83,6 +83,10 @@ TEST_F(HostInfoTest, get_host_state) {
   EXPECT_EQ(UP, hostInfo->get_host_state());
 }
 
+TEST_F(HostInfoTest, get_weight) {
+  EXPECT_EQ(HostInfo::DEFAULT_WEIGHT, hostInfo->get_weight());
+}
+
 TEST_F(HostInfoTest, set_host_state) {
   EXPECT_EQ(UP, hostInfo->get_host_state());
   hostInfo->set_host_state(DOWN);
