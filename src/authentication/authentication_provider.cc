@@ -28,9 +28,7 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "authentication_provider.h"
-
 #include "adfs/adfs.h"
-
 #include "secrets_manager_helper.h"
 
 #ifndef XCODE_BUILD
@@ -52,23 +50,23 @@
 #include <string>
 #include <unordered_map>
 
-Aws::SDKOptions sdkOptions;
-std::atomic<int> sdkRefCount{0};
-std::mutex sdkMutex;
+static Aws::SDKOptions sdk_opts;
+static std::atomic<int> sdk_ref_count{0};
+static std::mutex sdk_mutex;
 
-typedef struct tokenInfo {
+struct TokenInfo {
     std::string token;
-    long        expiration;  // the expiration time in second
-} TokenInfo;
+    uint64_t    expiration;  // the expiration time in second
+}; // TokenInfo;
 
 // Cached TokenInfo
-std::unordered_map<std::string, TokenInfo> cachedTokens;
+static std::unordered_map<std::string, TokenInfo> cached_tokens;
 
-bool ValidateCharArr(std::string_view str) {
+static bool ValidateCharArr(std::string_view str) {
     return !str.empty();
 }
 
-bool ValidateAdfsConf(FederatedAuthConfig config) {
+static bool ValidateAdfsConf(FederatedAuthConfig config) {
     return ValidateCharArr(config.idp_endpoint) &&
         ValidateCharArr(config.idp_port) &&
         ValidateCharArr(config.relaying_party_id) &&
@@ -78,148 +76,146 @@ bool ValidateAdfsConf(FederatedAuthConfig config) {
         ValidateCharArr(config.idp_password);
 }
 
-Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig config) {
+static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig config) {
     Aws::Auth::AWSCredentials credentials;
     switch (type) {
         case ADFS: {
             if (!ValidateAdfsConf(config)) {
                 #ifndef XCODE_BUILD
-                LOG(ERROR) << "Configuration for " << FEDERATEDAUTHTYPE_STRING[type] << " is invalid/incomplete.";
+                LOG(ERROR) << "Configuration for " << FEDERATED_AUTH_TYPE_STRING[type] << " is invalid/incomplete.";
                 #endif
                 return nullptr;
             };
-            Aws::Client::ClientConfiguration httpClientCfg;
-            httpClientCfg.requestTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 3000;
-            httpClientCfg.connectTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 5000;
-            httpClientCfg.verifySSL = true;
-            std::shared_ptr<Aws::Http::HttpClient> httpClient = Aws::Http::CreateHttpClient(httpClientCfg);
-            std::shared_ptr<Aws::STS::STSClient> stsClient = std::make_shared<Aws::STS::STSClient>();
-            AdfsCredentialsProvider adfs(config, httpClient, stsClient);
+            Aws::Client::ClientConfiguration http_client_cfg;
+            http_client_cfg.requestTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 3000;
+            http_client_cfg.connectTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 5000;
+            http_client_cfg.verifySSL = true;
+            std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
+            std::shared_ptr<Aws::STS::STSClient> sts_client = std::make_shared<Aws::STS::STSClient>();
+            AdfsCredentialsProvider adfs(config, http_client, sts_client);
             if (!adfs.GetAWSCredentials(credentials)) {
                 #ifndef XCODE_BUILD
-                LOG(ERROR) << FEDERATEDAUTHTYPE_STRING[type] << " provider failed to get valid credentials.";
+                LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " provider failed to get valid credentials.";
                 #endif
                 return nullptr;
             }
             break;
         }
         case IAM: {
-            Aws::Auth::DefaultAWSCredentialsProviderChain credProvider;
-            credentials = credProvider.GetAWSCredentials();
+            Aws::Auth::DefaultAWSCredentialsProviderChain cred_provider;
+            credentials = cred_provider.GetAWSCredentials();
             break;
         }
         case OKTA:
             // Fallthru, not implemented
         default:
             #ifndef XCODE_BUILD
-            LOG(ERROR) << FEDERATEDAUTHTYPE_STRING[type] << " is not a valid authentication type.";
+            LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " is not a valid authentication type.";
             #endif
             return nullptr;
     }
-    Aws::RDS::RDSClientConfiguration rdsClientCfg;
-    return new Aws::RDS::RDSClient(credentials, rdsClientCfg);
+    Aws::RDS::RDSClientConfiguration rds_client_cfg;
+    return new Aws::RDS::RDSClient(credentials, rds_client_cfg);
 }
 
-void ShutdownAwsAPI(void) {
-    if (0 == --sdkRefCount) {
-        std::lock_guard<std::mutex> lock(sdkMutex);
-        Aws::ShutdownAPI(sdkOptions);
+static void ShutdownAwsAPI() {
+    if (0 == --sdk_ref_count) {
+        std::lock_guard<std::mutex> lock(sdk_mutex);
+        Aws::ShutdownAPI(sdk_opts);
     }
 }
 
-void FreeAwsResource(Aws::RDS::RDSClient* client) {
-    if (client) {
-        delete static_cast<Aws::RDS::RDSClient*>(client);
-    }
+static void FreeAwsResource(Aws::RDS::RDSClient* client) {
+    delete client;
 
     // Shut down AWS API
     ShutdownAwsAPI();
 }
 
-void GenKeyAndTime(const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName, std::string& key, long& currentTimeInSeconds) {
-    key = std::string(dbHostName);
+static void GenKeyAndTime(const char* db_hostname, const char* db_region, const char* port, const char* db_user, std::string& key, uint64_t& curr_time_in_sec) {
+    key = std::string(db_hostname);
     key += "-";
-    key += std::string(dbRegion);
+    key += std::string(db_region);
     key += "-";
     key += std::string(port);
     key += "-";
-    key += std::string(dbUserName);
+    key += std::string(db_user);
 
     // Get the current time point
-    auto currentTimePoint = std::chrono::system_clock::now();
+    auto curr_time = std::chrono::system_clock::now();
 
     // Convert the time point to seconds
-    currentTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(currentTimePoint.time_since_epoch()).count();
+    curr_time_in_sec = std::chrono::duration_cast<std::chrono::seconds>(curr_time.time_since_epoch()).count();
 }
 
-bool UpdateTokenValue(char* token, const unsigned int maxSize, const char* newValue) {
-    int newTokenSize = strlen(newValue);
-    if (maxSize - 1 < newTokenSize) {
+static bool UpdateTokenValue(char* token, const unsigned max_size, const char* new_value) {
+    int new_token_size = strlen(new_value);
+    if (max_size - 1 < new_token_size) {
         #ifndef XCODE_BUILD
         LOG(WARNING) << "New token does not fit into allocated token";
         #endif
         return false;
     }
 
-    memcpy(token, newValue, newTokenSize);
-    token[newTokenSize] = 0;
+    memcpy(token, new_value, new_token_size);
+    token[new_token_size] = 0;
     return true;
 }
 
 FederatedAuthType GetFedAuthTypeEnum(const char *str) {
-    std::string upperStr(str);
-    std::transform(upperStr.begin(), upperStr.end(), upperStr.begin(), ::toupper);
+    std::string upper_str(str);
+    std::transform(upper_str.begin(), upper_str.end(), upper_str.begin(), ::toupper);
     for (int i = 0; i < INVALID; i++) {
-        if (!upperStr.compare(FEDERATEDAUTHTYPE_STRING[i])) {
-            return (FederatedAuthType)i;
+        if (upper_str == FEDERATED_AUTH_TYPE_STRING[i]) {
+            return static_cast<FederatedAuthType>(i);
         }
     }
     return INVALID;
 }
 
-bool GetCachedToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName) {
-    std::string key("");
-    long currentTimeInSeconds = 0;
-    GenKeyAndTime(dbHostName, dbRegion, port, dbUserName, key, currentTimeInSeconds);
+bool GetCachedToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user) {
+    std::string key;
+    uint64_t curr_time_in_sec = 0;
+    GenKeyAndTime(db_hostname, db_region, port, db_user, key, curr_time_in_sec);
 
-    auto itr = cachedTokens.find(key);
-    if (itr == cachedTokens.end() || currentTimeInSeconds > itr->second.expiration) {
+    auto itr = cached_tokens.find(key);
+    if (itr == cached_tokens.end() || curr_time_in_sec > itr->second.expiration) {
         #ifndef XCODE_BUILD
         LOG(WARNING) << "No cached token";
         #endif
         return false;
-    } else {
-        int tokenSize = itr->second.token.size();
-        #ifndef XCODE_BUILD
-        LOG(INFO) << "Token size is " << tokenSize;
-        #endif
-        return UpdateTokenValue(token, maxSize, itr->second.token.c_str());
     }
+
+    int token_size = itr->second.token.size();
+    #ifndef XCODE_BUILD
+    LOG(INFO) << "Token size is " << token_size;
+    #endif
+    return UpdateTokenValue(token, max_size, itr->second.token.c_str());
 }
 
-void UpdateCachedToken(const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName, const char* token, const char* expirationTime) {
-    std::string key("");
-    long currentTimeInSeconds = 0;
-    GenKeyAndTime(dbHostName, dbRegion, port, dbUserName, key, currentTimeInSeconds);
+void UpdateCachedToken(const char* db_hostname, const char* db_region, const char* port, const char* db_user, const char* token, const char* expiration_time) {
+    std::string key;
+    uint64_t curr_time_in_sec = 0;
+    GenKeyAndTime(db_hostname, db_region, port, db_user, key, curr_time_in_sec);
 
     TokenInfo ti;
     ti.token = std::string(token);
-    ti.expiration = currentTimeInSeconds + atol(expirationTime);
-    cachedTokens[key] = ti;
+    ti.expiration = curr_time_in_sec + atol(expiration_time);
+    cached_tokens[key] = ti;
 }
 
-bool GenerateConnectAuthToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config) {
-    // TODO - Need to move logger initializer to a central location
+bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config) {
+    // TODO(yuenhcol) - Need to move logger initializer to a central location
     #ifndef XCODE_BUILD
-    LOGGER_WRAPPER::initialize();
+    LoggerWrapper::initialize();
     #endif
-    if (1 == ++sdkRefCount) {
-        std::lock_guard<std::mutex> lock(sdkMutex);
-        Aws::InitAPI(sdkOptions);
+    if (1 == ++sdk_ref_count) {
+        std::lock_guard<std::mutex> lock(sdk_mutex);
+        Aws::InitAPI(sdk_opts);
     }
 
     #ifndef XCODE_BUILD
-    LOG(INFO) << "Generating token for " << FEDERATEDAUTHTYPE_STRING[type];
+    LOG(INFO) << "Generating token for " << FEDERATED_AUTH_TYPE_STRING[type];
     #endif
 
     Aws::RDS::RDSClient* client = CreateRDSClient(type, config);
@@ -228,43 +224,42 @@ bool GenerateConnectAuthToken(char* token, const unsigned int maxSize, const cha
         return false;
     }
 
-    Aws::String newToken = client->GenerateConnectAuthToken(dbHostName, dbRegion, port, dbUserName);
+    Aws::String new_token = client->GenerateConnectAuthToken(db_hostname, db_region, port, db_user);
     FreeAwsResource(client);
 
-    int tokenSize = newToken.size();
+    int token_size = new_token.size();
     #ifndef XCODE_BUILD
-    LOG(INFO) << "RDS Client generated token length is " << tokenSize;
+    LOG(INFO) << "RDS Client generated token length is " << token_size;
     #endif
-    return UpdateTokenValue(token, maxSize, newToken.c_str());
+    return UpdateTokenValue(token, max_size, new_token.c_str());
 }
 
-
-bool GetCredentialsFromSecretsManager(const char *secretId, const char *region, Credentials *credentials) {
-    if (1 == ++sdkRefCount) {
-        std::lock_guard<std::mutex> lock(sdkMutex);
-        Aws::InitAPI(sdkOptions);
+bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region, Credentials* credentials) {
+    if (1 == ++sdk_ref_count) {
+        std::lock_guard<std::mutex> lock(sdk_mutex);
+        Aws::InitAPI(sdk_opts);
     }
 
-    std::string regionStr = region;
+    std::string region_str = region;
     
-    if (regionStr.empty() && !SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(secretId, regionStr)) {
-        regionStr = Aws::Region::US_EAST_1;
+    if (region_str.empty() && !SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(secret_id, region_str)) {
+        region_str = Aws::Region::US_EAST_1;
     }
 
     // configure the secrets manager client according to the region determined
-    Aws::SecretsManager::SecretsManagerClientConfiguration smClientConfig;
-    smClientConfig.region = regionStr;
-    std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> smClient = std::make_shared<Aws::SecretsManager::SecretsManagerClient>(smClientConfig);
+    Aws::SecretsManager::SecretsManagerClientConfiguration sm_client_cfg;
+    sm_client_cfg.region = region_str;
+    std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> sm_client = std::make_shared<Aws::SecretsManager::SecretsManagerClient>(sm_client_cfg);
 
-    SECRETS_MANAGER_HELPER smHelper(smClient);
-    bool isSuccess = smHelper.FetchCredentials(secretId);
+    SECRETS_MANAGER_HELPER sm_helper(sm_client);
+    bool is_success = sm_helper.FetchCredentials(secret_id);
     ShutdownAwsAPI(); // done using the AWS API
 
     // don't copy any memory if there was a failure fetching the credentials
-    if (!isSuccess) {
+    if (!is_success) {
         return false;
     }
 
-    return UpdateTokenValue(credentials->username, credentials->username_size, smHelper.GetUsername().c_str())
-        && UpdateTokenValue(credentials->password, credentials->password_size, smHelper.GetPassword().c_str());
+    return UpdateTokenValue(credentials->username, credentials->username_size, sm_helper.GetUsername().c_str())
+        && UpdateTokenValue(credentials->password, credentials->password_size, sm_helper.GetPassword().c_str());
 }

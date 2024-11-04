@@ -29,18 +29,18 @@
 
 #include "logger_wrapper.h"
 
-void LOGGER_WRAPPER::initialize() {
-    static LOGGER_WRAPPER instance;
+void LoggerWrapper::initialize() {
+    static LoggerWrapper instance;
     if (!instance.init) {
         FLAGS_stderrthreshold = 4; // Disable console output
         FLAGS_timestamp_in_logfile_name = false;
-        instance.set_log_directory(LOGGER_CONFIG::LOG_LOCATION);
-        google::InitGoogleLogging(LOGGER_CONFIG::PROGRAM_NAME.c_str());
+        set_log_directory(logger_config::LOG_LOCATION);
+        google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
         instance.init = true;
     }
 }
 
-void LOGGER_WRAPPER::set_log_directory(std::string directory_path) {
+void LoggerWrapper::set_log_directory(const std::string& directory_path) {
     if (!std::filesystem::exists(directory_path)) {
         std::filesystem::create_directory(directory_path);
     }

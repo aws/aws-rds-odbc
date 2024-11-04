@@ -40,9 +40,9 @@ class AdfsCredentialsProvider : public FederationCredentialProvider {
 public:
     AdfsCredentialsProvider(
         const FederatedAuthConfig& config,
-        std::shared_ptr<Aws::Http::HttpClient> httpClient,
-        std::shared_ptr<Aws::STS::STSClient> stsClient
-    ): FederationCredentialProvider(config.iam_idp_arn, config.iam_role_arn, httpClient, stsClient), cfg(config) {}
+        std::shared_ptr<Aws::Http::HttpClient> http_client,
+        std::shared_ptr<Aws::STS::STSClient> sts_client
+    ): FederationCredentialProvider(config.iam_idp_arn, config.iam_role_arn, http_client, sts_client), cfg(config) {}
 
     // constant pattern strings 
     static const std::string FORM_ACTION_PATTERN;
@@ -51,16 +51,17 @@ public:
     static const std::string INPUT_TAG_PATTERN;
 
 protected:
-    virtual std::string GetSAMLAssertion(std::string& errInfo);
+    virtual std::string GetSAMLAssertion(std::string& err_info);
 
 private:
-    std::string getSignInPageUrl();
-    bool validateUrl(const std::string& url);
-    std::string escapeHtmlEntity(const std::string& html);
-    std::vector<std::string> getInputTagsFromHTML(const std::string& body);
-    std::string getValueByKey(const std::string& input, const std::string& key);
-    std::map<std::string, std::string> getParametersFromHtmlBody(std::string& body);
-    std::string getFormActionBody(std::string& url, std::map<std::string, std::string>& params);
+    std::string get_signin_url();
+    std::map<std::string, std::string> get_para_from_html_body(std::string& body);
+    std::string get_form_action_body(std::string& url, std::map<std::string, std::string>& params);
+
+    static bool validate_url(const std::string& url);
+    static std::string escape_html_entity(const std::string& html);
+    static std::vector<std::string> get_input_tags_from_html(const std::string& body);
+    static std::string get_value_by_key(const std::string& input, const std::string& key);
 
     FederatedAuthConfig cfg;
 };

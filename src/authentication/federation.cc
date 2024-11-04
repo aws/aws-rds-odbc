@@ -34,30 +34,30 @@
 #endif
 
 bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
-    Aws::STS::Model::AssumeRoleWithSAMLRequest& samlRequest,
-    Aws::Auth::AWSCredentials& awsCredentials) {
+    Aws::STS::Model::AssumeRoleWithSAMLRequest& saml_request,
+    Aws::Auth::AWSCredentials& credentials) {
 
-    Aws::STS::Model::AssumeRoleWithSAMLOutcome outcome = stsClient->AssumeRoleWithSAML(samlRequest);
+    Aws::STS::Model::AssumeRoleWithSAMLOutcome outcome = sts_client->AssumeRoleWithSAML(saml_request);
 
     bool retval = false;
     if (outcome.IsSuccess()) {
-        const Aws::STS::Model::Credentials& credentials = outcome.GetResult().GetCredentials();
+        const Aws::STS::Model::Credentials& new_cred = outcome.GetResult().GetCredentials();
 
         #ifndef XCODE_BUILD
-        LOG(INFO) << "Access key is " << credentials.GetAccessKeyId().c_str() << ", secret key length is " << credentials.GetSecretAccessKey().size();
+        LOG(INFO) << "Access key is " << new_cred.GetAccessKeyId().c_str() << ", secret key length is " << new_cred.GetSecretAccessKey().size();
         #endif
 
-        awsCredentials.SetAWSAccessKeyId(credentials.GetAccessKeyId());
-        awsCredentials.SetAWSSecretKey(credentials.GetSecretAccessKey());
-        awsCredentials.SetSessionToken(credentials.GetSessionToken());
+        credentials.SetAWSAccessKeyId(new_cred.GetAccessKeyId());
+        credentials.SetAWSSecretKey(new_cred.GetSecretAccessKey());
+        credentials.SetSessionToken(new_cred.GetSessionToken());
 
         retval = true;
     } else {
-        auto error = outcome.GetError();
-        std::string errInfo = "Failed to fetch credentials, ERROR: " + error.GetExceptionName()
+        const auto& error = outcome.GetError();
+        std::string err_info = "Failed to fetch credentials, ERROR: " + error.GetExceptionName()
             + ": " + error.GetMessage();
         #ifndef XCODE_BUILD
-        LOG(ERROR) << "errInfo in FetchCredentialsWithSAMLAssertion is " << errInfo.c_str();
+        LOG(ERROR) << "Error in FetchCredentialsWithSAMLAssertion is " << err_info.c_str();
         #endif
     }
 
@@ -65,25 +65,25 @@ bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
 }
 
 bool FederationCredentialProvider::GetAWSCredentials(Aws::Auth::AWSCredentials& credentials) {
-    std::string errInfo;
-    std::string samlAsseration = GetSAMLAssertion(errInfo);
+    std::string err_info;
+    std::string saml_assertion = GetSAMLAssertion(err_info);
 
     bool retval = false;
-    if (samlAsseration.empty()) {
+    if (saml_assertion.empty()) {
         #ifndef XCODE_BUILD
-        LOG(ERROR) << "errInfo in GetAWSCredentials is " << errInfo.c_str();
+        LOG(ERROR) << "Error in GetAWSCredentials is " << err_info.c_str();
         #endif
     } else {
         #ifndef XCODE_BUILD
-        LOG(INFO) << "samlAsseration is " << samlAsseration.c_str();
+        DLOG(INFO) << "SAML assertion is " << saml_assertion.c_str();
         #endif
 
-        Aws::STS::Model::AssumeRoleWithSAMLRequest samlRequest;
-        samlRequest.WithRoleArn(roleArn)
-            .WithSAMLAssertion(samlAsseration)
-            .WithPrincipalArn(idpArn);
+        Aws::STS::Model::AssumeRoleWithSAMLRequest saml_request;
+        saml_request.WithRoleArn(role_arn)
+            .WithSAMLAssertion(saml_assertion)
+            .WithPrincipalArn(idp_arn);
 
-        retval = FetchCredentialsWithSAMLAssertion(samlRequest, credentials);
+        retval = FetchCredentialsWithSAMLAssertion(saml_request, credentials);
     }
 
     return retval;

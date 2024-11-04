@@ -61,7 +61,7 @@ TEST_F(ClusterTopologyInfoTest, getNextWriter) {
     std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
   std::shared_ptr<HostInfo> reader_host_info_b =
     std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
-  std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
+  std::shared_ptr<ClusterTopologyInfo> cluster_topology_info = std::make_shared<ClusterTopologyInfo>();
   cluster_topology_info->add_host(writer_host_info);
   cluster_topology_info->add_host(reader_host_info_a);
   cluster_topology_info->add_host(reader_host_info_b);
@@ -70,6 +70,6 @@ TEST_F(ClusterTopologyInfoTest, getNextWriter) {
 }
 
 TEST_F(ClusterTopologyInfoTest, getNextWriter_empty) {
-  std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
+  std::shared_ptr<ClusterTopologyInfo> cluster_topology_info = std::make_shared<ClusterTopologyInfo>();
   EXPECT_THROW(cluster_topology_info->get_writer(), std::runtime_error);
 }

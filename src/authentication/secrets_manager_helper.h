@@ -34,15 +34,15 @@
 
 class SECRETS_MANAGER_HELPER {
     public:
-        SECRETS_MANAGER_HELPER(std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> smClient)
-            : smClient(smClient) {}
+        SECRETS_MANAGER_HELPER(std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> sm_client)
+            : sm_client(sm_client) {}
         ~SECRETS_MANAGER_HELPER() {}
 
         // attempts to match secret_ID to a secrets ARN regex and parses the region portion; returns true if parsed, false if not
-        static bool TryParseRegionFromSecretId(Aws::String secretId, Aws::String& region);
+        static bool TryParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region);
 
         // fetches credentials from the configured secrets manager client and stored the retrieved values into username and password
-        bool FetchCredentials(Aws::String secretId);
+        bool FetchCredentials(const Aws::String& secret_id);
 
         // get the fetched username
         Aws::String GetUsername() { return this->username; }
@@ -50,7 +50,7 @@ class SECRETS_MANAGER_HELPER {
         // get the fetched password
         Aws::String GetPassword() { return this->password; }
     private:
-        std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> smClient;
+        std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> sm_client;
         Aws::String username;
         Aws::String password;
 };

@@ -29,8 +29,8 @@
 
 #include "host_info.h"
 
-HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, const HostAvailabilityStrategy& hostAvailabilityStrategy, long weight) :
-    host{ host },
+HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, const HostAvailabilityStrategy& hostAvailabilityStrategy, uint64_t weight) :
+    host{ std::move(host) },
     port{ port },
     host_state{ state },
     is_writer{ is_writer },
@@ -39,14 +39,12 @@ HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer,
 {
 }
 
-HostInfo::~HostInfo() {}
-
 /**
  * Returns the host.
  *
  * @return the host
  */
-const std::string HostInfo::get_host() const {
+std::string HostInfo::get_host() const {
     return host;
 }
 
@@ -64,7 +62,7 @@ int HostInfo::get_port() const {
  * 
  * @return the weight
  */
-long HostInfo::get_weight() const {
+uint64_t HostInfo::get_weight() const {
     return weight;
 }
 
@@ -73,7 +71,7 @@ long HostInfo::get_weight() const {
  *
  * @return the host:port representation of this host
  */
-const std::string HostInfo::get_host_port_pair() const {
+std::string HostInfo::get_host_port_pair() const {
     return get_host() + HOST_PORT_SEPARATOR + std::to_string(get_port());
 }
 
