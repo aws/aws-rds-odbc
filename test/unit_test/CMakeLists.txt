@@ -31,10 +31,14 @@ add_executable(
   mock_objects.h
 
   # Test Suites
-  adfs_test.cc
-  authentication_provider_test.cc
-  cluster_topology_info_test.cc
   host_info_test.cc
+
+  authentication/authentication_provider_test.cc
+  authentication/adfs/adfs_test.cc
+
+  failover/cluster_topology_info_test.cc
+
+  host_availability/simple_host_availability_strategy_test.cc
 )
 
 #-----------------------------------------------------

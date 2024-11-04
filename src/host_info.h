@@ -31,52 +31,63 @@
 #define __HOSTINFO_H__
 
 #ifndef XCODE_BUILD
-#include "../util/logger_wrapper.h"
+#include "logger_wrapper.h"
 #endif
+
+#include "host_availability/host_availability_strategy.h"
 
 #include <memory>
 #include <string>
 
 enum HOST_STATE { UP, DOWN };
 
-// TODO Think about char types. Using strings for now, but should SQLCHAR *, or CHAR * be employed?
-// Most of the strings are for internal failover things
-class HOST_INFO {
+class HostInfo {
 public:
-    HOST_INFO();
-    //TODO - probably choose one of the following constructors, or more precisely choose which data type they should take
-    HOST_INFO(std::string host, int port);
-    HOST_INFO(const char* host, int port);
-    HOST_INFO(std::string host, int port, HOST_STATE state, bool is_writer);
-    HOST_INFO(const char* host, int port, HOST_STATE state, bool is_writer);
-    ~HOST_INFO();
-
-    int get_port();
-    std::string get_host();
-    std::string get_host_port_pair();
-    bool equal_host_port_pair(HOST_INFO& hi);
-    HOST_STATE get_host_state();
-    void set_host_state(HOST_STATE state);
-    bool is_host_up();
-    bool is_host_down();
-    bool is_host_writer();
-    void mark_as_writer(bool writer);
-    static bool is_host_same(std::shared_ptr<HOST_INFO> h1, std::shared_ptr<HOST_INFO> h2);
+    static constexpr long DEFAULT_WEIGHT = 100;
     static constexpr int NO_PORT = -1;
 
-    // used to be properties - TODO - remove the ones that are not necessary
+    // Default construction without any information is invalid
+    HostInfo() = delete;
+
+    HostInfo(
+        std::string host,
+        int port,
+        HOST_STATE state,
+        bool is_writer,
+        const HostAvailabilityStrategy& hostAvailabilityStrategy,
+        long weight = DEFAULT_WEIGHT
+    );
+
+    ~HostInfo();
+
+    bool equal_host_port_pair(HostInfo& hi) const;
+    bool is_host_down() const;
+    bool is_host_up() const;
+    bool is_host_writer() const;
+
+    const std::string get_host_port_pair() const;
+    const std::string get_host() const;
+    HOST_STATE get_host_state() const;
+    long get_weight() const;
+
+    int get_port() const;
+    void mark_as_writer(bool writer);
+    void set_host_state(HOST_STATE state);
+
     std::string session_id;
     std::string last_updated;
     std::string replica_lag;
-    std::string instance_name;
 
 private:
     const std::string HOST_PORT_SEPARATOR = ":";
     const std::string host;
     const int port = NO_PORT;
+    long weight = DEFAULT_WEIGHT;
 
     HOST_STATE host_state;
     bool is_writer;
+
+    const HostAvailabilityStrategy& hostAvailabilityStrategy;
 };
 
 #endif /* __HOSTINFO_H__ */

@@ -30,19 +30,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "mock_objects.h"
+#include <simple_host_availability_strategy.h>
 
-#include "cluster_topology_info.h"
-#include "host_info.h"
-
-using ::testing::Return;
-
-namespace {
-  const std::string base_host_string = "hostName";
-  const int base_port = 1234;
-}
-
-class ClusterTopologyInfoTest : public testing::Test {
+class SimpleHostAvailabilityStrategyTest : public testing::Test {
   protected:
     // Runs once per suite
     static void SetUpTestSuite() {}
@@ -52,19 +42,17 @@ class ClusterTopologyInfoTest : public testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(ClusterTopologyInfoTest, getNextWriter) {
-  std::shared_ptr<HOST_INFO> writer_host_info = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, true);
-  std::shared_ptr<HOST_INFO> reader_host_info_a = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false);
-  std::shared_ptr<HOST_INFO> reader_host_info_b = std::make_shared<HOST_INFO>(base_host_string, base_port, HOST_STATE::UP, false);
-  std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
-  cluster_topology_info->add_host(writer_host_info);
-  cluster_topology_info->add_host(reader_host_info_a);
-  cluster_topology_info->add_host(reader_host_info_b);
-  std::shared_ptr<HOST_INFO> host_info = cluster_topology_info->get_writer();
-  EXPECT_EQ(writer_host_info, host_info);
+TEST_F(SimpleHostAvailabilityStrategyTest, set_host_availability) {
+    SimpleHostAvailabilityStrategy* simpleHostAvailabilityStrategy = new SimpleHostAvailabilityStrategy();
+    simpleHostAvailabilityStrategy->set_host_availability(AVAILABLE);
+    // set_host_availability does nothing so ensure it can be called
+    // without throwing an exception
+    SUCCEED();
+    delete simpleHostAvailabilityStrategy;
 }
 
-TEST_F(ClusterTopologyInfoTest, getNextWriter_empty) {
-  std::shared_ptr<CLUSTER_TOPOLOGY_INFO> cluster_topology_info = std::make_shared<CLUSTER_TOPOLOGY_INFO>();
-  EXPECT_THROW(cluster_topology_info->get_writer(), std::runtime_error);
+TEST_F(SimpleHostAvailabilityStrategyTest, get_host_availability) {
+    SimpleHostAvailabilityStrategy* simpleHostAvailabilityStrategy = new SimpleHostAvailabilityStrategy();
+    EXPECT_EQ(AVAILABLE, simpleHostAvailabilityStrategy->get_host_availability(AVAILABLE));
+    EXPECT_EQ(NOT_AVAILABLE, simpleHostAvailabilityStrategy->get_host_availability(NOT_AVAILABLE));
 }

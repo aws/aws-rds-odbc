@@ -55,10 +55,10 @@ CLUSTER_TOPOLOGY_INFO::CLUSTER_TOPOLOGY_INFO(const CLUSTER_TOPOLOGY_INFO& src_in
       last_updated{src_info.last_updated},
       last_used_reader{src_info.last_used_reader} {
     for (auto host_info_source : src_info.writers) {
-        writers.push_back(std::make_shared<HOST_INFO>(*host_info_source)); //default copy
+        writers.push_back(std::make_shared<HostInfo>(*host_info_source)); //default copy
     }
     for (auto host_info_source : src_info.readers) {
-        readers.push_back(std::make_shared<HOST_INFO>(*host_info_source)); //default copy
+        readers.push_back(std::make_shared<HostInfo>(*host_info_source)); //default copy
     }
 }
 
@@ -77,7 +77,7 @@ CLUSTER_TOPOLOGY_INFO::~CLUSTER_TOPOLOGY_INFO() {
     readers.clear();
 }
 
-void CLUSTER_TOPOLOGY_INFO::add_host(std::shared_ptr<HOST_INFO> host_info) {
+void CLUSTER_TOPOLOGY_INFO::add_host(std::shared_ptr<HostInfo> host_info) {
     host_info->is_host_writer() ? writers.push_back(host_info) : readers.push_back(host_info);
     update_time();
     #ifndef XCODE_BUILD
@@ -102,7 +102,7 @@ void CLUSTER_TOPOLOGY_INFO::update_time() {
     last_updated = time(nullptr);
 }
 
-std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_writer() {
+std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_writer() {
     if (writers.empty()) {
         #ifndef XCODE_BUILD
         LOG(ERROR) << "No writer available in cluster topology.";
@@ -113,7 +113,7 @@ std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_writer() {
     return writers[0];
 }
 
-std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_next_reader() {
+std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_next_reader() {
     size_t num_readers = readers.size();
     if (readers.empty()) {
         #ifndef XCODE_BUILD
@@ -136,7 +136,7 @@ std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_next_reader() {
     return readers[current_reader];
 }
 
-std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_reader(int i) {
+std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_reader(int i) {
     if (i < 0 || i >= readers.size()) {
         throw std::runtime_error("No reader available at index " + i);
     }
@@ -144,28 +144,28 @@ std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_reader(int i) {
     return readers[i];
 }
 
-std::vector<std::shared_ptr<HOST_INFO>> CLUSTER_TOPOLOGY_INFO::get_readers() {
+std::vector<std::shared_ptr<HostInfo>> CLUSTER_TOPOLOGY_INFO::get_readers() {
     return readers;
 }
 
-std::vector<std::shared_ptr<HOST_INFO>> CLUSTER_TOPOLOGY_INFO::get_writers() {
+std::vector<std::shared_ptr<HostInfo>> CLUSTER_TOPOLOGY_INFO::get_writers() {
     return writers;
 }
 
-std::shared_ptr<HOST_INFO> CLUSTER_TOPOLOGY_INFO::get_last_used_reader() {
+std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_last_used_reader() {
     return last_used_reader;
 }
 
-void CLUSTER_TOPOLOGY_INFO::set_last_used_reader(std::shared_ptr<HOST_INFO> reader) {
+void CLUSTER_TOPOLOGY_INFO::set_last_used_reader(std::shared_ptr<HostInfo> reader) {
     last_used_reader = reader;
 }
 
-void CLUSTER_TOPOLOGY_INFO::mark_host_down(std::shared_ptr<HOST_INFO> host) {
+void CLUSTER_TOPOLOGY_INFO::mark_host_down(std::shared_ptr<HostInfo> host) {
     host->set_host_state(DOWN);
     down_hosts.insert(host->get_host_port_pair());
 }
 
-void CLUSTER_TOPOLOGY_INFO::mark_host_up(std::shared_ptr<HOST_INFO> host) {
+void CLUSTER_TOPOLOGY_INFO::mark_host_up(std::shared_ptr<HostInfo> host) {
     host->set_host_state(UP);
     down_hosts.erase(host->get_host_port_pair());
 }

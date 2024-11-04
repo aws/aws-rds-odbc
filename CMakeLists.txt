@@ -32,39 +32,40 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build as static libraries")
 #-----------------------------------------------------
 
 set(SRC
-  # Util
-  src/util/logger_wrapper.cc
+  src/host_info.cc
 
-  # Failover
-  src/failover/cluster_topology_info.cc
-  src/failover/host_info.cc
-
-  # Authentication
+  src/authentication/adfs/adfs.cc
   src/authentication/authentication_provider.cc
   src/authentication/federation.cc
-  # ADFS
-  src/authentication/adfs/adfs.cc
+
+  src/failover/cluster_topology_info.cc
+
+  src/host_availability/simple_host_availability_strategy.cc
+
+  src/util/logger_wrapper.cc
 )
 
 set(INC
-  # Util
-  src/util/logger_wrapper.h
+  src/host_info.h
 
-  # Failover
-  src/failover/cluster_topology_info.h
-  src/failover/host_info.h
-
-  # Authentication
+  src/authentication/adfs/adfs.h
   src/authentication/authentication_provider.h
   src/authentication/federation.h
-  # ADFS
-  src/authentication/adfs/adfs.h
+
+  src/failover/cluster_topology_info.h
+
+  src/host_availability/simple_host_availability_strategy.h
+
+  src/util/logger_wrapper.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories("${CMAKE_SOURCE_DIR}/src")
 include_directories("${CMAKE_SOURCE_DIR}/src/authentication")
+include_directories("${CMAKE_SOURCE_DIR}/src/authentication/adfs")
 include_directories("${CMAKE_SOURCE_DIR}/src/failover")
+include_directories("${CMAKE_SOURCE_DIR}/src/host_availability")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")
 
 #-----------------------------------------------------

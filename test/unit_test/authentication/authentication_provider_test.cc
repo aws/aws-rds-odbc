@@ -30,9 +30,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "mock_objects.h"
+#include "../mock_objects.h"
 
-#include "authentication_provider.h"
+#include <authentication_provider.h>
 
 namespace {
   const char* hostname = "hostName";

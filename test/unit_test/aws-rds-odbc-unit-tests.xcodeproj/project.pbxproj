@@ -8,17 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		734B1D382CC97CF900FB6683 /* libaws-rds-odbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D372CC97C4400FB6683 /* libaws-rds-odbc.a */; };
-		734B1D412CC97FA800FB6683 /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3C2CC97FA800FB6683 /* authentication_provider_test.cc */; };
 		734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3E2CC97FA800FB6683 /* host_info_test.cc */; };
-		734B1D432CC97FA800FB6683 /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3D2CC97FA800FB6683 /* cluster_topology_info_test.cc */; };
 		734B1D442CC97FA800FB6683 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3F2CC97FA800FB6683 /* main.cc */; };
-		734B1D452CC97FA800FB6683 /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3B2CC97FA800FB6683 /* adfs_test.cc */; };
 		734B1D4C2CC994FA00FB6683 /* libgmock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D4A2CC994FA00FB6683 /* libgmock.a */; };
 		734B1D4D2CC994FA00FB6683 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D4B2CC994FA00FB6683 /* libgtest.a */; };
 		734B1D562CCA68D900FB6683 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D462CC994B200FB6683 /* libz.tbd */; };
 		734B1D572CCA68E100FB6683 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D482CC994B800FB6683 /* libcurl.tbd */; };
 		73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */; };
 		73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9EF2CC92FD5005B92C0 /* Security.framework */; };
+		73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EC2CD3C3D1002268BF /* adfs_test.cc */; };
+		73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */; };
+		73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */; };
+		73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,9 +46,6 @@
 
 /* Begin PBXFileReference section */
 		734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "../../aws-rds-odbc.xcodeproj"; sourceTree = "<group>"; };
-		734B1D3B2CC97FA800FB6683 /* adfs_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs_test.cc; sourceTree = "<group>"; };
-		734B1D3C2CC97FA800FB6683 /* authentication_provider_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = authentication_provider_test.cc; sourceTree = "<group>"; };
-		734B1D3D2CC97FA800FB6683 /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
 		734B1D3E2CC97FA800FB6683 /* host_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = host_info_test.cc; sourceTree = "<group>"; };
 		734B1D3F2CC97FA800FB6683 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		734B1D402CC97FA800FB6683 /* mock_objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mock_objects.h; sourceTree = "<group>"; };
@@ -59,6 +57,10 @@
 		73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "aws-rds-odbc-unit-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		73CFD9EF2CC92FD5005B92C0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		73D322EC2CD3C3D1002268BF /* adfs_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs_test.cc; sourceTree = "<group>"; };
+		73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = authentication_provider_test.cc; sourceTree = "<group>"; };
+		73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
+		73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy_test.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,9 +92,9 @@
 		73BD67732CC92229000817A9 = {
 			isa = PBXGroup;
 			children = (
-				734B1D3B2CC97FA800FB6683 /* adfs_test.cc */,
-				734B1D3C2CC97FA800FB6683 /* authentication_provider_test.cc */,
-				734B1D3D2CC97FA800FB6683 /* cluster_topology_info_test.cc */,
+				73D322EF2CD3C3D1002268BF /* authentication */,
+				73D322F12CD3C3D1002268BF /* failover */,
+				73D322F62CD3CDBE002268BF /* host_availability */,
 				734B1D3E2CC97FA800FB6683 /* host_info_test.cc */,
 				734B1D3F2CC97FA800FB6683 /* main.cc */,
 				734B1D402CC97FA800FB6683 /* mock_objects.h */,
@@ -122,6 +124,39 @@
 				73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		73D322ED2CD3C3D1002268BF /* adfs */ = {
+			isa = PBXGroup;
+			children = (
+				73D322EC2CD3C3D1002268BF /* adfs_test.cc */,
+			);
+			path = adfs;
+			sourceTree = "<group>";
+		};
+		73D322EF2CD3C3D1002268BF /* authentication */ = {
+			isa = PBXGroup;
+			children = (
+				73D322ED2CD3C3D1002268BF /* adfs */,
+				73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */,
+			);
+			path = authentication;
+			sourceTree = "<group>";
+		};
+		73D322F12CD3C3D1002268BF /* failover */ = {
+			isa = PBXGroup;
+			children = (
+				73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */,
+			);
+			path = failover;
+			sourceTree = "<group>";
+		};
+		73D322F62CD3CDBE002268BF /* host_availability */ = {
+			isa = PBXGroup;
+			children = (
+				73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */,
+			);
+			path = host_availability;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,11 +235,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				734B1D412CC97FA800FB6683 /* authentication_provider_test.cc in Sources */,
 				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
-				734B1D432CC97FA800FB6683 /* cluster_topology_info_test.cc in Sources */,
+				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
+				73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */,
+				73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */,
+				73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */,
 				734B1D442CC97FA800FB6683 /* main.cc in Sources */,
-				734B1D452CC97FA800FB6683 /* adfs_test.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
