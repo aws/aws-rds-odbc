@@ -46,6 +46,8 @@ set(SRC
   src/host_availability/simple_host_availability_strategy.cc
   src/host_selector/random_host_selector.cc
 
+  src/limitless/limitless_query_helper.cc
+
   src/util/logger_wrapper.cc
 )
 
@@ -65,6 +67,8 @@ set(INC
   src/host_selector/host_selector.h
   src/host_selector/random_host_selector.h
 
+  src/limitless/limitless_query_helper.h
+
   src/util/logger_wrapper.h
 )
 
@@ -77,6 +81,10 @@ include_directories("${CMAKE_SOURCE_DIR}/src/failover")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_availability")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_selector")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")
+
+if(WIN32)
+  add_compile_definitions(WIN32)
+endif()
 
 #-----------------------------------------------------
 
@@ -162,6 +170,24 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glog)
 include_directories(${glog_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} glog::glog)
+
+#-----------------------------------------------------
+# Find and add ODBC
+
+if(APPLE)
+  set(ODBC_INCLUDE_DIR /opt/homebrew/opt/unixodbc/include)
+  set(ODBC_LIBRARY /opt/homebrew/opt/unixodbc/lib/libodbc.a)
+endif()
+
+if (WIN32)
+  set(ODBC_INCLUDE_DIR "C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/um")
+  set(ODBC_LIBRARY "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64/odbc32.lib")
+endif()
+
+message(STATUS "ODBC_INCLUDE_DIR: ${ODBC_INCLUDE_DIR}")
+message(STATUS "ODBC_LIBRARY: ${ODBC_LIBRARY}")
+include_directories(${ODBC_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} ${ODBC_LIBRARY})
 
 #-----------------------------------------------------
 # Combine static libraries into the target static library

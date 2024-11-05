@@ -18,7 +18,7 @@ env:
 jobs:
   static-analysis:
     name: Static Analysis
-    runs-on: macos-14
+    runs-on: macos-14 # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md
     env:
       CMAKE_GENERATOR: Unix Makefiles
     steps:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install llvm cppcheck
+          brew install cppcheck llvm unixodbc
           python3.9 -m venv ./venv
           source ./venv/bin/activate
           python3.9 -m pip install codechecker

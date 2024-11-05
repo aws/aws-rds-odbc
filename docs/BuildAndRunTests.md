@@ -33,7 +33,7 @@
 
 ### Prerequisites
 Open a terminal and run the following.
-1. `brew install googletest`
+1. `brew install googletest unixodbc`
 
 ### Build and run tests
 1. Open a terminal and change to the root repository folder.

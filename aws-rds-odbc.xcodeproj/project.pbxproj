@@ -39,6 +39,11 @@
 		73D788362CC919070028B42F /* host_info.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788262CC919070028B42F /* host_info.h */; };
 		73D788372CC919070028B42F /* federation.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788212CC919070028B42F /* federation.h */; };
 		73D788382CC919070028B42F /* cluster_topology_info.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788242CC919070028B42F /* cluster_topology_info.h */; };
+		73DAE0212CDA71DD00225BE1 /* limitless_query_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE01F2CDA71DD00225BE1 /* limitless_query_helper.cc */; };
+		73DAE0222CDA71DD00225BE1 /* limitless_query_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73DAE01E2CDA71DD00225BE1 /* limitless_query_helper.h */; };
+		73DAE0242CDA88EC00225BE1 /* libodbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73DAE0232CDA88EC00225BE1 /* libodbc.a */; };
+		73DAE02A2CDA8A0100225BE1 /* secrets_manager_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */; };
+		73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -85,6 +90,11 @@
 		73D788272CC919070028B42F /* host_info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = host_info.cc; sourceTree = "<group>"; };
 		73D788292CC919070028B42F /* logger_wrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = logger_wrapper.h; sourceTree = "<group>"; };
 		73D7882A2CC919070028B42F /* logger_wrapper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = logger_wrapper.cc; sourceTree = "<group>"; };
+		73DAE01E2CDA71DD00225BE1 /* limitless_query_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = limitless_query_helper.h; sourceTree = "<group>"; };
+		73DAE01F2CDA71DD00225BE1 /* limitless_query_helper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = limitless_query_helper.cc; sourceTree = "<group>"; };
+		73DAE0232CDA88EC00225BE1 /* libodbc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libodbc.a; path = ../../../../../../../opt/homebrew/Cellar/unixodbc/2.3.12/lib/libodbc.a; sourceTree = "<group>"; };
+		73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets_manager_helper.h; sourceTree = "<group>"; };
+		73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +104,7 @@
 			files = (
 				734B1D552CCA5D6F00FB6683 /* libcurl.tbd in Frameworks */,
 				734B1D532CCA5D6400FB6683 /* libz.tbd in Frameworks */,
+				73DAE0242CDA88EC00225BE1 /* libodbc.a in Frameworks */,
 				734B1C2B2CC9611400FB6683 /* libaws-c-auth.a in Frameworks */,
 				734B1C2C2CC9611400FB6683 /* libaws-c-cal.a in Frameworks */,
 				734B1C262CC9611400FB6683 /* libaws-c-common.a in Frameworks */,
@@ -119,6 +130,7 @@
 		734B1B532CC956B100FB6683 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				73DAE0232CDA88EC00225BE1 /* libodbc.a */,
 				734B1D582CCA6FCE00FB6683 /* libglog.a */,
 				734B1D542CCA5D6F00FB6683 /* libcurl.tbd */,
 				734B1D522CCA5D6400FB6683 /* libz.tbd */,
@@ -194,6 +206,8 @@
 				73D788202CC919070028B42F /* authentication_provider.cc */,
 				73D788212CC919070028B42F /* federation.h */,
 				73D788222CC919070028B42F /* federation.cc */,
+				73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */,
+				73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */,
 			);
 			path = authentication;
 			sourceTree = "<group>";
@@ -219,6 +233,7 @@
 		73D7882C2CC919070028B42F /* src */ = {
 			isa = PBXGroup;
 			children = (
+				73DAE0202CDA71DD00225BE1 /* limitless */,
 				73D788232CC919070028B42F /* authentication */,
 				73D788282CC919070028B42F /* failover */,
 				73D322E62CD3BC08002268BF /* host_availability */,
@@ -229,6 +244,15 @@
 			path = src;
 			sourceTree = "<group>";
 		};
+		73DAE0202CDA71DD00225BE1 /* limitless */ = {
+			isa = PBXGroup;
+			children = (
+				73DAE01E2CDA71DD00225BE1 /* limitless_query_helper.h */,
+				73DAE01F2CDA71DD00225BE1 /* limitless_query_helper.cc */,
+			);
+			path = limitless;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -236,8 +260,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */,
 				73D788332CC919070028B42F /* authentication_provider.h in Headers */,
 				73D788342CC919070028B42F /* adfs.h in Headers */,
+				73DAE0222CDA71DD00225BE1 /* limitless_query_helper.h in Headers */,
 				73D788352CC919070028B42F /* logger_wrapper.h in Headers */,
 				73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */,
 				73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */,
@@ -307,12 +333,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73DAE0212CDA71DD00225BE1 /* limitless_query_helper.cc in Sources */,
 				73D7882D2CC919070028B42F /* adfs.cc in Sources */,
 				73D7882E2CC919070028B42F /* authentication_provider.cc in Sources */,
 				73D7882F2CC919070028B42F /* host_info.cc in Sources */,
 				73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */,
 				73D788302CC919070028B42F /* federation.cc in Sources */,
 				73D788322CC919070028B42F /* cluster_topology_info.cc in Sources */,
+				73DAE02A2CDA8A0100225BE1 /* secrets_manager_helper.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,6 +399,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -426,6 +456,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -447,8 +479,13 @@
 					"$(SRCROOT)/aws_sdk/install/include",
 					/opt/homebrew/opt/glog/include,
 					/opt/homebrew/opt/gflags/include,
+					/opt/homebrew/opt/unixodbc/include,
 				);
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/aws_sdk/install/lib";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/aws_sdk/install/lib",
+					/opt/homebrew/opt/unixodbc/lib,
+					/opt/homebrew/Cellar/unixodbc/2.3.12/lib,
+				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -469,8 +506,13 @@
 					"$(SRCROOT)/aws_sdk/install/include",
 					/opt/homebrew/opt/glog/include,
 					/opt/homebrew/opt/gflags/include,
+					/opt/homebrew/opt/unixodbc/include,
 				);
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/aws_sdk/install/lib";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/aws_sdk/install/lib",
+					/opt/homebrew/opt/unixodbc/lib,
+					/opt/homebrew/Cellar/unixodbc/2.3.12/lib,
+				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

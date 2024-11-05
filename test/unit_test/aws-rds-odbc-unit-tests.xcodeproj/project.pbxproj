@@ -20,6 +20,7 @@
 		73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */; };
 		73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */; };
 		73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */; };
+		73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = authentication_provider_test.cc; sourceTree = "<group>"; };
 		73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
 		73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy_test.cc; sourceTree = "<group>"; };
+		73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper_test.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +141,7 @@
 			children = (
 				73D322ED2CD3C3D1002268BF /* adfs */,
 				73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */,
+				73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */,
 			);
 			path = authentication;
 			sourceTree = "<group>";
@@ -236,6 +239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
+				73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */,
 				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
 				73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */,
 				73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */,
