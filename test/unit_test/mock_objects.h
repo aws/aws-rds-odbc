@@ -32,7 +32,18 @@
 
 #include <gmock/gmock.h>
 
+#include <aws/secretsmanager/SecretsManagerClient.h>
+#include <aws/secretsmanager/model/GetSecretValueRequest.h>
+
 #include "federation.h"
+#include "authentication_provider.h"
+
+class MOCK_SECRETS_MANAGER_CLIENT : public Aws::SecretsManager::SecretsManagerClient {
+public:
+    MOCK_SECRETS_MANAGER_CLIENT() : SecretsManagerClient() {};
+
+    MOCK_METHOD(Aws::SecretsManager::Model::GetSecretValueOutcome, GetSecretValue, (const Aws::SecretsManager::Model::GetSecretValueRequest&), (const));
+};
 
 // Note that we inherit from the real class and mock only virtual functions.
 
