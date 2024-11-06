@@ -80,8 +80,8 @@ bool SECRETS_MANAGER_HELPER::FetchCredentials(const Aws::String& secret_id) {
         }
 
         return false;
-    } else {
-        LOG(ERROR) << "Error getting secret value: " << outcome.GetError().GetMessage();
-        return false;
     }
+
+    LOG(ERROR) << "Error getting secret value: " << outcome.GetError().GetMessage();
+    return false;
 }

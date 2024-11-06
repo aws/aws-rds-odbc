@@ -24,7 +24,7 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #ifndef __HOSTINFO_H__
@@ -51,7 +51,7 @@ public:
         int port,
         HOST_STATE state,
         bool is_writer,
-        const HostAvailabilityStrategy& hostAvailabilityStrategy,
+        std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy,
         uint64_t weight = DEFAULT_WEIGHT
     );
 
@@ -71,6 +71,9 @@ public:
     void mark_as_writer(bool writer);
     void set_host_state(HOST_STATE state);
 
+    std::shared_ptr<HostAvailabilityStrategy> get_host_availability_strategy() const;
+    void set_host_availability_strategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy);
+
     std::string session_id;
     std::string last_updated;
     std::string replica_lag;
@@ -84,7 +87,7 @@ private:
     HOST_STATE host_state;
     bool is_writer;
 
-    const HostAvailabilityStrategy& hostAvailabilityStrategy;
+    std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy;
 };
 
 #endif /* __HOSTINFO_H__ */

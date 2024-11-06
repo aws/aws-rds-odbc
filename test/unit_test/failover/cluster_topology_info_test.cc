@@ -24,24 +24,23 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include "../mock_objects.h"
-
 #include <cluster_topology_info.h>
 #include <host_info.h>
 #include <simple_host_availability_strategy.h>
+
+#include "../mock_objects.h"
 
 using ::testing::Return;
 
 namespace {
   const std::string base_host_string = "hostName";
   const int base_port = 1234;
-  const SimpleHostAvailabilityStrategy simpleHostAvailabilityStrategy;
+  std::shared_ptr<SimpleHostAvailabilityStrategy> simple_host_availability_strategy =
+    std::make_shared<SimpleHostAvailabilityStrategy>();
 }
 
 class ClusterTopologyInfoTest : public testing::Test {
@@ -56,11 +55,11 @@ class ClusterTopologyInfoTest : public testing::Test {
 
 TEST_F(ClusterTopologyInfoTest, getNextWriter) {
   std::shared_ptr<HostInfo> writer_host_info =
-    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, true, simpleHostAvailabilityStrategy);
+    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, true, simple_host_availability_strategy);
   std::shared_ptr<HostInfo> reader_host_info_a =
-    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
+    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simple_host_availability_strategy);
   std::shared_ptr<HostInfo> reader_host_info_b =
-    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
+    std::make_shared<HostInfo>(base_host_string, base_port, HOST_STATE::UP, false, simple_host_availability_strategy);
   std::shared_ptr<ClusterTopologyInfo> cluster_topology_info = std::make_shared<ClusterTopologyInfo>();
   cluster_topology_info->add_host(writer_host_info);
   cluster_topology_info->add_host(reader_host_info_a);

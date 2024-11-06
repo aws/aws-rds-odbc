@@ -24,17 +24,17 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "host_info.h"
 
-HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, const HostAvailabilityStrategy& hostAvailabilityStrategy, uint64_t weight) :
+HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy, uint64_t weight) :
     host{ std::move(host) },
     port{ port },
     host_state{ state },
     is_writer{ is_writer },
-    hostAvailabilityStrategy { hostAvailabilityStrategy },
+    host_availability_strategy{ std::move(host_availability_strategy) },
     weight { weight }
 {
 }
@@ -59,7 +59,7 @@ int HostInfo::get_port() const {
 
 /**
  * Returns the weight
- * 
+ *
  * @return the weight
  */
 uint64_t HostInfo::get_weight() const {
@@ -101,4 +101,12 @@ bool HostInfo::is_host_writer() const {
 
 void HostInfo::mark_as_writer(bool writer) {
     is_writer = writer;
+}
+
+std::shared_ptr<HostAvailabilityStrategy> HostInfo::get_host_availability_strategy() const {
+    return host_availability_strategy;
+}
+
+void HostInfo::set_host_availability_strategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy) {
+    host_availability_strategy = std::move(new_host_availability_strategy);
 }

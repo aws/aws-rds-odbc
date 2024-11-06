@@ -43,16 +43,18 @@ class SimpleHostAvailabilityStrategyTest : public testing::Test {
 };
 
 TEST_F(SimpleHostAvailabilityStrategyTest, set_host_availability) {
-    SimpleHostAvailabilityStrategy* simpleHostAvailabilityStrategy = new SimpleHostAvailabilityStrategy();
-    simpleHostAvailabilityStrategy->set_host_availability(AVAILABLE);
+    std::shared_ptr<SimpleHostAvailabilityStrategy> simple_host_availability_strategy = 
+        std::make_shared<SimpleHostAvailabilityStrategy>();
+
+    simple_host_availability_strategy->set_host_availability(AVAILABLE);
     // set_host_availability does nothing so ensure it can be called
     // without throwing an exception
     SUCCEED();
-    delete simpleHostAvailabilityStrategy;
 }
 
 TEST_F(SimpleHostAvailabilityStrategyTest, get_host_availability) {
-    SimpleHostAvailabilityStrategy* simpleHostAvailabilityStrategy = new SimpleHostAvailabilityStrategy();
-    EXPECT_EQ(AVAILABLE, simpleHostAvailabilityStrategy->get_host_availability(AVAILABLE));
-    EXPECT_EQ(NOT_AVAILABLE, simpleHostAvailabilityStrategy->get_host_availability(NOT_AVAILABLE));
+    std::shared_ptr<SimpleHostAvailabilityStrategy> simple_host_availability_strategy = 
+        std::make_shared<SimpleHostAvailabilityStrategy>();
+    EXPECT_EQ(AVAILABLE, simple_host_availability_strategy->get_host_availability(AVAILABLE));
+    EXPECT_EQ(NOT_AVAILABLE, simple_host_availability_strategy->get_host_availability(NOT_AVAILABLE));
 }
