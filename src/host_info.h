@@ -43,8 +43,7 @@ public:
     static constexpr uint64_t DEFAULT_WEIGHT = 100;
     static constexpr int NO_PORT = -1;
 
-    // Default construction without any information is invalid
-    HostInfo() = delete;
+    HostInfo() = default;
 
     HostInfo(
         std::string host,

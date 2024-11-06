@@ -31,7 +31,10 @@
 #define __MOCKOBJECTS_H__
 
 #include <gmock/gmock.h>
-
+#ifdef WIN32
+#include <windows.h>
+#endif
+#include <sql.h>
 #include <aws/secretsmanager/SecretsManagerClient.h>
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
 

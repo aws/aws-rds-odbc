@@ -27,28 +27,31 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __LIMITLESSQUERYHELPER_H__
-#define __LIMITLESSQUERYHELPER_H__
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <odbc_helper.h>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include "../mock_objects.h"
 
-#include <sql.h>
-#include <sqlext.h>
-
-#include <vector>
-
-#include "../host_info.h"
-
-class LimitlessQueryHelper {
-public:
-    static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
-
-    static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map);
-
-private:
-    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map);
+class OdbcHelperTest : public testing::Test {
+  protected:
+    // Runs once per suite
+    static void SetUpTestSuite() {}
+    static void TearDownTestSuite() {}
+    // Runs per test case
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
-#endif /* __LIMITLESSQUERYHELPER_H__ */
+TEST_F(OdbcHelperTest, CheckResult_SqlSucceeded) {
+    void* mock_handle = reinterpret_cast<void*>(0x1234);
+
+    EXPECT_TRUE(OdbcHelper::CheckResult(SQL_SUCCESS, "", mock_handle, SQL_HANDLE_STMT));
+}
+
+TEST_F(OdbcHelperTest, CheckResult_SqlError) {
+    void* mock_handle = reinterpret_cast<void*>(0x1234);
+
+    EXPECT_FALSE(OdbcHelper::CheckResult(SQL_ERROR, "", mock_handle, SQL_HANDLE_STMT));
+}
+

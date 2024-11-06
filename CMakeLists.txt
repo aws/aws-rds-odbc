@@ -49,6 +49,7 @@ set(SRC
   src/limitless/limitless_query_helper.cc
 
   src/util/logger_wrapper.cc
+  src/util/odbc_helper.cc
 )
 
 set(INC
@@ -70,6 +71,7 @@ set(INC
   src/limitless/limitless_query_helper.h
 
   src/util/logger_wrapper.h
+  src/util/odbc_helper.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})

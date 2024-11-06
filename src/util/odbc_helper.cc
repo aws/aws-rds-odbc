@@ -24,31 +24,45 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __LIMITLESSQUERYHELPER_H__
-#define __LIMITLESSQUERYHELPER_H__
+#include "odbc_helper.h"
+#include "logger_wrapper.h"
 
-#ifdef WIN32
-#include <windows.h>
-#endif
+bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
+    if (SQL_SUCCEEDED(rc)) {
+        return true;
+    }
 
-#include <sql.h>
-#include <sqlext.h>
+    if (!log_message.empty()) {
+        LogMessage(log_message, handle, handle_type);
+    }
+    
+	return false;
+}
 
-#include <vector>
+void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
+	SQLCHAR     sqlstate[32];
+	SQLCHAR     message[1000];
+	SQLINTEGER	nativeerror;
+	SQLSMALLINT textlen;
+	SQLRETURN	ret;
+	SQLSMALLINT	recno = 0;
 
-#include "../host_info.h"
+  	LOG(ERROR) << log_message;
 
-class LimitlessQueryHelper {
-public:
-    static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
+	do {
+		recno++;
+		ret = SQLGetDiagRec(handle_type, handle, recno, sqlstate, &nativeerror,
+							message, sizeof(message), &textlen);
+		if (ret == SQL_INVALID_HANDLE)
+			LOG(ERROR) << "Invalid handle";
+		else if (SQL_SUCCEEDED(ret))
+            LOG(ERROR) << sqlstate << message;
+	} while (ret == SQL_SUCCESS);
 
-    static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map);
-
-private:
-    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map);
-};
-
-#endif /* __LIMITLESSQUERYHELPER_H__ */
+	if (ret == SQL_NO_DATA && recno == 1) {
+		LOG(ERROR) << "No error information";
+    }
+}

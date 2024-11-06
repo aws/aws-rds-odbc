@@ -51,7 +51,6 @@ class HostInfoTest : public testing::Test {
         hostInfo = std::make_shared<HostInfo>(host, port, UP, false, simple_host_availability_strategy);
     }
     void TearDown() override {}
-    
 
     std::shared_ptr<HostInfo> hostInfo;
 };

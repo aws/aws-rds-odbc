@@ -29,7 +29,7 @@ add_executable(
   # Executable Name
   ${PROJECT_NAME}
 
-  # Runner / Utility 
+  # Runner / Utility
   main.cc
   mock_objects.h
 
@@ -44,8 +44,19 @@ add_executable(
   failover/cluster_topology_info_test.cc
 
   host_availability/simple_host_availability_strategy_test.cc
+
   host_selector/random_host_selector_test.cc
+
+  util/odbc_helper_test.cc
 )
+
+#-----------------------------------------------------
+# Find required libraries
+
+if (APPLE)
+  find_library(ICONV_LIB iconv)
+  find_library(LTDL_LIB ltdl)
+endif()
 
 #-----------------------------------------------------
 
@@ -56,6 +67,8 @@ target_link_libraries(
   # External Libaries
   gtest_main
   gmock_main
+  ${ICONV_LIB}
+  ${LTDL_LIB}
 
   # Source Libaries
   aws-rds-odbc

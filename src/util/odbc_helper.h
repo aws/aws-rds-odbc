@@ -24,11 +24,11 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __LIMITLESSQUERYHELPER_H__
-#define __LIMITLESSQUERYHELPER_H__
+#ifndef __ODBCHELPER_H__
+#define __ODBCHELPER_H__
 
 #ifdef WIN32
 #include <windows.h>
@@ -36,19 +36,14 @@
 
 #include <sql.h>
 #include <sqlext.h>
+#include <string>
 
-#include <vector>
-
-#include "../host_info.h"
-
-class LimitlessQueryHelper {
+class OdbcHelper {
 public:
-    static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
-
-    static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map);
+    static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
 
 private:
-    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map);
+    static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
 };
 
-#endif /* __LIMITLESSQUERYHELPER_H__ */
+#endif /* __ODBCHELPER_H__ */
