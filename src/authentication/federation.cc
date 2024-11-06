@@ -24,14 +24,11 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "federation.h"
-
-#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
-#endif
 
 bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
     Aws::STS::Model::AssumeRoleWithSAMLRequest& saml_request,
@@ -43,9 +40,7 @@ bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
     if (outcome.IsSuccess()) {
         const Aws::STS::Model::Credentials& new_cred = outcome.GetResult().GetCredentials();
 
-        #ifndef XCODE_BUILD
         LOG(INFO) << "Access key is " << new_cred.GetAccessKeyId().c_str() << ", secret key length is " << new_cred.GetSecretAccessKey().size();
-        #endif
 
         credentials.SetAWSAccessKeyId(new_cred.GetAccessKeyId());
         credentials.SetAWSSecretKey(new_cred.GetSecretAccessKey());
@@ -56,9 +51,7 @@ bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
         const auto& error = outcome.GetError();
         std::string err_info = "Failed to fetch credentials, ERROR: " + error.GetExceptionName()
             + ": " + error.GetMessage();
-        #ifndef XCODE_BUILD
         LOG(ERROR) << "Error in FetchCredentialsWithSAMLAssertion is " << err_info.c_str();
-        #endif
     }
 
     return retval;
@@ -70,13 +63,9 @@ bool FederationCredentialProvider::GetAWSCredentials(Aws::Auth::AWSCredentials& 
 
     bool retval = false;
     if (saml_assertion.empty()) {
-        #ifndef XCODE_BUILD
         LOG(ERROR) << "Error in GetAWSCredentials is " << err_info.c_str();
-        #endif
     } else {
-        #ifndef XCODE_BUILD
         DLOG(INFO) << "SAML assertion is " << saml_assertion.c_str();
-        #endif
 
         Aws::STS::Model::AssumeRoleWithSAMLRequest saml_request;
         saml_request.WithRoleArn(role_arn)

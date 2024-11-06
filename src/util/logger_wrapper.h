@@ -30,6 +30,12 @@
 #ifndef __LOGGERWRAPPER_H__
 #define __LOGGERWRAPPER_H__
 
+#ifdef XCODE_BUILD
+// Setting this to a value greater than 3 strips out all of the
+// Google logging functionality
+#define GOOGLE_STRIP_LOG 4
+#endif /* XCODE_BUILD */
+
 #include <glog/logging.h>
 
 #include <format>

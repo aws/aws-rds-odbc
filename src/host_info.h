@@ -30,10 +30,7 @@
 #ifndef __HOSTINFO_H__
 #define __HOSTINFO_H__
 
-#ifndef XCODE_BUILD
 #include "logger_wrapper.h"
-#endif
-
 #include "host_availability/host_availability_strategy.h"
 
 #include <memory>

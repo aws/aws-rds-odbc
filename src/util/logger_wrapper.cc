@@ -24,12 +24,13 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "logger_wrapper.h"
 
 void LoggerWrapper::initialize() {
+#ifndef XCODE_BUILD
     static LoggerWrapper instance;
     if (!instance.init) {
         FLAGS_stderrthreshold = 4; // Disable console output
@@ -38,11 +39,14 @@ void LoggerWrapper::initialize() {
         google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
         instance.init = true;
     }
+#endif
 }
 
 void LoggerWrapper::set_log_directory(const std::string& directory_path) {
+#ifndef XCODE_BUILD
     if (!std::filesystem::exists(directory_path)) {
         std::filesystem::create_directory(directory_path);
     }
     FLAGS_log_dir = directory_path;
+#endif
 }

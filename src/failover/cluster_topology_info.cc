@@ -24,7 +24,7 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "cluster_topology_info.h"
@@ -42,10 +42,8 @@ static int get_random_number() {
 }
 
 ClusterTopologyInfo::ClusterTopologyInfo() {
-    #ifndef XCODE_BUILD
     LoggerWrapper::initialize();
     DLOG(INFO) << "Constructor";
-    #endif
     update_time();
 }
 
@@ -63,9 +61,7 @@ ClusterTopologyInfo::ClusterTopologyInfo(const ClusterTopologyInfo& src_info)
 }
 
 ClusterTopologyInfo::~ClusterTopologyInfo() {
-    #ifndef XCODE_BUILD
     DLOG(INFO) << "Deconstructor";
-    #endif
     for (auto p : writers) {
         p.reset();
     }
@@ -80,9 +76,7 @@ ClusterTopologyInfo::~ClusterTopologyInfo() {
 void ClusterTopologyInfo::add_host(const std::shared_ptr<HostInfo>& host_info) {
     host_info->is_host_writer() ? writers.push_back(host_info) : readers.push_back(host_info);
     update_time();
-    #ifndef XCODE_BUILD
     DLOG(INFO) << (host_info->is_host_writer() ? "Writer" : "Reader" ) << ", " << host_info->get_host_port_pair() << " added to cluster topology.";
-    #endif
 }
 
 size_t ClusterTopologyInfo::total_hosts() {
@@ -104,9 +98,7 @@ void ClusterTopologyInfo::update_time() {
 
 std::shared_ptr<HostInfo> ClusterTopologyInfo::get_writer() {
     if (writers.empty()) {
-        #ifndef XCODE_BUILD
         LOG(ERROR) << "No writer available in cluster topology.";
-        #endif
         throw std::runtime_error("No writer available");
     }
 
@@ -116,9 +108,7 @@ std::shared_ptr<HostInfo> ClusterTopologyInfo::get_writer() {
 std::shared_ptr<HostInfo> ClusterTopologyInfo::get_next_reader() {
     size_t num_readers = readers.size();
     if (readers.empty()) {
-        #ifndef XCODE_BUILD
         LOG(ERROR) << "No reader available in cluster topology.";
-        #endif
         throw std::runtime_error("No reader available");
     }
 

@@ -24,7 +24,7 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include <cstdlib>
@@ -80,10 +80,8 @@ bool SECRETS_MANAGER_HELPER::FetchCredentials(const Aws::String& secret_id) {
         }
 
         return false;
+    } else {
+        LOG(ERROR) << "Error getting secret value: " << outcome.GetError().GetMessage();
+        return false;
     }
-
-    #ifndef XCODE_BUILD
-    LOG(ERROR) << "Error getting secret value: " << outcome.GetError().GetMessage();
-    #endif
-    return false;
 }
