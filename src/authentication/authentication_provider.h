@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-// TODO - Limits here are based on PgSQL
+// TODO(yuenhcol) - Limits here are based on PgSQL
 #define LARGE_REGISTRY_LEN          4096
 #define MEDIUM_REGISTRY_LEN         1024
 #define SMALL_REGISTRY_LEN          10	
@@ -53,7 +53,7 @@ typedef enum {
     FOREACH_AUTHTYPE(GENERATE_ENUM)
 } FederatedAuthType;
 
-static const char *FEDERATEDAUTHTYPE_STRING[] = {
+static const char* FEDERATED_AUTH_TYPE_STRING[] = {
     FOREACH_AUTHTYPE(GENERATE_STRING)
 };
 
@@ -79,11 +79,11 @@ typedef struct Credentials {
 
 FederatedAuthType GetFedAuthTypeEnum(const char *str);
 
-bool GetCachedToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName);
-void UpdateCachedToken(const char* dbHostName, const char* dbRegion, const char* port, const char* dbUserName, const char* token, const char* expirationTime);
-bool GenerateConnectAuthToken(char* token, const unsigned int maxSize, const char* dbHostName, const char* dbRegion, unsigned port, const char* dbUserName, FederatedAuthType type, FederatedAuthConfig config);
+bool GetCachedToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user);
+void UpdateCachedToken(const char* db_hostname, const char* db_region, const char* port, const char* db_user, const char* token, const char* expiration_time);
+bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config);
 
-bool GetCredentialsFromSecretsManager(const char *secretId, const char *region, Credentials *credentials);
+bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region, Credentials* credentials);
 
 #ifdef __cplusplus
 }

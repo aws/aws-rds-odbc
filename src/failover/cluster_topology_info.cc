@@ -36,33 +36,33 @@
 
   Returns random number.
  */
-int get_random_number() {
-    std::srand((unsigned int)time(nullptr));
+static int get_random_number() {
+    std::srand(static_cast<unsigned int>(time(nullptr)));
     return rand();
 }
 
-CLUSTER_TOPOLOGY_INFO::CLUSTER_TOPOLOGY_INFO() {
+ClusterTopologyInfo::ClusterTopologyInfo() {
     #ifndef XCODE_BUILD
-    LOGGER_WRAPPER::initialize();
+    LoggerWrapper::initialize();
     DLOG(INFO) << "Constructor";
     #endif
     update_time();
 }
 
 // copy constructor
-CLUSTER_TOPOLOGY_INFO::CLUSTER_TOPOLOGY_INFO(const CLUSTER_TOPOLOGY_INFO& src_info)
+ClusterTopologyInfo::ClusterTopologyInfo(const ClusterTopologyInfo& src_info)
     : current_reader{src_info.current_reader},
       last_updated{src_info.last_updated},
       last_used_reader{src_info.last_used_reader} {
-    for (auto host_info_source : src_info.writers) {
+    for (const auto& host_info_source : src_info.writers) {
         writers.push_back(std::make_shared<HostInfo>(*host_info_source)); //default copy
     }
-    for (auto host_info_source : src_info.readers) {
+    for (const auto& host_info_source : src_info.readers) {
         readers.push_back(std::make_shared<HostInfo>(*host_info_source)); //default copy
     }
 }
 
-CLUSTER_TOPOLOGY_INFO::~CLUSTER_TOPOLOGY_INFO() {
+ClusterTopologyInfo::~ClusterTopologyInfo() {
     #ifndef XCODE_BUILD
     DLOG(INFO) << "Deconstructor";
     #endif
@@ -77,7 +77,7 @@ CLUSTER_TOPOLOGY_INFO::~CLUSTER_TOPOLOGY_INFO() {
     readers.clear();
 }
 
-void CLUSTER_TOPOLOGY_INFO::add_host(std::shared_ptr<HostInfo> host_info) {
+void ClusterTopologyInfo::add_host(const std::shared_ptr<HostInfo>& host_info) {
     host_info->is_host_writer() ? writers.push_back(host_info) : readers.push_back(host_info);
     update_time();
     #ifndef XCODE_BUILD
@@ -85,24 +85,24 @@ void CLUSTER_TOPOLOGY_INFO::add_host(std::shared_ptr<HostInfo> host_info) {
     #endif
 }
 
-size_t CLUSTER_TOPOLOGY_INFO::total_hosts() {
+size_t ClusterTopologyInfo::total_hosts() {
     return writers.size() + readers.size();
 }
 
-size_t CLUSTER_TOPOLOGY_INFO::num_readers() {
+size_t ClusterTopologyInfo::num_readers() {
     return readers.size();
 }
 
-std::time_t CLUSTER_TOPOLOGY_INFO::time_last_updated() {
+std::time_t ClusterTopologyInfo::time_last_updated() const {
     return last_updated;
 }
 
-// TODO harmonize time function across objects so the times are comparable
-void CLUSTER_TOPOLOGY_INFO::update_time() {
+// TODO(yuenhocol) harmonize time function across objects so the times are comparable
+void ClusterTopologyInfo::update_time() {
     last_updated = time(nullptr);
 }
 
-std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_writer() {
+std::shared_ptr<HostInfo> ClusterTopologyInfo::get_writer() {
     if (writers.empty()) {
         #ifndef XCODE_BUILD
         LOG(ERROR) << "No writer available in cluster topology.";
@@ -113,7 +113,7 @@ std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_writer() {
     return writers[0];
 }
 
-std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_next_reader() {
+std::shared_ptr<HostInfo> ClusterTopologyInfo::get_next_reader() {
     size_t num_readers = readers.size();
     if (readers.empty()) {
         #ifndef XCODE_BUILD
@@ -136,40 +136,40 @@ std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_next_reader() {
     return readers[current_reader];
 }
 
-std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_reader(int i) {
+std::shared_ptr<HostInfo> ClusterTopologyInfo::get_reader(int i) {
     if (i < 0 || i >= readers.size()) {
-        throw std::runtime_error("No reader available at index " + i);
+        throw std::runtime_error("No reader available at index " + std::to_string(i));
     }
 
     return readers[i];
 }
 
-std::vector<std::shared_ptr<HostInfo>> CLUSTER_TOPOLOGY_INFO::get_readers() {
+std::vector<std::shared_ptr<HostInfo>> ClusterTopologyInfo::get_readers() {
     return readers;
 }
 
-std::vector<std::shared_ptr<HostInfo>> CLUSTER_TOPOLOGY_INFO::get_writers() {
+std::vector<std::shared_ptr<HostInfo>> ClusterTopologyInfo::get_writers() {
     return writers;
 }
 
-std::shared_ptr<HostInfo> CLUSTER_TOPOLOGY_INFO::get_last_used_reader() {
+std::shared_ptr<HostInfo> ClusterTopologyInfo::get_last_used_reader() {
     return last_used_reader;
 }
 
-void CLUSTER_TOPOLOGY_INFO::set_last_used_reader(std::shared_ptr<HostInfo> reader) {
-    last_used_reader = reader;
+void ClusterTopologyInfo::set_last_used_reader(const std::shared_ptr<HostInfo>& reader) {
+    last_used_reader = std::move(reader);
 }
 
-void CLUSTER_TOPOLOGY_INFO::mark_host_down(std::shared_ptr<HostInfo> host) {
+void ClusterTopologyInfo::mark_host_down(const std::shared_ptr<HostInfo>& host) {
     host->set_host_state(DOWN);
     down_hosts.insert(host->get_host_port_pair());
 }
 
-void CLUSTER_TOPOLOGY_INFO::mark_host_up(std::shared_ptr<HostInfo> host) {
+void ClusterTopologyInfo::mark_host_up(const std::shared_ptr<HostInfo>& host) {
     host->set_host_state(UP);
     down_hosts.erase(host->get_host_port_pair());
 }
 
-std::set<std::string> CLUSTER_TOPOLOGY_INFO::get_down_hosts() {
+std::set<std::string> ClusterTopologyInfo::get_down_hosts() {
     return down_hosts;
 }

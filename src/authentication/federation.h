@@ -38,22 +38,22 @@
 
 class FederationCredentialProvider {
 public:
-    FederationCredentialProvider(const std::string& idpArn, const std::string& roleArn,
-        std::shared_ptr<Aws::Http::HttpClient> httpClient, std::shared_ptr<Aws::STS::STSClient> stsClient)
-        : idpArn(idpArn), roleArn(roleArn), httpClient(httpClient), stsClient(stsClient) {}
+    FederationCredentialProvider(const std::string& idp_arn, const std::string& role_arn,
+        std::shared_ptr<Aws::Http::HttpClient> http_client, std::shared_ptr<Aws::STS::STSClient> sts_client)
+        : idp_arn(idp_arn), role_arn(role_arn), http_client(http_client), sts_client(sts_client) {}
 
     bool GetAWSCredentials(Aws::Auth::AWSCredentials& credentials);
 
 protected:
-    virtual std::string GetSAMLAssertion(std::string& errInfo) = 0;
+    virtual std::string GetSAMLAssertion(std::string& err_info) = 0;
 
-    bool FetchCredentialsWithSAMLAssertion(Aws::STS::Model::AssumeRoleWithSAMLRequest& samlRequest,
+    bool FetchCredentialsWithSAMLAssertion(Aws::STS::Model::AssumeRoleWithSAMLRequest& saml_req,
         Aws::Auth::AWSCredentials& credentials);
 
-    std::string idpArn;
-    std::string roleArn;
-    std::shared_ptr<Aws::Http::HttpClient> httpClient;
-    std::shared_ptr<Aws::STS::STSClient> stsClient;
+    std::string idp_arn;
+    std::string role_arn;
+    std::shared_ptr<Aws::Http::HttpClient> http_client;
+    std::shared_ptr<Aws::STS::STSClient> sts_client;
 };
 
 #endif  //__FEDERATION_H__

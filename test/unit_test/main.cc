@@ -36,7 +36,7 @@
 int main(int argc, char** argv) {
 
   #ifndef XCODE_BUILD
-  LOGGER_WRAPPER::initialize();
+  LoggerWrapper::initialize();
   #endif
 
 #ifdef WIN32

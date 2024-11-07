@@ -59,12 +59,13 @@ jobs:
 
       - name: Run static analysis
         run: |
-          export PATH="$PATH:$(brew --cellar)/llvm/19.1.1/bin"
+          export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
           whereis clang-tidy
           source ./venv/bin/activate
           CodeChecker analyze ./build/compile_commands.json -i ./skipfile --config codechecker.json -o ./reports
 
       - name: Print static analysis
+        if: always()
         run: |
           source ./venv/bin/activate
           CodeChecker parse --print-steps ./reports

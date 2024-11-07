@@ -43,7 +43,7 @@ enum HOST_STATE { UP, DOWN };
 
 class HostInfo {
 public:
-    static constexpr long DEFAULT_WEIGHT = 100;
+    static constexpr uint64_t DEFAULT_WEIGHT = 100;
     static constexpr int NO_PORT = -1;
 
     // Default construction without any information is invalid
@@ -55,20 +55,20 @@ public:
         HOST_STATE state,
         bool is_writer,
         const HostAvailabilityStrategy& hostAvailabilityStrategy,
-        long weight = DEFAULT_WEIGHT
+        uint64_t weight = DEFAULT_WEIGHT
     );
 
-    ~HostInfo();
+    ~HostInfo() = default;
 
     bool equal_host_port_pair(HostInfo& hi) const;
     bool is_host_down() const;
     bool is_host_up() const;
     bool is_host_writer() const;
 
-    const std::string get_host_port_pair() const;
-    const std::string get_host() const;
+    std::string get_host_port_pair() const;
+    std::string get_host() const;
     HOST_STATE get_host_state() const;
-    long get_weight() const;
+    uint64_t get_weight() const;
 
     int get_port() const;
     void mark_as_writer(bool writer);
@@ -82,7 +82,7 @@ private:
     const std::string HOST_PORT_SEPARATOR = ":";
     const std::string host;
     const int port = NO_PORT;
-    long weight = DEFAULT_WEIGHT;
+    uint64_t weight = DEFAULT_WEIGHT;
 
     HOST_STATE host_state;
     bool is_writer;
