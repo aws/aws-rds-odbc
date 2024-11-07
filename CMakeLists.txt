@@ -44,6 +44,7 @@ set(SRC
   src/failover/cluster_topology_info.cc
 
   src/host_availability/simple_host_availability_strategy.cc
+  src/host_selector/random_host_selector.cc
 
   src/util/logger_wrapper.cc
 )
@@ -61,6 +62,8 @@ set(INC
   src/failover/cluster_topology_info.h
 
   src/host_availability/simple_host_availability_strategy.h
+  src/host_selector/host_selector.h
+  src/host_selector/random_host_selector.h
 
   src/util/logger_wrapper.h
 )
@@ -72,6 +75,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src/authentication")
 include_directories("${CMAKE_SOURCE_DIR}/src/authentication/adfs")
 include_directories("${CMAKE_SOURCE_DIR}/src/failover")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_availability")
+include_directories("${CMAKE_SOURCE_DIR}/src/host_selector")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")
 
 #-----------------------------------------------------

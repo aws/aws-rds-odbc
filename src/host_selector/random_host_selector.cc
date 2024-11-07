@@ -27,78 +27,28 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include "host_info.h"
+#include "random_host_selector.h"
 
-HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, const HostAvailabilityStrategy& hostAvailabilityStrategy, uint64_t weight) :
-    host{ std::move(host) },
-    port{ port },
-    host_state{ state },
-    is_writer{ is_writer },
-    hostAvailabilityStrategy { hostAvailabilityStrategy },
-    weight { weight }
-{
-}
+#include <random>
 
-/**
- * Returns the host.
- *
- * @return the host
- */
-std::string HostInfo::get_host() const {
-    return host;
-}
+HostInfo RandomHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer,
+    std::unordered_map<std::string, std::string>) {
 
-/**
- * Returns the port.
- *
- * @return the port
- */
-int HostInfo::get_port() const {
-    return port;
-}
+    std::vector<HostInfo> selection;
+    selection.reserve(hosts.size());
 
-/**
- * Returns the weight
- * 
- * @return the weight
- */
-uint64_t HostInfo::get_weight() const {
-    return weight;
-}
+    std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(selection), [&is_writer](const HostInfo& host) {
+        return host.is_host_up() && (is_writer ? host.is_host_writer() : true);
+    });
 
-/**
- * Returns a host:port representation of this host.
- *
- * @return the host:port representation of this host
- */
-std::string HostInfo::get_host_port_pair() const {
-    return get_host() + HOST_PORT_SEPARATOR + std::to_string(get_port());
-}
+    if (selection.empty()) {
+        throw std::runtime_error("No avaiable hosts found in list");
+    }
 
-bool HostInfo::equal_host_port_pair(HostInfo& hi) const {
-    return get_host_port_pair() == hi.get_host_port_pair();
-}
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, selection.size() - 1);
 
-HOST_STATE HostInfo::get_host_state() const {
-    return host_state;
-}
-
-void HostInfo::set_host_state(HOST_STATE state) {
-    host_state = state;
-}
-
-bool HostInfo::is_host_up() const {
-    return host_state == UP;
-}
-
-bool HostInfo::is_host_down() const {
-    return host_state == DOWN;
-}
-
-bool HostInfo::is_host_writer() const {
-    return is_writer;
-}
-
-void HostInfo::mark_as_writer(bool writer) {
-    is_writer = writer;
+    int rand_idx = dis(gen);
+    return selection[rand_idx];
 }
