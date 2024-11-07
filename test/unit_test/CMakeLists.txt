@@ -22,6 +22,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 #-----------------------------------------------------
 
+include_directories("${CMAKE_SOURCE_DIR}/test")
+include_directories("${CMAKE_SOURCE_DIR}/test/unit_test")
+
 add_executable(
   # Executable Name
   ${PROJECT_NAME}
@@ -35,6 +38,7 @@ add_executable(
 
   authentication/authentication_provider_test.cc
   authentication/adfs/adfs_test.cc
+  authentication/okta/okta_test.cc
   authentication/secrets_manager_helper_test.cc
 
   failover/cluster_topology_info_test.cc

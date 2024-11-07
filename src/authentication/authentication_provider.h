@@ -37,8 +37,8 @@ extern "C" {
 // TODO(yuenhcol) - Limits here are based on PgSQL
 #define LARGE_REGISTRY_LEN          4096
 #define MEDIUM_REGISTRY_LEN         1024
-#define SMALL_REGISTRY_LEN          10	
 #define MEDIUM_SMALL_REGISTRY_LEN   16
+#define SMALL_REGISTRY_LEN          10
 
 #define FOREACH_AUTHTYPE(AUTHTYPE) \
     AUTHTYPE(ADFS)      \
@@ -61,6 +61,7 @@ typedef struct {
     char idp_endpoint[MEDIUM_REGISTRY_LEN];
     char idp_port[SMALL_REGISTRY_LEN];
     char relaying_party_id[MEDIUM_REGISTRY_LEN];
+    char app_id[MEDIUM_REGISTRY_LEN];
     char iam_role_arn[MEDIUM_REGISTRY_LEN];
     char iam_idp_arn[MEDIUM_REGISTRY_LEN];
     char idp_username[MEDIUM_REGISTRY_LEN];

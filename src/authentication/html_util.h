@@ -27,42 +27,13 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __ADFS_H__
-#define __ADFS_H__
+#ifndef __HTML_UTIL_H__
+#define __HTML_UTIL_H__
 
-#include "../authentication_provider.h"
-#include "../federation.h"
-
-#include <map>
 #include <string>
 
-class AdfsCredentialsProvider : public FederationCredentialProvider {
-public:
-    AdfsCredentialsProvider(
-        const FederatedAuthConfig& config,
-        std::shared_ptr<Aws::Http::HttpClient> http_client,
-        std::shared_ptr<Aws::STS::STSClient> sts_client
-    ): FederationCredentialProvider(config.iam_idp_arn, config.iam_role_arn, http_client, sts_client), cfg(config) {}
-
-    // constant pattern strings 
-    static const std::string FORM_ACTION_PATTERN;
-    static const std::string SAML_RESPONSE_PATTERN;
-    static const std::string URL_PATTERN;
-    static const std::string INPUT_TAG_PATTERN;
-
-protected:
-    virtual std::string GetSAMLAssertion(std::string& err_info);
-
-private:
-    std::string get_signin_url();
-    std::map<std::string, std::string> get_para_from_html_body(std::string& body);
-    std::string get_form_action_body(std::string& url, std::map<std::string, std::string>& params);
-
-    static bool validate_url(const std::string& url);
-    static std::vector<std::string> get_input_tags_from_html(const std::string& body);
-    static std::string get_value_by_key(const std::string& input, const std::string& key);
-
-    FederatedAuthConfig cfg;
+namespace HtmlUtil {
+    std::string escape_html_entity(const std::string& html);
 };
 
-#endif  //__ADFS_H__
+#endif  //__HTML_UTIL_H__
