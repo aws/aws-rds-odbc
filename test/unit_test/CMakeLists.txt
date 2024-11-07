@@ -40,6 +40,7 @@ add_executable(
   failover/cluster_topology_info_test.cc
 
   host_availability/simple_host_availability_strategy_test.cc
+  host_selector/random_host_selector_test.cc
 )
 
 #-----------------------------------------------------

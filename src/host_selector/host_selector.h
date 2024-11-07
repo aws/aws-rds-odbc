@@ -27,78 +27,20 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include "host_info.h"
+#ifndef __HOST_SELECTOR_H__
+#define __HOST_SELECTOR_H__
 
-HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, const HostAvailabilityStrategy& hostAvailabilityStrategy, uint64_t weight) :
-    host{ std::move(host) },
-    port{ port },
-    host_state{ state },
-    is_writer{ is_writer },
-    hostAvailabilityStrategy { hostAvailabilityStrategy },
-    weight { weight }
-{
-}
+#include "../host_info.h"
 
-/**
- * Returns the host.
- *
- * @return the host
- */
-std::string HostInfo::get_host() const {
-    return host;
-}
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-/**
- * Returns the port.
- *
- * @return the port
- */
-int HostInfo::get_port() const {
-    return port;
-}
+class HostSelector {
+public:
+    virtual ~HostSelector() = default;
+    virtual HostInfo get_host(std::vector<HostInfo> hosts, bool is_writer,
+        std::unordered_map<std::string, std::string> properties) = 0;
+};
 
-/**
- * Returns the weight
- * 
- * @return the weight
- */
-uint64_t HostInfo::get_weight() const {
-    return weight;
-}
-
-/**
- * Returns a host:port representation of this host.
- *
- * @return the host:port representation of this host
- */
-std::string HostInfo::get_host_port_pair() const {
-    return get_host() + HOST_PORT_SEPARATOR + std::to_string(get_port());
-}
-
-bool HostInfo::equal_host_port_pair(HostInfo& hi) const {
-    return get_host_port_pair() == hi.get_host_port_pair();
-}
-
-HOST_STATE HostInfo::get_host_state() const {
-    return host_state;
-}
-
-void HostInfo::set_host_state(HOST_STATE state) {
-    host_state = state;
-}
-
-bool HostInfo::is_host_up() const {
-    return host_state == UP;
-}
-
-bool HostInfo::is_host_down() const {
-    return host_state == DOWN;
-}
-
-bool HostInfo::is_host_writer() const {
-    return is_writer;
-}
-
-void HostInfo::mark_as_writer(bool writer) {
-    is_writer = writer;
-}
+#endif //__HOST_SELECTOR_H__
