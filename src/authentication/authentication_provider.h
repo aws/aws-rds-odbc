@@ -34,6 +34,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 // TODO(yuenhcol) - Limits here are based on PgSQL
 #define LARGE_REGISTRY_LEN          4096
 #define MEDIUM_REGISTRY_LEN         1024

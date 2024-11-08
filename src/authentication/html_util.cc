@@ -35,7 +35,7 @@
 #endif
 
 namespace HtmlUtil {
-    std::string HtmlUtil::escape_html_entity(const std::string& html) {
+    std::string escape_html_entity(const std::string& html) {
         std::string retval;
         DLOG(INFO) << "Before HTML escape modification: " << html;
         int i = 0;
