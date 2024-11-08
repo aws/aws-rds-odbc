@@ -89,6 +89,14 @@ static bool ValidateOktaConf(FederatedAuthConfig config) {
         ValidateCharArr(config.idp_password);
 }
 
+static uint64_t ParseNumber(const char* str_in, const uint64_t default_val) {
+    try {
+        return atol(str_in);
+    } catch (std::exception& e) {
+        return default_val;
+    }
+}
+
 static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAuthConfig config) {
     Aws::Auth::AWSCredentials credentials;
     switch (type) {
@@ -100,8 +108,8 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
                 return nullptr;
             };
             Aws::Client::ClientConfiguration http_client_cfg;
-            http_client_cfg.requestTimeoutMs = config.http_client_socket_timeout ? atol(config.http_client_socket_timeout) : 3000;
-            http_client_cfg.connectTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 5000;
+            http_client_cfg.requestTimeoutMs = ParseNumber(config.http_client_socket_timeout, 3000);
+            http_client_cfg.connectTimeoutMs = ParseNumber(config.http_client_connect_timeout, 5000);
             http_client_cfg.verifySSL = true;
             std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
             std::shared_ptr<Aws::STS::STSClient> sts_client = std::make_shared<Aws::STS::STSClient>();
@@ -125,8 +133,8 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
                 return nullptr;
             };
             Aws::Client::ClientConfiguration http_client_cfg;
-            http_client_cfg.requestTimeoutMs = config.http_client_socket_timeout ? atol(config.http_client_socket_timeout) : 3000;
-            http_client_cfg.connectTimeoutMs = config.http_client_connect_timeout ? atol(config.http_client_connect_timeout) : 5000;
+            http_client_cfg.requestTimeoutMs = ParseNumber(config.http_client_socket_timeout, 3000);
+            http_client_cfg.connectTimeoutMs = ParseNumber(config.http_client_connect_timeout, 5000);
             http_client_cfg.verifySSL = true;
             http_client_cfg.followRedirects = Aws::Client::FollowRedirectsPolicy::ALWAYS;
             std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
