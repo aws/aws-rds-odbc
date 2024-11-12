@@ -51,11 +51,18 @@ add_executable(
 )
 
 #-----------------------------------------------------
-# Find required libraries
+# Find required headers and libraries
 
 if (APPLE)
+  # Required to ensure unixodbc is found and used before iODBC
+  set(ODBC_INCLUDE_DIR /opt/homebrew/opt/unixodbc/include)
+  find_package(ODBC REQUIRED)
+  
   find_library(ICONV_LIB iconv)
   find_library(LTDL_LIB ltdl)
+
+  include_directories(${ODBC_INCLUDE_DIRS})
+  target_link_libraries(${PROJECT_NAME} ${ODBC_LIBRARIES} ${ICONV_LIB} ${LTDL_LIB})
 endif()
 
 #-----------------------------------------------------
@@ -67,8 +74,6 @@ target_link_libraries(
   # External Libaries
   gtest_main
   gmock_main
-  ${ICONV_LIB}
-  ${LTDL_LIB}
 
   # Source Libaries
   aws-rds-odbc

@@ -177,19 +177,16 @@ target_link_libraries(${PROJECT_NAME} glog::glog)
 # Find and add ODBC
 
 if(APPLE)
+  # Required to ensure unixodbc is found and used before iODBC
   set(ODBC_INCLUDE_DIR /opt/homebrew/opt/unixodbc/include)
-  set(ODBC_LIBRARY /opt/homebrew/opt/unixodbc/lib/libodbc.a)
 endif()
 
-if (WIN32)
-  set(ODBC_INCLUDE_DIR "C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/um")
-  set(ODBC_LIBRARY "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64/odbc32.lib")
-endif()
+find_package(ODBC REQUIRED)
 
-message(STATUS "ODBC_INCLUDE_DIR: ${ODBC_INCLUDE_DIR}")
-message(STATUS "ODBC_LIBRARY: ${ODBC_LIBRARY}")
-include_directories(${ODBC_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME} ${ODBC_LIBRARY})
+message(STATUS "ODBC_INCLUDE_DIRS: ${ODBC_INCLUDE_DIRS}")
+message(STATUS "ODBC_LIBRARIES: ${ODBC_LIBRARIES}")
+include_directories(${ODBC_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${ODBC_LIBRARIES})
 
 #-----------------------------------------------------
 # Combine static libraries into the target static library

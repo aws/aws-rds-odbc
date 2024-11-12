@@ -29,10 +29,7 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "html_util.h"
-
-#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
-#endif
 
 namespace HtmlUtil {
     std::string escape_html_entity(const std::string& html) {

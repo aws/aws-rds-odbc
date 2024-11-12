@@ -38,10 +38,7 @@
 
 #include "authentication_provider.h"
 #include "secrets_manager_helper.h"
-
-#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
-#endif
 
 namespace {
     const Aws::String USERNAME_KEY{ "username" };

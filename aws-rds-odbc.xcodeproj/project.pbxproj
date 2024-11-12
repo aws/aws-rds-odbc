@@ -25,6 +25,15 @@
 		734B1C312CC9611400FB6683 /* libaws-c-compression.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C212CC9611400FB6683 /* libaws-c-compression.a */; };
 		734B1D532CCA5D6400FB6683 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D522CCA5D6400FB6683 /* libz.tbd */; };
 		734B1D552CCA5D6F00FB6683 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D542CCA5D6F00FB6683 /* libcurl.tbd */; };
+		7369B6102CDE5C9E00C98EDF /* odbc_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B60F2CDE5C9E00C98EDF /* odbc_helper.cc */; };
+		7369B6112CDE5C9E00C98EDF /* odbc_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */; };
+		7369B61C2CDE649B00C98EDF /* random_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B61A2CDE649B00C98EDF /* random_host_selector.cc */; };
+		7369B61D2CDE649B00C98EDF /* host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6182CDE649B00C98EDF /* host_selector.h */; };
+		7369B61E2CDE649B00C98EDF /* random_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6192CDE649B00C98EDF /* random_host_selector.h */; };
+		7369B6272CDE666E00C98EDF /* okta.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6252CDE666E00C98EDF /* okta.cc */; };
+		7369B6282CDE666E00C98EDF /* html_util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6232CDE666E00C98EDF /* html_util.cc */; };
+		7369B6292CDE666E00C98EDF /* html_util.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6222CDE666E00C98EDF /* html_util.h */; };
+		7369B62A2CDE666E00C98EDF /* okta.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6242CDE666E00C98EDF /* okta.h */; };
 		73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E42CD3BC08002268BF /* host_availability_strategy.h */; };
 		73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */; };
 		73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */; };
@@ -73,6 +82,16 @@
 		734B1D522CCA5D6400FB6683 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		734B1D542CCA5D6F00FB6683 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		734B1D582CCA6FCE00FB6683 /* libglog.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglog.a; path = ../../../glog/build/libglog.a; sourceTree = "<group>"; };
+		7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = odbc_helper.h; sourceTree = "<group>"; };
+		7369B60F2CDE5C9E00C98EDF /* odbc_helper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = odbc_helper.cc; sourceTree = "<group>"; };
+		7369B6162CDE63E500C98EDF /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		7369B6182CDE649B00C98EDF /* host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_selector.h; sourceTree = "<group>"; };
+		7369B6192CDE649B00C98EDF /* random_host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = random_host_selector.h; sourceTree = "<group>"; };
+		7369B61A2CDE649B00C98EDF /* random_host_selector.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random_host_selector.cc; sourceTree = "<group>"; };
+		7369B6222CDE666E00C98EDF /* html_util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = html_util.h; sourceTree = "<group>"; };
+		7369B6232CDE666E00C98EDF /* html_util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = html_util.cc; sourceTree = "<group>"; };
+		7369B6242CDE666E00C98EDF /* okta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = okta.h; sourceTree = "<group>"; };
+		7369B6252CDE666E00C98EDF /* okta.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = okta.cc; sourceTree = "<group>"; };
 		73D322E22CD3A46E002268BF /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		73D322E32CD3A46E002268BF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		73D322E42CD3BC08002268BF /* host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_availability_strategy.h; sourceTree = "<group>"; };
@@ -131,6 +150,7 @@
 		734B1B532CC956B100FB6683 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7369B6162CDE63E500C98EDF /* libiconv.tbd */,
 				73DAE0232CDA88EC00225BE1 /* libodbc.a */,
 				734B1D582CCA6FCE00FB6683 /* libglog.a */,
 				734B1D542CCA5D6F00FB6683 /* libcurl.tbd */,
@@ -159,6 +179,25 @@
 				734B1B542CC956B100FB6683 /* CoreFoundation.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7369B61B2CDE649B00C98EDF /* host_selector */ = {
+			isa = PBXGroup;
+			children = (
+				7369B6182CDE649B00C98EDF /* host_selector.h */,
+				7369B6192CDE649B00C98EDF /* random_host_selector.h */,
+				7369B61A2CDE649B00C98EDF /* random_host_selector.cc */,
+			);
+			path = host_selector;
+			sourceTree = "<group>";
+		};
+		7369B6262CDE666E00C98EDF /* okta */ = {
+			isa = PBXGroup;
+			children = (
+				7369B6242CDE666E00C98EDF /* okta.h */,
+				7369B6252CDE666E00C98EDF /* okta.cc */,
+			);
+			path = okta;
 			sourceTree = "<group>";
 		};
 		73D322E62CD3BC08002268BF /* host_availability */ = {
@@ -203,10 +242,13 @@
 			isa = PBXGroup;
 			children = (
 				73D7881E2CC919070028B42F /* adfs */,
+				7369B6262CDE666E00C98EDF /* okta */,
 				73D7881F2CC919070028B42F /* authentication_provider.h */,
 				73D788202CC919070028B42F /* authentication_provider.cc */,
 				73D788212CC919070028B42F /* federation.h */,
 				73D788222CC919070028B42F /* federation.cc */,
+				7369B6222CDE666E00C98EDF /* html_util.h */,
+				7369B6232CDE666E00C98EDF /* html_util.cc */,
 				73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */,
 				73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */,
 			);
@@ -225,6 +267,8 @@
 		73D7882B2CC919070028B42F /* util */ = {
 			isa = PBXGroup;
 			children = (
+				7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */,
+				7369B60F2CDE5C9E00C98EDF /* odbc_helper.cc */,
 				73D788292CC919070028B42F /* logger_wrapper.h */,
 				73D7882A2CC919070028B42F /* logger_wrapper.cc */,
 			);
@@ -234,10 +278,11 @@
 		73D7882C2CC919070028B42F /* src */ = {
 			isa = PBXGroup;
 			children = (
-				73DAE0202CDA71DD00225BE1 /* limitless */,
 				73D788232CC919070028B42F /* authentication */,
 				73D788282CC919070028B42F /* failover */,
 				73D322E62CD3BC08002268BF /* host_availability */,
+				7369B61B2CDE649B00C98EDF /* host_selector */,
+				73DAE0202CDA71DD00225BE1 /* limitless */,
 				73D7882B2CC919070028B42F /* util */,
 				73D788262CC919070028B42F /* host_info.h */,
 				73D788272CC919070028B42F /* host_info.cc */,
@@ -262,7 +307,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */,
+				7369B61D2CDE649B00C98EDF /* host_selector.h in Headers */,
+				7369B61E2CDE649B00C98EDF /* random_host_selector.h in Headers */,
 				73D788332CC919070028B42F /* authentication_provider.h in Headers */,
+				7369B6292CDE666E00C98EDF /* html_util.h in Headers */,
+				7369B62A2CDE666E00C98EDF /* okta.h in Headers */,
 				73D788342CC919070028B42F /* adfs.h in Headers */,
 				73DAE0222CDA71DD00225BE1 /* limitless_query_helper.h in Headers */,
 				73D788352CC919070028B42F /* logger_wrapper.h in Headers */,
@@ -270,6 +319,7 @@
 				73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */,
 				73D788362CC919070028B42F /* host_info.h in Headers */,
 				73D788372CC919070028B42F /* federation.h in Headers */,
+				7369B6112CDE5C9E00C98EDF /* odbc_helper.h in Headers */,
 				73D788382CC919070028B42F /* cluster_topology_info.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,8 +389,12 @@
 				73D7882D2CC919070028B42F /* adfs.cc in Sources */,
 				73D7882E2CC919070028B42F /* authentication_provider.cc in Sources */,
 				73D7882F2CC919070028B42F /* host_info.cc in Sources */,
+				7369B6102CDE5C9E00C98EDF /* odbc_helper.cc in Sources */,
 				73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */,
 				73D788302CC919070028B42F /* federation.cc in Sources */,
+				7369B6272CDE666E00C98EDF /* okta.cc in Sources */,
+				7369B6282CDE666E00C98EDF /* html_util.cc in Sources */,
+				7369B61C2CDE649B00C98EDF /* random_host_selector.cc in Sources */,
 				73D788322CC919070028B42F /* cluster_topology_info.cc in Sources */,
 				73DAE02A2CDA8A0100225BE1 /* secrets_manager_helper.cc in Sources */,
 			);
