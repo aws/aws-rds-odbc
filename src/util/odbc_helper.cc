@@ -39,30 +39,30 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
         LogMessage(log_message, handle, handle_type);
     }
     
-	return false;
+    return false;
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
-	SQLCHAR     sqlstate[32];
-	SQLCHAR     message[1000];
-	SQLINTEGER	nativeerror;
-	SQLSMALLINT textlen;
-	SQLRETURN	ret;
-	SQLSMALLINT	recno = 0;
+    SQLCHAR     sqlstate[32];
+    SQLCHAR     message[1000];
+    SQLINTEGER	nativeerror;
+    SQLSMALLINT textlen;
+    SQLRETURN	ret;
+    SQLSMALLINT	recno = 0;
 
-  	LOG(ERROR) << log_message;
+    LOG(ERROR) << log_message;
 
-	do {
-		recno++;
-		ret = SQLGetDiagRec(handle_type, handle, recno, sqlstate, &nativeerror,
-							message, sizeof(message), &textlen);
-		if (ret == SQL_INVALID_HANDLE)
-			LOG(ERROR) << "Invalid handle";
-		else if (SQL_SUCCEEDED(ret))
+    do {
+        recno++;
+        ret = SQLGetDiagRec(handle_type, handle, recno, sqlstate, &nativeerror,
+                            message, sizeof(message), &textlen);
+        if (ret == SQL_INVALID_HANDLE)
+            LOG(ERROR) << "Invalid handle";
+        else if (SQL_SUCCEEDED(ret))
             LOG(ERROR) << sqlstate << message;
-	} while (ret == SQL_SUCCESS);
+    } while (ret == SQL_SUCCESS);
 
-	if (ret == SQL_NO_DATA && recno == 1) {
-		LOG(ERROR) << "No error information";
+    if (ret == SQL_NO_DATA && recno == 1) {
+        LOG(ERROR) << "No error information";
     }
 }

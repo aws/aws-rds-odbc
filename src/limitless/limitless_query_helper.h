@@ -43,6 +43,8 @@
 
 class LimitlessQueryHelper {
 public:
+    static const int ROUTER_ENDPOINT_LENGTH = 2049;
+    static const int LOAD_LENGTH = 5;
     static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
 
     static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map);

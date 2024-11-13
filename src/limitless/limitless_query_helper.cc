@@ -35,7 +35,7 @@
 #include "../util/odbc_helper.h"
 
 const std::string LimitlessQueryHelper::LIMITLESS_ROUTER_ENDPOINT_QUERY  =
-      "select router_endpoint, load from aurora_limitless_router_endpoints()";
+      "SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()";
 
 std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map) {
     HSTMT hstmt = SQL_NULL_HSTMT;
@@ -45,15 +45,15 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
     }
 
     // Generally accepted URL endpoint max length + 1 for null terminator
-    SQLCHAR router_endpoint_value[2049] = {0};
+    SQLCHAR router_endpoint_value[ROUTER_ENDPOINT_LENGTH] = {0};
     SQLLEN ind_router_endpoint_value = 0;
 
-    SQLCHAR load_value[5] = {0};
+    SQLCHAR load_value[LOAD_LENGTH] = {0};
     SQLLEN ind_load_value = 0;
 
     rc = SQLBindCol(hstmt, 1, SQL_C_CHAR, &router_endpoint_value, sizeof(router_endpoint_value), &ind_router_endpoint_value);
     SQLRETURN rc2 = SQLBindCol(hstmt, 2, SQL_C_CHAR, &load_value, sizeof(load_value), &ind_load_value);
-    if (!OdbcHelper::CheckResult(rc, "SQLBindCol for router endpoing failed", hstmt, SQL_HANDLE_STMT) || 
+    if (!OdbcHelper::CheckResult(rc, "SQLBindCol for router endpoint failed", hstmt, SQL_HANDLE_STMT) || 
         !OdbcHelper::CheckResult(rc2, "SQLBindCol for load value failed", hstmt, SQL_HANDLE_STMT)) {
         return std::vector<HostInfo>();
     }
