@@ -24,18 +24,26 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
-#define __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
+#ifndef __ODBCHELPER_H__
+#define __ODBCHELPER_H__
 
-#include "host_availability_strategy.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 
-class SimpleHostAvailabilityStrategy: public HostAvailabilityStrategy {
-public:    
-    void set_host_availability(HostAvailability hostAvailability) override;
-    HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
+#include <sql.h>
+#include <sqlext.h>
+#include <string>
+
+class OdbcHelper {
+public:
+    static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
+
+private:
+    static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
 };
 
-#endif /* __SIMPLEHOSTAVAILABILITYSTRATEGY_H__ */
+#endif /* __ODBCHELPER_H__ */

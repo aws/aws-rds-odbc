@@ -27,15 +27,31 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
-#define __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <odbc_helper.h>
 
-#include "host_availability_strategy.h"
+#include "../mock_objects.h"
 
-class SimpleHostAvailabilityStrategy: public HostAvailabilityStrategy {
-public:    
-    void set_host_availability(HostAvailability hostAvailability) override;
-    HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
+class OdbcHelperTest : public testing::Test {
+  protected:
+    // Runs once per suite
+    static void SetUpTestSuite() {}
+    static void TearDownTestSuite() {}
+    // Runs per test case
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
-#endif /* __SIMPLEHOSTAVAILABILITYSTRATEGY_H__ */
+TEST_F(OdbcHelperTest, CheckResult_SqlSucceeded) {
+    void* mock_handle = reinterpret_cast<void*>(0x1234);
+
+    EXPECT_TRUE(OdbcHelper::CheckResult(SQL_SUCCESS, "", mock_handle, SQL_HANDLE_STMT));
+}
+
+TEST_F(OdbcHelperTest, CheckResult_SqlError) {
+    void* mock_handle = reinterpret_cast<void*>(0x1234);
+
+    EXPECT_FALSE(OdbcHelper::CheckResult(SQL_ERROR, "", mock_handle, SQL_HANDLE_STMT));
+}
+

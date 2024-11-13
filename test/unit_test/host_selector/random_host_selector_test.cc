@@ -31,17 +31,15 @@
 #include <gtest/gtest.h>
 
 #include <random_host_selector.h>
-#include <simple_host_availability_strategy.h>
 
 namespace {
     const int base_port = 1234;
-    const SimpleHostAvailabilityStrategy simpleHostAvailabilityStrategy;
-    HostInfo writer_host_info_a("writer_a", base_port, HOST_STATE::UP, true, simpleHostAvailabilityStrategy);
-    HostInfo writer_host_info_b("writer_b", base_port, HOST_STATE::UP, true, simpleHostAvailabilityStrategy);
-    HostInfo writer_host_info_down("writer_down", base_port, HOST_STATE::DOWN, true, simpleHostAvailabilityStrategy);
-    HostInfo reader_host_info_a("reader_a", base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
-    HostInfo reader_host_info_b("reader_b", base_port, HOST_STATE::UP, false, simpleHostAvailabilityStrategy);
-    HostInfo reader_host_info_down("reader_down", base_port, HOST_STATE::DOWN, false, simpleHostAvailabilityStrategy);
+    HostInfo writer_host_info_a("writer_a", base_port, HOST_STATE::UP, true, nullptr);
+    HostInfo writer_host_info_b("writer_b", base_port, HOST_STATE::UP, true, nullptr);
+    HostInfo writer_host_info_down("writer_down", base_port, HOST_STATE::DOWN, true, nullptr);
+    HostInfo reader_host_info_a("reader_a", base_port, HOST_STATE::UP, false, nullptr);
+    HostInfo reader_host_info_b("reader_b", base_port, HOST_STATE::UP, false, nullptr);
+    HostInfo reader_host_info_down("reader_down", base_port, HOST_STATE::DOWN, false, nullptr);
     std::unordered_map<std::string, std::string> empty_map;
 }
 

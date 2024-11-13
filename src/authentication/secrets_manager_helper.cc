@@ -24,7 +24,7 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include <cstdlib>
@@ -38,10 +38,7 @@
 
 #include "authentication_provider.h"
 #include "secrets_manager_helper.h"
-
-#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
-#endif
 
 namespace {
     const Aws::String USERNAME_KEY{ "username" };
@@ -82,8 +79,6 @@ bool SECRETS_MANAGER_HELPER::FetchCredentials(const Aws::String& secret_id) {
         return false;
     }
 
-    #ifndef XCODE_BUILD
     LOG(ERROR) << "Error getting secret value: " << outcome.GetError().GetMessage();
-    #endif
     return false;
 }

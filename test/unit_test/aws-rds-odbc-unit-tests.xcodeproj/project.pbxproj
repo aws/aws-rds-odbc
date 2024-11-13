@@ -14,12 +14,18 @@
 		734B1D4D2CC994FA00FB6683 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D4B2CC994FA00FB6683 /* libgtest.a */; };
 		734B1D562CCA68D900FB6683 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D462CC994B200FB6683 /* libz.tbd */; };
 		734B1D572CCA68E100FB6683 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D482CC994B800FB6683 /* libcurl.tbd */; };
+		7369B6142CDE5CBC00C98EDF /* odbc_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6122CDE5CBC00C98EDF /* odbc_helper_test.cc */; };
+		7369B6212CDE64AD00C98EDF /* random_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B61F2CDE64AD00C98EDF /* random_host_selector_test.cc */; };
+		7369B62D2CDE669D00C98EDF /* okta_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B62B2CDE669D00C98EDF /* okta_test.cc */; };
+		7369B62F2CDE677300C98EDF /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7369B62E2CDE677300C98EDF /* libiconv.tbd */; };
+		7369B6312CDE680600C98EDF /* libltdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7369B6302CDE680600C98EDF /* libltdl.a */; };
 		73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */; };
 		73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9EF2CC92FD5005B92C0 /* Security.framework */; };
 		73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EC2CD3C3D1002268BF /* adfs_test.cc */; };
 		73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */; };
 		73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */; };
 		73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */; };
+		73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +60,11 @@
 		734B1D4A2CC994FA00FB6683 /* libgmock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgmock.a; path = ../../../../../../../../../opt/homebrew/Cellar/googletest/1.15.2/lib/libgmock.a; sourceTree = "<group>"; };
 		734B1D4B2CC994FA00FB6683 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = ../../../../../../../../../opt/homebrew/Cellar/googletest/1.15.2/lib/libgtest.a; sourceTree = "<group>"; };
 		734B1D5B2CCA709300FB6683 /* libglog.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglog.a; path = ../../../../../glog/build/libglog.a; sourceTree = "<group>"; };
+		7369B6122CDE5CBC00C98EDF /* odbc_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = odbc_helper_test.cc; sourceTree = "<group>"; };
+		7369B61F2CDE64AD00C98EDF /* random_host_selector_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random_host_selector_test.cc; sourceTree = "<group>"; };
+		7369B62B2CDE669D00C98EDF /* okta_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = okta_test.cc; sourceTree = "<group>"; };
+		7369B62E2CDE677300C98EDF /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		7369B6302CDE680600C98EDF /* libltdl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libltdl.a; path = ../../../../../../../../../opt/homebrew/Cellar/libtool/2.5.3/lib/libltdl.a; sourceTree = "<group>"; };
 		73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "aws-rds-odbc-unit-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		73CFD9EF2CC92FD5005B92C0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -61,6 +72,7 @@
 		73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = authentication_provider_test.cc; sourceTree = "<group>"; };
 		73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
 		73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy_test.cc; sourceTree = "<group>"; };
+		73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper_test.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +85,8 @@
 				734B1D382CC97CF900FB6683 /* libaws-rds-odbc.a in Frameworks */,
 				734B1D562CCA68D900FB6683 /* libz.tbd in Frameworks */,
 				734B1D572CCA68E100FB6683 /* libcurl.tbd in Frameworks */,
+				7369B62F2CDE677300C98EDF /* libiconv.tbd in Frameworks */,
+				7369B6312CDE680600C98EDF /* libltdl.a in Frameworks */,
 				734B1D4D2CC994FA00FB6683 /* libgtest.a in Frameworks */,
 				734B1D4C2CC994FA00FB6683 /* libgmock.a in Frameworks */,
 			);
@@ -89,12 +103,38 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		7369B6132CDE5CBC00C98EDF /* util */ = {
+			isa = PBXGroup;
+			children = (
+				7369B6122CDE5CBC00C98EDF /* odbc_helper_test.cc */,
+			);
+			path = util;
+			sourceTree = "<group>";
+		};
+		7369B6202CDE64AD00C98EDF /* host_selector */ = {
+			isa = PBXGroup;
+			children = (
+				7369B61F2CDE64AD00C98EDF /* random_host_selector_test.cc */,
+			);
+			path = host_selector;
+			sourceTree = "<group>";
+		};
+		7369B62C2CDE669D00C98EDF /* okta */ = {
+			isa = PBXGroup;
+			children = (
+				7369B62B2CDE669D00C98EDF /* okta_test.cc */,
+			);
+			path = okta;
+			sourceTree = "<group>";
+		};
 		73BD67732CC92229000817A9 = {
 			isa = PBXGroup;
 			children = (
 				73D322EF2CD3C3D1002268BF /* authentication */,
 				73D322F12CD3C3D1002268BF /* failover */,
 				73D322F62CD3CDBE002268BF /* host_availability */,
+				7369B6202CDE64AD00C98EDF /* host_selector */,
+				7369B6132CDE5CBC00C98EDF /* util */,
 				734B1D3E2CC97FA800FB6683 /* host_info_test.cc */,
 				734B1D3F2CC97FA800FB6683 /* main.cc */,
 				734B1D402CC97FA800FB6683 /* mock_objects.h */,
@@ -114,6 +154,8 @@
 		73CFD9EC2CC92FA0005B92C0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7369B6302CDE680600C98EDF /* libltdl.a */,
+				7369B62E2CDE677300C98EDF /* libiconv.tbd */,
 				734B1D5B2CCA709300FB6683 /* libglog.a */,
 				734B1D4A2CC994FA00FB6683 /* libgmock.a */,
 				734B1D4B2CC994FA00FB6683 /* libgtest.a */,
@@ -138,7 +180,9 @@
 			isa = PBXGroup;
 			children = (
 				73D322ED2CD3C3D1002268BF /* adfs */,
+				7369B62C2CDE669D00C98EDF /* okta */,
 				73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */,
+				73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */,
 			);
 			path = authentication;
 			sourceTree = "<group>";
@@ -236,10 +280,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
+				73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */,
+				7369B62D2CDE669D00C98EDF /* okta_test.cc in Sources */,
 				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
 				73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */,
 				73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */,
+				7369B6142CDE5CBC00C98EDF /* odbc_helper_test.cc in Sources */,
 				73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */,
+				7369B6212CDE64AD00C98EDF /* random_host_selector_test.cc in Sources */,
 				734B1D442CC97FA800FB6683 /* main.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -373,8 +421,12 @@
 					/opt/homebrew/opt/glog/include,
 					/opt/homebrew/opt/gflags/include,
 					/opt/homebrew/opt/googletest/include,
+					/opt/homebrew/opt/unixodbc/include,
 				);
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/googletest/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/googletest/lib,
+					/opt/homebrew/opt/libtool/lib,
+				);
 				OBJROOT = "$(SRCROOT)/xcode-build";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -393,8 +445,12 @@
 					/opt/homebrew/opt/glog/include,
 					/opt/homebrew/opt/gflags/include,
 					/opt/homebrew/opt/googletest/include,
+					/opt/homebrew/opt/unixodbc/include,
 				);
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/googletest/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/googletest/lib,
+					/opt/homebrew/opt/libtool/lib,
+				);
 				OBJROOT = "$(SRCROOT)/xcode-build";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";

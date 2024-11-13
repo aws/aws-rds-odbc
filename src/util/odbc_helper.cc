@@ -24,18 +24,45 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
-#define __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
+#include "odbc_helper.h"
+#include "logger_wrapper.h"
 
-#include "host_availability_strategy.h"
+bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
+    if (SQL_SUCCEEDED(rc)) {
+        return true;
+    }
 
-class SimpleHostAvailabilityStrategy: public HostAvailabilityStrategy {
-public:    
-    void set_host_availability(HostAvailability hostAvailability) override;
-    HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
-};
+    if (!log_message.empty()) {
+        LogMessage(log_message, handle, handle_type);
+    }
+    
+    return false;
+}
 
-#endif /* __SIMPLEHOSTAVAILABILITYSTRATEGY_H__ */
+void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
+    SQLCHAR     sqlstate[32];
+    SQLCHAR     message[1000];
+    SQLINTEGER	nativeerror;
+    SQLSMALLINT textlen;
+    SQLRETURN	ret;
+    SQLSMALLINT	recno = 0;
+
+    LOG(ERROR) << log_message;
+
+    do {
+        recno++;
+        ret = SQLGetDiagRec(handle_type, handle, recno, sqlstate, &nativeerror,
+                            message, sizeof(message), &textlen);
+        if (ret == SQL_INVALID_HANDLE)
+            LOG(ERROR) << "Invalid handle";
+        else if (SQL_SUCCEEDED(ret))
+            LOG(ERROR) << sqlstate << message;
+    } while (ret == SQL_SUCCESS);
+
+    if (ret == SQL_NO_DATA && recno == 1) {
+        LOG(ERROR) << "No error information";
+    }
+}

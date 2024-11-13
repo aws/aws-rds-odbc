@@ -24,20 +24,14 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
- 
-#include "gtest/gtest.h"
 
-#ifndef XCODE_BUILD
+#include "gtest/gtest.h"
 #include <logger_wrapper.h>
-#endif
 
 int main(int argc, char** argv) {
-
-  #ifndef XCODE_BUILD
   LoggerWrapper::initialize();
-  #endif
 
 #ifdef WIN32
 #ifdef _DEBUG

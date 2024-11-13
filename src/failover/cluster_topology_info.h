@@ -32,9 +32,7 @@
 
 #include "host_info.h"
 
-#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
-#endif
 
 #include <ctime>
 #include <set>

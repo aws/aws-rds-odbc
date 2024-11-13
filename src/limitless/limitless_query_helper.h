@@ -27,15 +27,30 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
-#define __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
+#ifndef __LIMITLESSQUERYHELPER_H__
+#define __LIMITLESSQUERYHELPER_H__
 
-#include "host_availability_strategy.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 
-class SimpleHostAvailabilityStrategy: public HostAvailabilityStrategy {
-public:    
-    void set_host_availability(HostAvailability hostAvailability) override;
-    HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
+#include <sql.h>
+#include <sqlext.h>
+
+#include <vector>
+
+#include "../host_info.h"
+
+class LimitlessQueryHelper {
+public:
+    static const int ROUTER_ENDPOINT_LENGTH = 2049;
+    static const int LOAD_LENGTH = 5;
+    static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
+
+    static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map);
+
+private:
+    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map);
 };
 
-#endif /* __SIMPLEHOSTAVAILABILITYSTRATEGY_H__ */
+#endif /* __LIMITLESSQUERYHELPER_H__ */

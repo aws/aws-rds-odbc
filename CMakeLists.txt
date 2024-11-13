@@ -46,7 +46,10 @@ set(SRC
   src/host_availability/simple_host_availability_strategy.cc
   src/host_selector/random_host_selector.cc
 
+  src/limitless/limitless_query_helper.cc
+
   src/util/logger_wrapper.cc
+  src/util/odbc_helper.cc
 )
 
 set(INC
@@ -65,7 +68,10 @@ set(INC
   src/host_selector/host_selector.h
   src/host_selector/random_host_selector.h
 
+  src/limitless/limitless_query_helper.h
+
   src/util/logger_wrapper.h
+  src/util/odbc_helper.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
@@ -77,6 +83,10 @@ include_directories("${CMAKE_SOURCE_DIR}/src/failover")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_availability")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_selector")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")
+
+if(WIN32)
+  add_compile_definitions(WIN32)
+endif()
 
 #-----------------------------------------------------
 
@@ -162,6 +172,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glog)
 include_directories(${glog_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} glog::glog)
+
+#-----------------------------------------------------
+# Find and add ODBC
+
+if(APPLE)
+  # Required to ensure unixodbc is found and used before iODBC
+  set(ODBC_INCLUDE_DIR /opt/homebrew/opt/unixodbc/include)
+endif()
+
+find_package(ODBC REQUIRED)
+
+message(STATUS "ODBC_INCLUDE_DIRS: ${ODBC_INCLUDE_DIRS}")
+message(STATUS "ODBC_LIBRARIES: ${ODBC_LIBRARIES}")
+include_directories(${ODBC_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${ODBC_LIBRARIES})
 
 #-----------------------------------------------------
 # Combine static libraries into the target static library

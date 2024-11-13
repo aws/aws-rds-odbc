@@ -37,7 +37,8 @@ namespace {
   const std::string host = "hostName";
   int port = 1234;
   const std::string hostPortPair = host + ":" + std::to_string(port);
-  const SimpleHostAvailabilityStrategy simpleHostAvailabilityStrategy;
+  std::shared_ptr<SimpleHostAvailabilityStrategy> simple_host_availability_strategy = 
+    std::make_shared<SimpleHostAvailabilityStrategy>();
 }
 
 class HostInfoTest : public testing::Test {
@@ -47,13 +48,11 @@ class HostInfoTest : public testing::Test {
     static void TearDownTestSuite() {}
     // Runs per test case
     void SetUp() override {
-        hostInfo = new HostInfo(host, port, UP, false, simpleHostAvailabilityStrategy);
+        hostInfo = std::make_shared<HostInfo>(host, port, UP, false, simple_host_availability_strategy);
     }
-    void TearDown() override {
-        delete hostInfo;
-    }
-    
-    HostInfo* hostInfo;
+    void TearDown() override {}
+
+    std::shared_ptr<HostInfo> hostInfo;
 };
 
 TEST_F(HostInfoTest, get_host) {
@@ -69,13 +68,13 @@ TEST_F(HostInfoTest, get_host_port_pair) {
 }
 
 TEST_F(HostInfoTest, equal_host_port_pair) {
-  HostInfo hostInfoHostPortMatches(host, port, UP, false, simpleHostAvailabilityStrategy);
+  HostInfo hostInfoHostPortMatches(host, port, UP, false, simple_host_availability_strategy);
   EXPECT_TRUE(hostInfo->equal_host_port_pair(hostInfoHostPortMatches));
 
-  HostInfo hostInfoHostDoesNotMatch(host + "DoesNotMatch", port, UP, false, simpleHostAvailabilityStrategy);
+  HostInfo hostInfoHostDoesNotMatch(host + "DoesNotMatch", port, UP, false, simple_host_availability_strategy);
   EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoHostDoesNotMatch));
 
-  HostInfo hostInfoPortDoesNotMatch(host, port + 1, UP, false, simpleHostAvailabilityStrategy);
+  HostInfo hostInfoPortDoesNotMatch(host, port + 1, UP, false, simple_host_availability_strategy);
   EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoPortDoesNotMatch));
 }
 
@@ -111,4 +110,16 @@ TEST_F(HostInfoTest, mark_as_writer) {
   EXPECT_TRUE(hostInfo->is_host_writer());
   hostInfo->mark_as_writer(false);
   EXPECT_FALSE(hostInfo->is_host_writer());
+}
+
+TEST_F(HostInfoTest, get_host_availability_strategy) {
+  EXPECT_EQ(simple_host_availability_strategy, hostInfo->get_host_availability_strategy());
+}
+
+TEST_F(HostInfoTest, set_host_availability_strategy) {
+  hostInfo->set_host_availability_strategy(nullptr);
+  EXPECT_EQ(nullptr, hostInfo->get_host_availability_strategy());
+
+  hostInfo->set_host_availability_strategy(simple_host_availability_strategy);
+  EXPECT_EQ(simple_host_availability_strategy, hostInfo->get_host_availability_strategy());
 }

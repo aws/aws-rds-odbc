@@ -24,7 +24,7 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "authentication_provider.h"
@@ -33,10 +33,7 @@
 #include <okta/okta.h>
 
 #include "secrets_manager_helper.h"
-
-#ifndef XCODE_BUILD
 #include "../util/logger_wrapper.h"
-#endif
 
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
@@ -102,9 +99,7 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
     switch (type) {
         case ADFS: {
             if (!ValidateAdfsConf(config)) {
-                #ifndef XCODE_BUILD
                 LOG(ERROR) << "Configuration for " << FEDERATED_AUTH_TYPE_STRING[type] << " is invalid/incomplete.";
-                #endif
                 return nullptr;
             };
             Aws::Client::ClientConfiguration http_client_cfg;
@@ -115,9 +110,7 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
             std::shared_ptr<Aws::STS::STSClient> sts_client = std::make_shared<Aws::STS::STSClient>();
             AdfsCredentialsProvider adfs(config, http_client, sts_client);
             if (!adfs.GetAWSCredentials(credentials)) {
-                #ifndef XCODE_BUILD
                 LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " provider failed to get valid credentials.";
-                #endif
                 return nullptr;
             }
             break;
@@ -147,9 +140,7 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
             break;
         }
         default:
-            #ifndef XCODE_BUILD
             LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " is not a valid authentication type.";
-            #endif
             return nullptr;
     }
     Aws::RDS::RDSClientConfiguration rds_client_cfg;
@@ -189,9 +180,7 @@ static void GenKeyAndTime(const char* db_hostname, const char* db_region, const 
 static bool UpdateTokenValue(char* token, const unsigned max_size, const char* new_value) {
     int new_token_size = strlen(new_value);
     if (max_size - 1 < new_token_size) {
-        #ifndef XCODE_BUILD
         LOG(WARNING) << "New token does not fit into allocated token";
-        #endif
         return false;
     }
 
@@ -218,16 +207,12 @@ bool GetCachedToken(char* token, const unsigned int max_size, const char* db_hos
 
     auto itr = cached_tokens.find(key);
     if (itr == cached_tokens.end() || curr_time_in_sec > itr->second.expiration) {
-        #ifndef XCODE_BUILD
         LOG(WARNING) << "No cached token";
-        #endif
         return false;
     }
 
     int token_size = itr->second.token.size();
-    #ifndef XCODE_BUILD
     LOG(INFO) << "Token size is " << token_size;
-    #endif
     return UpdateTokenValue(token, max_size, itr->second.token.c_str());
 }
 
@@ -244,17 +229,13 @@ void UpdateCachedToken(const char* db_hostname, const char* db_region, const cha
 
 bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config) {
     // TODO(yuenhcol) - Need to move logger initializer to a central location
-    #ifndef XCODE_BUILD
     LoggerWrapper::initialize();
-    #endif
     if (1 == ++sdk_ref_count) {
         std::lock_guard<std::mutex> lock(sdk_mutex);
         Aws::InitAPI(sdk_opts);
     }
 
-    #ifndef XCODE_BUILD
     LOG(INFO) << "Generating token for " << FEDERATED_AUTH_TYPE_STRING[type];
-    #endif
 
     Aws::RDS::RDSClient* client = CreateRDSClient(type, config);
     if (!client) {
@@ -266,9 +247,7 @@ bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const ch
     FreeAwsResource(client);
 
     int token_size = new_token.size();
-    #ifndef XCODE_BUILD
     LOG(INFO) << "RDS Client generated token length is " << token_size;
-    #endif
     return UpdateTokenValue(token, max_size, new_token.c_str());
 }
 
@@ -279,7 +258,7 @@ bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region,
     }
 
     std::string region_str = region;
-    
+
     if (region_str.empty() && !SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(secret_id, region_str)) {
         region_str = Aws::Region::US_EAST_1;
     }
