@@ -45,9 +45,11 @@ set(SRC
 
   src/host_availability/simple_host_availability_strategy.cc
   src/host_selector/random_host_selector.cc
+  src/host_selector/round_robin_host_selector.cc
 
   src/limitless/limitless_query_helper.cc
 
+  src/util/cache_map.cc
   src/util/logger_wrapper.cc
   src/util/odbc_helper.cc
 )
@@ -67,9 +69,11 @@ set(INC
   src/host_availability/simple_host_availability_strategy.h
   src/host_selector/host_selector.h
   src/host_selector/random_host_selector.h
+  src/host_selector/round_robin_host_selector.h
 
   src/limitless/limitless_query_helper.h
 
+  src/util/cache_map.h
   src/util/logger_wrapper.h
   src/util/odbc_helper.h
 )
