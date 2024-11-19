@@ -75,7 +75,7 @@ std::string HostInfo::get_host_port_pair() const {
     return get_host() + host_port_separator + std::to_string(get_port());
 }
 
-bool HostInfo::equal_host_port_pair(HostInfo& hi) const {
+bool HostInfo::equal_host_port_pair(const HostInfo& hi) const {
     return get_host_port_pair() == hi.get_host_port_pair();
 }
 

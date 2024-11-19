@@ -42,6 +42,20 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
     return false;
 }
 
+bool OdbcHelper::CheckConnection(SQLHDBC conn) {
+    HSTMT hstmt = SQL_NULL_HSTMT;
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
+    if (!SQL_SUCCEEDED(rc)) {
+        return false;
+    }
+
+    rc = SQLExecDirect(hstmt, const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>("SELECT 1")), SQL_NTS);
+    SQLFreeStmt(hstmt, SQL_CLOSE);
+    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+
+    return SQL_SUCCEEDED(rc);
+}
+
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     SQLCHAR     sqlstate[MAX_STATE_LENGTH];
     SQLCHAR     message[MAX_MSG_LENGTH];

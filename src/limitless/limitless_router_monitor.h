@@ -24,31 +24,43 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see
+// along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef ODBCHELPER_H_
-#define ODBCHELPER_H_
+#ifndef LIMITLESSROUTERMONITOR_H_
+#define LIMITLESSROUTERMONITOR_H_
 
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include <vector>
 
-#include <sql.h>
-#include <sqlext.h>
-#include <string>
+#include "../host_info.h"
 
-class OdbcHelper {
+class LimitlessRouterMonitor {
 public:
-    static const int MAX_STATE_LENGTH = 32;
-    static const int MAX_MSG_LENGTH = 1024;
+    LimitlessRouterMonitor(
+        const char *connection_string,
+        int host_port,
+        unsigned int interval_ms,
+        std::shared_ptr<std::vector<HostInfo>> limitless_routers
+    );
 
-    static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
+    ~LimitlessRouterMonitor();
 
-    static bool CheckConnection(SQLHDBC conn);
+    bool IsStopped();
 
+    void Close();
 private:
-    static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
+    std::atomic_bool stopped = false;
+
+    unsigned int interval_ms;
+
+    std::shared_ptr<std::vector<HostInfo>> limitless_routers;
+
+    std::shared_ptr<std::thread> monitor_thread = nullptr;
+
+    void run(const char *connection_string, int host_port);
 };
 
-#endif // ODBCHELPER_H_
+#endif

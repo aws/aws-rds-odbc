@@ -48,8 +48,6 @@ public:
     MOCK_METHOD(Aws::SecretsManager::Model::GetSecretValueOutcome, GetSecretValue, (const Aws::SecretsManager::Model::GetSecretValueRequest&), (const));
 };
 
-// Note that we inherit from the real class and mock only virtual functions.
-
 class MOCK_HTTP_RESP : public Aws::Http::HttpResponse {
 public:
     MOCK_HTTP_RESP() : Aws::Http::HttpResponse(nullptr){}
