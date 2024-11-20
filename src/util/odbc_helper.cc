@@ -43,8 +43,8 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
-    SQLCHAR     sqlstate[32];
-    SQLCHAR     message[1000];
+    SQLCHAR     sqlstate[MAX_STATE_LENGTH];
+    SQLCHAR     message[MAX_MSG_LENGTH];
     SQLINTEGER	nativeerror;
     SQLSMALLINT textlen;
     SQLRETURN	ret;

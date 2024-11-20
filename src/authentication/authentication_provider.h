@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __AUTHENTICATION_PROVIDER_H__
-#define __AUTHENTICATION_PROVIDER_H__
+#ifndef AUTHENTICATION_PROVIDER_H_
+#define AUTHENTICATION_PROVIDER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +55,7 @@ typedef enum {
     FOREACH_AUTHTYPE(GENERATE_ENUM)
 } FederatedAuthType;
 
-static const char* FEDERATED_AUTH_TYPE_STRING[] = {
+static const char* federated_auth_type_str[] = {
     FOREACH_AUTHTYPE(GENERATE_STRING)
 };
 
@@ -82,9 +82,9 @@ typedef struct Credentials {
 
 FederatedAuthType GetFedAuthTypeEnum(const char *str);
 
-bool GetCachedToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user);
+bool GetCachedToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user);
 void UpdateCachedToken(const char* db_hostname, const char* db_region, const char* port, const char* db_user, const char* token, const char* expiration_time);
-bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config);
+bool GenerateConnectAuthToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config);
 
 bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region, Credentials* credentials);
 
@@ -92,4 +92,4 @@ bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region,
 }
 #endif
 
-#endif  //__AUTHENTICATION_PROVIDER_H__
+#endif // AUTHENTICATION_PROVIDER_H_

@@ -32,26 +32,26 @@
 
 template <typename K, typename V>
 void CacheMap<K, V>::put(const K& key, const V& value) {
-    put(key, value, DEFAULT_EXPIRATION_);
+    put(key, value, DEFAULT_EXPIRATION_SEC);
 }
 
 template <typename K, typename V>
 void CacheMap<K, V>::put(const K& key, const V& value, int sec_ttl) {
-    std::lock_guard<std::mutex> lock(cache_lock_);
+    std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point expiry_time =
         std::chrono::steady_clock::now() + std::chrono::seconds(sec_ttl);
-    cache_[key] = CacheEntry{value, expiry_time};
+    cache[key] = CacheEntry{value, expiry_time};
 }
 
 template <typename K, typename V>
 V CacheMap<K, V>::get(const K& key) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    if (auto itr = cache_.find(key); itr != cache_.end()) {
+    if (auto itr = cache.find(key); itr != cache.end()) {
         if (itr->second.expiry > now) {
             return itr->second.value;
         }
         // Expired, remove from cache
-        cache_.erase(itr);        
+        cache.erase(itr);        
     }
     return {};
 }
@@ -59,12 +59,12 @@ V CacheMap<K, V>::get(const K& key) {
 template <typename K, typename V>
 bool CacheMap<K, V>::find(const K& key) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    if (auto itr = cache_.find(key); itr != cache_.end()) {
+    if (auto itr = cache.find(key); itr != cache.end()) {
         if (itr->second.expiry > now) {
             return true;
         }
         // Expired, remove from cache
-        cache_.erase(itr);
+        cache.erase(itr);
     }
     return false;
 }
@@ -72,20 +72,20 @@ bool CacheMap<K, V>::find(const K& key) {
 template <typename K, typename V>
 unsigned int CacheMap<K, V>::size() {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    for (auto itr = cache_.begin(); itr != cache_.end();) {
+    for (auto itr = cache.begin(); itr != cache.end();) {
         if (itr->second.expiry < now) {
-            itr = cache_.erase(itr);
+            itr = cache.erase(itr);
         } else {
             itr++;
         }
     }
-    return cache_.size();
+    return cache.size();
 }
 
 template <typename K, typename V>
 void CacheMap<K, V>::clear() {
-    std::lock_guard<std::mutex> lock(cache_lock_);
-    cache_.clear();
+    std::lock_guard<std::mutex> lock(cache_lock);
+    cache.clear();
 }
 
 // Explicit Template Instantiations

@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __RANDOM_HOST_SELECTOR_H__
-#define __RANDOM_HOST_SELECTOR_H__
+#ifndef RANDOM_HOST_SELECTOR_H_
+#define RANDOM_HOST_SELECTOR_H_
 
 #include "../host_info.h"
 #include "host_selector.h"
@@ -39,4 +39,4 @@ public:
         std::unordered_map<std::string, std::string> properties) override;
 };
 
-#endif //__RANDOM_HOST_SELECTOR_H__
+#endif // RANDOM_HOST_SELECTOR_H_

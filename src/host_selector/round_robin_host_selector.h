@@ -47,11 +47,11 @@ public:
     static void clear_cache();
 
 private:
-    const int DEFAULT_WEIGHT_ = 1;
-    const int NO_HOST_IDX_ = -1;
+    const int DEFAULT_WEIGHT = 1;
+    const int NO_HOST_IDX = -1;
 
-    static std::mutex cache_mutex_;
-    static CacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> round_robin_cache_;
+    static std::mutex cache_mutex;
+    static CacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> round_robin_cache;
 
     virtual int convert_to_int(const std::string& str);
 

@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __HOSTAVAILABILITYSTRATEGY_H__
-#define __HOSTAVAILABILITYSTRATEGY_H__
+#ifndef HOSTAVAILABILITYSTRATEGY_H_
+#define HOSTAVAILABILITYSTRATEGY_H_
 
 typedef enum {
   AVAILABLE,
@@ -43,4 +43,4 @@ public:
     virtual HostAvailability get_host_availability(HostAvailability rawHostAvailability) = 0;
 };
 
-#endif /* __HOSTAVAILABILITYSTRATEGY_H__ */
+#endif // HOSTAVAILABILITYSTRATEGY_H_

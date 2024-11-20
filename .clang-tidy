@@ -7,6 +7,7 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
+  llvm-include-order,
   -google-readability-braces-around-statements,
   -google-readability-namespace-comments,
   -google-runtime-references,
@@ -20,12 +21,12 @@ Checks: >
   -modernize-concat-nested-namespaces,
   -modernize-use-nodiscard,
   -modernize-avoid-c-arrays,
+  -modernize-use-using,
   -performance-move-const-arg,
   -performance-avoid-endl,
   -performance-enum-size,
   -readability-braces-around-statements,
   -readability-identifier-length,
-  -readability-magic-numbers,
   -readability-named-parameter,
   -readability-redundant-declaration,
   -readability-avoid-return-with-void-value,
@@ -41,7 +42,11 @@ Checks: >
 # Turn all the warnings from the checks above into errors.
 WarningsAsErrors: "*"
 
-HeaderFilterRegex: ""
+HeaderFilterRegex: "aws-rds-odbc/(build|src).*\\.h$"
+# Skip checking dependencies
+ExcludeHeaderFilterRegex: "(_deps|aws_sdk)"
+InheritParentConfig: false
+SystemHeaders: false
 
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,                 value: lower_case }
@@ -52,9 +57,6 @@ CheckOptions:
   - { key: readability-identifier-naming.FunctionCase,                  value: aNy_CasE   }
   - { key: readability-identifier-naming.VariableCase,                  value: lower_case }
   - { key: readability-identifier-naming.ClassMemberCase,               value: lower_case }
-  - { key: readability-identifier-naming.ClassMemberSuffix,             value: _          }
-  - { key: readability-identifier-naming.PrivateMemberSuffix,           value: _          }
-  - { key: readability-identifier-naming.ProtectedMemberSuffix,         value: _          }
   - { key: readability-identifier-naming.EnumConstantCase,              value: UPPER_CASE }
   - { key: readability-identifier-naming.ConstexprVariableCase,         value: UPPER_CASE }
   - { key: readability-identifier-naming.GlobalConstantCase,            value: UPPER_CASE }

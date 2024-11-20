@@ -28,11 +28,12 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "adfs.h"
-#include "../html_util.h"
-#include "../util/logger_wrapper.h"
 
 #include <regex>
 #include <unordered_set>
+
+#include "../html_util.h"
+#include "../util/logger_wrapper.h"
 
 const std::string AdfsCredentialsProvider::FORM_ACTION_PATTERN = "<form.*?action=\"([^\"]+)\"";
 const std::string AdfsCredentialsProvider::SAML_RESPONSE_PATTERN = "SAMLResponse\\W+value=\"(.*)\"( />)";

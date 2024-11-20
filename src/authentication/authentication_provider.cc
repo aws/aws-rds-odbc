@@ -32,16 +32,13 @@
 #include <adfs/adfs.h>
 #include <okta/okta.h>
 
-#include "secrets_manager_helper.h"
-#include "../util/logger_wrapper.h"
-
+#include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
 #include <aws/core/http/HttpClient.h>
-#include <aws/core/Aws.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
-#include <aws/sts/STSClient.h>
 #include <aws/rds/RDSClient.h>
+#include <aws/sts/STSClient.h>
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 
 #include <algorithm>
 #include <atomic>
@@ -50,9 +47,15 @@
 #include <string>
 #include <unordered_map>
 
+#include "../util/logger_wrapper.h"
+#include "secrets_manager_helper.h"
+
 static Aws::SDKOptions sdk_opts;
 static std::atomic<int> sdk_ref_count{0};
 static std::mutex sdk_mutex;
+
+static constexpr uint64_t DEFAULT_SOCKET_TIMEOUT = 3000;
+static constexpr uint64_t DEFAULT_CONNECT_TIMEOUT = 5000;
 
 struct TokenInfo {
     std::string token;
@@ -99,18 +102,18 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
     switch (type) {
         case ADFS: {
             if (!ValidateAdfsConf(config)) {
-                LOG(ERROR) << "Configuration for " << FEDERATED_AUTH_TYPE_STRING[type] << " is invalid/incomplete.";
+                LOG(ERROR) << "Configuration for " << federated_auth_type_str[type] << " is invalid/incomplete.";
                 return nullptr;
             };
             Aws::Client::ClientConfiguration http_client_cfg;
-            http_client_cfg.requestTimeoutMs = ParseNumber(config.http_client_socket_timeout, 3000);
-            http_client_cfg.connectTimeoutMs = ParseNumber(config.http_client_connect_timeout, 5000);
+            http_client_cfg.requestTimeoutMs = ParseNumber(config.http_client_socket_timeout, DEFAULT_SOCKET_TIMEOUT);
+            http_client_cfg.connectTimeoutMs = ParseNumber(config.http_client_connect_timeout, DEFAULT_CONNECT_TIMEOUT);
             http_client_cfg.verifySSL = true;
             std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
             std::shared_ptr<Aws::STS::STSClient> sts_client = std::make_shared<Aws::STS::STSClient>();
             AdfsCredentialsProvider adfs(config, http_client, sts_client);
             if (!adfs.GetAWSCredentials(credentials)) {
-                LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " provider failed to get valid credentials.";
+                LOG(ERROR) << federated_auth_type_str[type] << " provider failed to get valid credentials.";
                 return nullptr;
             }
             break;
@@ -122,25 +125,25 @@ static Aws::RDS::RDSClient* CreateRDSClient(FederatedAuthType type, FederatedAut
         }
         case OKTA: {
             if (!ValidateOktaConf(config)) {
-                LOG(ERROR) << "Configuration for " << FEDERATED_AUTH_TYPE_STRING[type] << " is invalid/incomplete.";
+                LOG(ERROR) << "Configuration for " << federated_auth_type_str[type] << " is invalid/incomplete.";
                 return nullptr;
             };
             Aws::Client::ClientConfiguration http_client_cfg;
-            http_client_cfg.requestTimeoutMs = ParseNumber(config.http_client_socket_timeout, 3000);
-            http_client_cfg.connectTimeoutMs = ParseNumber(config.http_client_connect_timeout, 5000);
+            http_client_cfg.requestTimeoutMs = ParseNumber(config.http_client_socket_timeout, DEFAULT_SOCKET_TIMEOUT);
+            http_client_cfg.connectTimeoutMs = ParseNumber(config.http_client_connect_timeout, DEFAULT_CONNECT_TIMEOUT);
             http_client_cfg.verifySSL = true;
             http_client_cfg.followRedirects = Aws::Client::FollowRedirectsPolicy::ALWAYS;
             std::shared_ptr<Aws::Http::HttpClient> http_client = Aws::Http::CreateHttpClient(http_client_cfg);
             std::shared_ptr<Aws::STS::STSClient> sts_client = std::make_shared<Aws::STS::STSClient>();
             OktaCredentialsProvider okta(config, http_client, sts_client);
             if (!okta.GetAWSCredentials(credentials)) {
-                LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " provider failed to get valid credentials.";
+                LOG(ERROR) << federated_auth_type_str[type] << " provider failed to get valid credentials.";
                 return nullptr;
             }
             break;
         }
         default:
-            LOG(ERROR) << FEDERATED_AUTH_TYPE_STRING[type] << " is not a valid authentication type.";
+            LOG(ERROR) << federated_auth_type_str[type] << " is not a valid authentication type.";
             return nullptr;
     }
     Aws::RDS::RDSClientConfiguration rds_client_cfg;
@@ -193,14 +196,14 @@ FederatedAuthType GetFedAuthTypeEnum(const char *str) {
     std::string upper_str(str);
     std::transform(upper_str.begin(), upper_str.end(), upper_str.begin(), ::toupper);
     for (int i = 0; i < INVALID; i++) {
-        if (upper_str == FEDERATED_AUTH_TYPE_STRING[i]) {
+        if (upper_str == federated_auth_type_str[i]) {
             return static_cast<FederatedAuthType>(i);
         }
     }
     return INVALID;
 }
 
-bool GetCachedToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user) {
+bool GetCachedToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user) {
     std::string key;
     uint64_t curr_time_in_sec = 0;
     GenKeyAndTime(db_hostname, db_region, port, db_user, key, curr_time_in_sec);
@@ -227,7 +230,7 @@ void UpdateCachedToken(const char* db_hostname, const char* db_region, const cha
     cached_tokens[key] = ti;
 }
 
-bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config) {
+bool GenerateConnectAuthToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config) {
     // TODO(yuenhcol) - Need to move logger initializer to a central location
     LoggerWrapper::initialize();
     if (1 == ++sdk_ref_count) {
@@ -235,7 +238,7 @@ bool GenerateConnectAuthToken(char* token, const unsigned int max_size, const ch
         Aws::InitAPI(sdk_opts);
     }
 
-    LOG(INFO) << "Generating token for " << FEDERATED_AUTH_TYPE_STRING[type];
+    LOG(INFO) << "Generating token for " << federated_auth_type_str[type];
 
     Aws::RDS::RDSClient* client = CreateRDSClient(type, config);
     if (!client) {
@@ -259,7 +262,7 @@ bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region,
 
     std::string region_str = region;
 
-    if (region_str.empty() && !SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(secret_id, region_str)) {
+    if (region_str.empty() && !SecretsManagerHelper::TryParseRegionFromSecretId(secret_id, region_str)) {
         region_str = Aws::Region::US_EAST_1;
     }
 
@@ -268,7 +271,7 @@ bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region,
     sm_client_cfg.region = region_str;
     std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> sm_client = std::make_shared<Aws::SecretsManager::SecretsManagerClient>(sm_client_cfg);
 
-    SECRETS_MANAGER_HELPER sm_helper(sm_client);
+    SecretsManagerHelper sm_helper(sm_client);
     bool is_success = sm_helper.FetchCredentials(secret_id);
     ShutdownAwsAPI(); // done using the AWS API
 

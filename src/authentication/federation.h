@@ -27,20 +27,21 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __FEDERATION_H__
-#define __FEDERATION_H__
+#ifndef FEDERATION_H_
+#define FEDERATION_H_
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/http/HttpClient.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 #include <aws/sts/STSClient.h>
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 
 class FederationCredentialProvider {
 public:
-    FederationCredentialProvider(const std::string& idp_arn, const std::string& role_arn,
+    FederationCredentialProvider(std::string idp_arn, std::string role_arn,
         std::shared_ptr<Aws::Http::HttpClient> http_client, std::shared_ptr<Aws::STS::STSClient> sts_client)
-        : idp_arn(idp_arn), role_arn(role_arn), http_client(http_client), sts_client(sts_client) {}
+        : idp_arn(std::move(idp_arn)), role_arn(std::move(role_arn)),
+        http_client(std::move(http_client)), sts_client(std::move(sts_client)) {}
 
     bool GetAWSCredentials(Aws::Auth::AWSCredentials& credentials);
 
@@ -56,4 +57,4 @@ protected:
     std::shared_ptr<Aws::STS::STSClient> sts_client;
 };
 
-#endif  //__FEDERATION_H__
+#endif // FEDERATION_H_

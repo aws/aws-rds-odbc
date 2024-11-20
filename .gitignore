@@ -442,6 +442,7 @@ aws_sdk/
 
 # Build output directory
 build
+cmake-build-debug
 
 # CodeChecker static analysis reports directory
 reports

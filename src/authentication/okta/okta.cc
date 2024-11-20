@@ -28,12 +28,12 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "okta.h"
-#include "../html_util.h"
-
-#include "../util/logger_wrapper.h"
 
 #include <regex>
 #include <unordered_set>
+
+#include "../html_util.h"
+#include "../util/logger_wrapper.h"
 
 const std::string OktaCredentialsProvider::SAML_RESPONSE_PATTERN = "<input name=\"SAMLResponse\".+value=\"(.+)\"/\\>";
 

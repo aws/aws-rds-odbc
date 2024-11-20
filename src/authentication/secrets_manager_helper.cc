@@ -27,18 +27,19 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#include "secrets_manager_helper.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <regex>
 
 #include <aws/core/Aws.h>
 #include <aws/core/utils/json/JsonSerializer.h>
-#include <aws/secretsmanager/model/GetSecretValueRequest.h>
 #include <aws/secretsmanager/SecretsManagerServiceClientModel.h>
+#include <aws/secretsmanager/model/GetSecretValueRequest.h>
 
-#include "authentication_provider.h"
-#include "secrets_manager_helper.h"
 #include "../util/logger_wrapper.h"
+#include "authentication_provider.h"
 
 namespace {
     const Aws::String USERNAME_KEY{ "username" };
@@ -46,7 +47,7 @@ namespace {
     const std::string SECRETS_ARN_PATTERN{ "arn:aws:secretsmanager:([-a-zA-Z0-9]+):.*" };
 }
 
-bool SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region) {
+bool SecretsManagerHelper::TryParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region) {
     std::regex rgx(SECRETS_ARN_PATTERN);
     std::smatch matches;
 
@@ -58,7 +59,7 @@ bool SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(const Aws::String& secre
     return false;
 }
 
-bool SECRETS_MANAGER_HELPER::FetchCredentials(const Aws::String& secret_id) {
+bool SecretsManagerHelper::FetchCredentials(const Aws::String& secret_id) {
     Aws::SecretsManager::Model::GetSecretValueRequest request;
     request.SetSecretId(secret_id);
 

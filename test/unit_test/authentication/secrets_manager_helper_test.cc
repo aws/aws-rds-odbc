@@ -83,7 +83,7 @@ TEST_F(SecretsManagerHelperTest, FetchCredentialsOK) {
     Property("GetSecretId", &Aws::SecretsManager::Model::GetSecretValueRequest::GetSecretId, StrEq(TEST_SECRET_ID))
   )).WillOnce(Return(successfulOutcome));
 
-  SECRETS_MANAGER_HELPER smHelper(mockSmClient);
+  SecretsManagerHelper smHelper(mockSmClient);
 
   bool res = smHelper.FetchCredentials(TEST_SECRET_ID);
   EXPECT_TRUE(res);
@@ -98,7 +98,7 @@ TEST_F(SecretsManagerHelperTest, FetchCredentialsError) {
     Property("GetSecretId", &Aws::SecretsManager::Model::GetSecretValueRequest::GetSecretId, StrEq(TEST_SECRET_ID))
   )).WillOnce(Return(erroredOutcome));
 
-  SECRETS_MANAGER_HELPER smHelper(mockSmClient);
+  SecretsManagerHelper smHelper(mockSmClient);
 
   bool res = smHelper.FetchCredentials(TEST_SECRET_ID);
   EXPECT_FALSE(res);
@@ -108,7 +108,7 @@ TEST_F(SecretsManagerHelperTest, TryParseRegionFromSecretIdOK) {
   Aws::String secretIdWithRegion = "arn:aws:secretsmanager:us-east-2:otherthings";
   Aws::String region = "";
 
-  bool res = SECRETS_MANAGER_HELPER::TryParseRegionFromSecretId(secretIdWithRegion, region);
+  bool res = SecretsManagerHelper::TryParseRegionFromSecretId(secretIdWithRegion, region);
   EXPECT_TRUE(res);
   EXPECT_EQ(region, "us-east-2");
 }

@@ -27,16 +27,16 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __SECRETSMANAGERHELPER_H__
-#define __SECRETSMANAGERHELPER_H__
+#ifndef SECRETSMANAGERHELPER_H_
+#define SECRETSMANAGERHELPER_H_
 
 #include <aws/secretsmanager/SecretsManagerClient.h>
 
-class SECRETS_MANAGER_HELPER {
+class SecretsManagerHelper {
     public:
-        SECRETS_MANAGER_HELPER(std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> sm_client)
-            : sm_client(sm_client) {}
-        ~SECRETS_MANAGER_HELPER() {}
+        explicit SecretsManagerHelper(std::shared_ptr<Aws::SecretsManager::SecretsManagerClient> sm_client)
+            : sm_client(std::move(sm_client)) {}
+        ~SecretsManagerHelper() = default;
 
         // attempts to match secret_ID to a secrets ARN regex and parses the region portion; returns true if parsed, false if not
         static bool TryParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region);
@@ -55,4 +55,4 @@ class SECRETS_MANAGER_HELPER {
         Aws::String password;
 };
 
-#endif
+#endif // SECRETSMANAGERHELPER_H_

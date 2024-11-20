@@ -27,8 +27,8 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __ODBCHELPER_H__
-#define __ODBCHELPER_H__
+#ifndef ODBCHELPER_H_
+#define ODBCHELPER_H_
 
 #ifdef WIN32
 #include <windows.h>
@@ -40,10 +40,13 @@
 
 class OdbcHelper {
 public:
+    static const int MAX_STATE_LENGTH = 32;
+    static const int MAX_MSG_LENGTH = 1024;
+
     static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
 
 private:
     static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
 };
 
-#endif /* __ODBCHELPER_H__ */
+#endif // ODBCHELPER_H_

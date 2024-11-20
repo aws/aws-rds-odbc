@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
-#define __SIMPLEHOSTAVAILABILITYSTRATEGY_H__
+#ifndef SIMPLEHOSTAVAILABILITYSTRATEGY_H_
+#define SIMPLEHOSTAVAILABILITYSTRATEGY_H_
 
 #include "host_availability_strategy.h"
 
@@ -38,4 +38,4 @@ public:
     HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
 };
 
-#endif /* __SIMPLEHOSTAVAILABILITYSTRATEGY_H__ */
+#endif // SIMPLEHOSTAVAILABILITYSTRATEGY_H_

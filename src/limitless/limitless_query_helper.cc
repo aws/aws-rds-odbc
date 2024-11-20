@@ -27,10 +27,11 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#include "limitless_query_helper.h"
+
 #include <cmath>
 #include <string>
 
-#include "limitless_query_helper.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 
@@ -80,10 +81,10 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
 }
 
 HostInfo LimitlessQueryHelper::CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map) {
-    int64_t weight = std::round(10.0 - (atof(reinterpret_cast<const char *>(load)) * 10.0));
+    int64_t weight = std::round(WEIGHT_SCALING - (atof(reinterpret_cast<const char *>(load)) * WEIGHT_SCALING));
 
-    if (weight < 1 || weight > 10) {
-        weight = 1;
+    if (weight < MIN_WEIGHT || weight > MAX_WEIGHT) {
+        weight = MIN_WEIGHT;
         LOG(WARNING) << "Invalid router load of " << load << " for " << router_endpoint;
     }
 
