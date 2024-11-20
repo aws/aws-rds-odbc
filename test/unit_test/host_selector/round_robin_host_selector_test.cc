@@ -72,7 +72,7 @@ TEST_F(RoundRobinHostSelectorTest, get_writer_fail_all_readers) {
 TEST_F(RoundRobinHostSelectorTest, get_reader_one_down) {
     RoundRobinHostSelector host_selector;
     std::unordered_map<std::string, std::string> props;
-    std::vector<HostInfo> hosts = {reader_host_info_a, reader_host_info_down};
+    std::vector<HostInfo> hosts = {reader_host_info_down, reader_host_info_a};
     HostInfo host_info = host_selector.get_host(hosts, false, props);
     EXPECT_EQ(reader_host_info_a.get_host(), host_info.get_host());
 }
@@ -88,6 +88,14 @@ TEST_F(RoundRobinHostSelectorTest, get_first_reader) {
     RoundRobinHostSelector host_selector;
     std::unordered_map<std::string, std::string> props;
     std::vector<HostInfo> hosts = {reader_host_info_a, reader_host_info_b, reader_host_info_c};
+    HostInfo host_info = host_selector.get_host(hosts, false, props);
+    EXPECT_EQ(reader_host_info_a.get_host(), host_info.get_host());
+}
+
+TEST_F(RoundRobinHostSelectorTest, get_first_reader_unsorted_input) {
+    RoundRobinHostSelector host_selector;
+    std::unordered_map<std::string, std::string> props;
+    std::vector<HostInfo> hosts = {reader_host_info_c, reader_host_info_a, reader_host_info_b};
     HostInfo host_info = host_selector.get_host(hosts, false, props);
     EXPECT_EQ(reader_host_info_a.get_host(), host_info.get_host());
 }
