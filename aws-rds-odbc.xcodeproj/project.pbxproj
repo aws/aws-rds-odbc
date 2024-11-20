@@ -34,6 +34,11 @@
 		7369B6282CDE666E00C98EDF /* html_util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6232CDE666E00C98EDF /* html_util.cc */; };
 		7369B6292CDE666E00C98EDF /* html_util.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6222CDE666E00C98EDF /* html_util.h */; };
 		7369B62A2CDE666E00C98EDF /* okta.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6242CDE666E00C98EDF /* okta.h */; };
+		738543F32CEE0E370019F6C6 /* round_robin_property.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F22CEE0E370019F6C6 /* round_robin_property.h */; };
+		738543F42CEE0E370019F6C6 /* round_robin_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */; };
+		738543F52CEE0E370019F6C6 /* round_robin_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */; };
+		738543F82CEE0E400019F6C6 /* cache_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F62CEE0E400019F6C6 /* cache_map.h */; };
+		738543F92CEE0E400019F6C6 /* cache_map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543F72CEE0E400019F6C6 /* cache_map.cc */; };
 		73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E42CD3BC08002268BF /* host_availability_strategy.h */; };
 		73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */; };
 		73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */; };
@@ -92,6 +97,11 @@
 		7369B6232CDE666E00C98EDF /* html_util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = html_util.cc; sourceTree = "<group>"; };
 		7369B6242CDE666E00C98EDF /* okta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = okta.h; sourceTree = "<group>"; };
 		7369B6252CDE666E00C98EDF /* okta.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = okta.cc; sourceTree = "<group>"; };
+		738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = round_robin_host_selector.h; sourceTree = "<group>"; };
+		738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = round_robin_host_selector.cc; sourceTree = "<group>"; };
+		738543F22CEE0E370019F6C6 /* round_robin_property.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = round_robin_property.h; sourceTree = "<group>"; };
+		738543F62CEE0E400019F6C6 /* cache_map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cache_map.h; sourceTree = "<group>"; };
+		738543F72CEE0E400019F6C6 /* cache_map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cache_map.cc; sourceTree = "<group>"; };
 		73D322E22CD3A46E002268BF /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		73D322E32CD3A46E002268BF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		73D322E42CD3BC08002268BF /* host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_availability_strategy.h; sourceTree = "<group>"; };
@@ -184,6 +194,9 @@
 		7369B61B2CDE649B00C98EDF /* host_selector */ = {
 			isa = PBXGroup;
 			children = (
+				738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */,
+				738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */,
+				738543F22CEE0E370019F6C6 /* round_robin_property.h */,
 				7369B6182CDE649B00C98EDF /* host_selector.h */,
 				7369B6192CDE649B00C98EDF /* random_host_selector.h */,
 				7369B61A2CDE649B00C98EDF /* random_host_selector.cc */,
@@ -267,6 +280,8 @@
 		73D7882B2CC919070028B42F /* util */ = {
 			isa = PBXGroup;
 			children = (
+				738543F62CEE0E400019F6C6 /* cache_map.h */,
+				738543F72CEE0E400019F6C6 /* cache_map.cc */,
 				7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */,
 				7369B60F2CDE5C9E00C98EDF /* odbc_helper.cc */,
 				73D788292CC919070028B42F /* logger_wrapper.h */,
@@ -306,12 +321,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				738543F32CEE0E370019F6C6 /* round_robin_property.h in Headers */,
+				738543F42CEE0E370019F6C6 /* round_robin_host_selector.h in Headers */,
 				73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */,
 				7369B61D2CDE649B00C98EDF /* host_selector.h in Headers */,
 				7369B61E2CDE649B00C98EDF /* random_host_selector.h in Headers */,
 				73D788332CC919070028B42F /* authentication_provider.h in Headers */,
 				7369B6292CDE666E00C98EDF /* html_util.h in Headers */,
 				7369B62A2CDE666E00C98EDF /* okta.h in Headers */,
+				738543F82CEE0E400019F6C6 /* cache_map.h in Headers */,
 				73D788342CC919070028B42F /* adfs.h in Headers */,
 				73DAE0222CDA71DD00225BE1 /* limitless_query_helper.h in Headers */,
 				73D788352CC919070028B42F /* logger_wrapper.h in Headers */,
@@ -387,11 +405,13 @@
 				73DAE02C2CDBA7BB00225BE1 /* logger_wrapper.cc in Sources */,
 				73DAE0212CDA71DD00225BE1 /* limitless_query_helper.cc in Sources */,
 				73D7882D2CC919070028B42F /* adfs.cc in Sources */,
+				738543F92CEE0E400019F6C6 /* cache_map.cc in Sources */,
 				73D7882E2CC919070028B42F /* authentication_provider.cc in Sources */,
 				73D7882F2CC919070028B42F /* host_info.cc in Sources */,
 				7369B6102CDE5C9E00C98EDF /* odbc_helper.cc in Sources */,
 				73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */,
 				73D788302CC919070028B42F /* federation.cc in Sources */,
+				738543F52CEE0E370019F6C6 /* round_robin_host_selector.cc in Sources */,
 				7369B6272CDE666E00C98EDF /* okta.cc in Sources */,
 				7369B6282CDE666E00C98EDF /* html_util.cc in Sources */,
 				7369B61C2CDE649B00C98EDF /* random_host_selector.cc in Sources */,
