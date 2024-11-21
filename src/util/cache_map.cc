@@ -1,0 +1,93 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License, version 2.0
+// (GPLv2), as published by the Free Software Foundation, with the
+// following additional permissions:
+//
+// This program is distributed with certain software that is licensed
+// under separate terms, as designated in a particular file or component
+// or in the license documentation. Without limiting your rights under
+// the GPLv2, the authors of this program hereby grant you an additional
+// permission to link the program and your derivative works with the
+// separately licensed software that they have included with the program.
+//
+// Without limiting the foregoing grant of rights under the GPLv2 and
+// additional permission as to separately licensed software, this
+// program is also subject to the Universal FOSS Exception, version 1.0,
+// a copy of which can be found along with its FAQ at
+// http://oss.oracle.com/licenses/universal-foss-exception.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License, version 2.0, for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see
+// http://www.gnu.org/licenses/gpl-2.0.html.
+
+#include "cache_map.h"
+#include "host_selector/round_robin_property.h"
+
+template <typename K, typename V>
+void CacheMap<K, V>::put(const K& key, const V& value) {
+    put(key, value, DEFAULT_EXPIRATION_);
+}
+
+template <typename K, typename V>
+void CacheMap<K, V>::put(const K& key, const V& value, int sec_ttl) {
+    std::lock_guard<std::mutex> lock(cache_lock_);
+    std::chrono::steady_clock::time_point expiry_time =
+        std::chrono::steady_clock::now() + std::chrono::seconds(sec_ttl);
+    cache_[key] = CacheEntry{value, expiry_time};
+}
+
+template <typename K, typename V>
+V CacheMap<K, V>::get(const K& key) {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    if (auto itr = cache_.find(key); itr != cache_.end()) {
+        if (itr->second.expiry > now) {
+            return itr->second.value;
+        }
+        // Expired, remove from cache
+        cache_.erase(itr);        
+    }
+    return {};
+}
+
+template <typename K, typename V>
+bool CacheMap<K, V>::find(const K& key) {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    if (auto itr = cache_.find(key); itr != cache_.end()) {
+        if (itr->second.expiry > now) {
+            return true;
+        }
+        // Expired, remove from cache
+        cache_.erase(itr);
+    }
+    return false;
+}
+
+template <typename K, typename V>
+unsigned int CacheMap<K, V>::size() {
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    for (auto itr = cache_.begin(); itr != cache_.end();) {
+        if (itr->second.expiry < now) {
+            itr = cache_.erase(itr);
+        } else {
+            itr++;
+        }
+    }
+    return cache_.size();
+}
+
+template <typename K, typename V>
+void CacheMap<K, V>::clear() {
+    std::lock_guard<std::mutex> lock(cache_lock_);
+    cache_.clear();
+}
+
+// Explicit Template Instantiations
+template class CacheMap<std::string, std::string>;
+template class CacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>>;

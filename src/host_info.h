@@ -78,9 +78,9 @@ public:
     std::string replica_lag;
 
 private:
-    const std::string HOST_PORT_SEPARATOR = ":";
-    const std::string host;
-    const int port = NO_PORT;
+    std::string HOST_PORT_SEPARATOR = ":";
+    std::string host;
+    int port = NO_PORT;
     uint64_t weight = DEFAULT_WEIGHT;
 
     HOST_STATE host_state;

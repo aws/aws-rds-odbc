@@ -46,7 +46,9 @@ add_executable(
   host_availability/simple_host_availability_strategy_test.cc
 
   host_selector/random_host_selector_test.cc
+  host_selector/round_robin_host_selector_test.cc
 
+  util/cache_map_test.cc
   util/odbc_helper_test.cc
 )
 
