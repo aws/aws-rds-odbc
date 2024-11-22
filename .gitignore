@@ -442,7 +442,7 @@ aws_sdk/
 
 # Build output directory
 build
-cmake-build-debug
+build-debug
 
 # CodeChecker static analysis reports directory
 reports
@@ -472,5 +472,6 @@ contents.xcworkspacedata
 *.swo
 *.tmp
 
-# IntelliJ IDEA
+# IntelliJ IDEA / CLion
+.clang-tidy
 .idea
