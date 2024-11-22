@@ -37,8 +37,6 @@
 #endif /* XCODE_BUILD */
 
 #include <glog/logging.h>
-
-#include <format>
 #include <filesystem>
 
 namespace logger_config {
