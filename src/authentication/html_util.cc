@@ -31,47 +31,42 @@
 #include "html_util.h"
 #include "../util/logger_wrapper.h"
 
-namespace HtmlUtil {
-    std::string escape_html_entity(const std::string& html) {
-        std::string retval;
-        DLOG(INFO) << "Before HTML escape modification: " << html;
-        int i = 0;
-        int length = html.length();
-        while (i < length) {
-            char c = html[i];
-            if (c != '&') {
-                retval.append(1, c);
-                i++;
-                continue;
-            }
-
-            if (html.substr(i, 6) == "&#x2b;") {
-                retval.append(1,'+');
-                i += 6;
-            } else if (html.substr(i, 6) == "&#x3d;") {
-                retval.append(1, '=');
-                i += 6;
-            } else if (html.substr(i, 4) == "&lt;") {
-                retval.append(1,'<');
-                i += 4;
-            } else if (html.substr(i, 4) == "&gt;") {
-                retval.append(1, '>');
-                i += 4;
-            } else if (html.substr(i, 5) == "&amp;") {
-                retval.append(1, '&');
-                i += 5;
-            } else if (html.substr(i, 6) == "&apos;") {
-                retval.append(1, '\'');
-                i += 6;
-            } else if (html.substr(i, 6) == "&quot;") {
-                retval.append(1, '"');
-                i += 6;
-            } else {
-                retval.append(1, c);
-                ++i;
-            }
-        }
-        DLOG(INFO) << "After HTML escape modification: " << html;
-        return retval;
-    }
+const std::unordered_map<std::string, char> HtmlUtil::HTML_DECODE_MAP = {
+    {"&#x2b;", '+'},
+    {"&#x3d;", '='},
+    {"&lt;", '<'},
+    {"&gt;", '>'},
+    {"&amp;", '&'},
+    {"&apos;", '\''},
+    {"&quot;", '"'}
 };
+
+std::string HtmlUtil::escape_html_entity(const std::string& html) {
+    std::string retval;
+    DLOG(INFO) << "Before HTML escape modification: " << html;
+    int i = 0;
+    int length = html.length();
+    while (i < length) {
+        char c = html[i];
+        if (c != '&') {
+            retval.append(1, c);
+            i++;
+            continue;
+        }
+
+        int semicolon_idx = html.find(';', i);
+        if (semicolon_idx != std::string::npos) {
+            std::string html_code = html.substr(i, semicolon_idx - i + 1);
+            if (auto itr = HtmlUtil::HTML_DECODE_MAP.find(html_code); itr != HtmlUtil::HTML_DECODE_MAP.end()) {
+                retval.append(1, itr->second);
+                i = semicolon_idx + 1;
+            }
+        } else {
+            retval.append(1, c);
+            i++;
+        }
+
+    }
+    DLOG(INFO) << "After HTML escape modification: " << html;
+    return retval;
+}

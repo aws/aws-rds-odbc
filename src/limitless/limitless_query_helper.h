@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __LIMITLESSQUERYHELPER_H__
-#define __LIMITLESSQUERYHELPER_H__
+#ifndef LIMITLESSQUERYHELPER_H_
+#define LIMITLESSQUERYHELPER_H_
 
 #ifdef WIN32
 #include <windows.h>
@@ -45,12 +45,15 @@ class LimitlessQueryHelper {
 public:
     static const int ROUTER_ENDPOINT_LENGTH = 2049;
     static const int LOAD_LENGTH = 5;
+    static const int WEIGHT_SCALING = 10;
+    static const int MAX_WEIGHT = 10;
+    static const int MIN_WEIGHT = 1;
     static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
 
-    static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map);
+    static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map);
 
 private:
-    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map);
+    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, int host_port_to_map);
 };
 
-#endif /* __LIMITLESSQUERYHELPER_H__ */
+#endif // LIMITLESSQUERYHELPER_H_

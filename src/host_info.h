@@ -27,14 +27,14 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __HOSTINFO_H__
-#define __HOSTINFO_H__
-
-#include "logger_wrapper.h"
-#include "host_availability/host_availability_strategy.h"
+#ifndef HOSTINFO_H_
+#define HOSTINFO_H_
 
 #include <memory>
 #include <string>
+
+#include "host_availability/host_availability_strategy.h"
+#include "logger_wrapper.h"
 
 enum HOST_STATE { UP, DOWN };
 
@@ -78,7 +78,7 @@ public:
     std::string replica_lag;
 
 private:
-    std::string HOST_PORT_SEPARATOR = ":";
+    std::string host_port_separator = ":";
     std::string host;
     int port = NO_PORT;
     uint64_t weight = DEFAULT_WEIGHT;
@@ -89,4 +89,4 @@ private:
     std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy;
 };
 
-#endif /* __HOSTINFO_H__ */
+#endif /* HOSTINFO_H_ */

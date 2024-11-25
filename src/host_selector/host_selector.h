@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __HOST_SELECTOR_H__
-#define __HOST_SELECTOR_H__
+#ifndef HOST_SELECTOR_H_
+#define HOST_SELECTOR_H_
 
 #include "../host_info.h"
 
@@ -43,4 +43,4 @@ public:
         std::unordered_map<std::string, std::string> properties) = 0;
 };
 
-#endif //__HOST_SELECTOR_H__
+#endif // HOST_SELECTOR_H_

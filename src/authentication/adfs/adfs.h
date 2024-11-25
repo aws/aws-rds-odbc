@@ -27,14 +27,14 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __ADFS_H__
-#define __ADFS_H__
-
-#include "../authentication_provider.h"
-#include "../federation.h"
+#ifndef ADFS_H_
+#define ADFS_H_
 
 #include <map>
 #include <string>
+
+#include "../authentication_provider.h"
+#include "../federation.h"
 
 class AdfsCredentialsProvider : public FederationCredentialProvider {
 public:
@@ -42,7 +42,9 @@ public:
         const FederatedAuthConfig& config,
         std::shared_ptr<Aws::Http::HttpClient> http_client,
         std::shared_ptr<Aws::STS::STSClient> sts_client
-    ): FederationCredentialProvider(config.iam_idp_arn, config.iam_role_arn, http_client, sts_client), cfg(config) {}
+    ): FederationCredentialProvider(
+            config.iam_idp_arn, config.iam_role_arn, std::move(http_client), std::move(sts_client)
+        ), cfg(config) {}
 
     // constant pattern strings 
     static const std::string FORM_ACTION_PATTERN;
@@ -51,7 +53,7 @@ public:
     static const std::string INPUT_TAG_PATTERN;
 
 protected:
-    virtual std::string GetSAMLAssertion(std::string& err_info);
+    std::string GetSAMLAssertion(std::string& err_info) override;
 
 private:
     std::string get_signin_url();
@@ -65,4 +67,4 @@ private:
     FederatedAuthConfig cfg;
 };
 
-#endif  //__ADFS_H__
+#endif // ADFS_H_

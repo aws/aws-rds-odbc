@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __LOGGERWRAPPER_H__
-#define __LOGGERWRAPPER_H__
+#ifndef LOGGERWRAPPER_H_
+#define LOGGERWRAPPER_H_
 
 #ifdef XCODE_BUILD
 // Setting this to a value greater than 3 strips out all of the
@@ -36,8 +36,8 @@
 #define GOOGLE_STRIP_LOG 4
 #endif /* XCODE_BUILD */
 
-#include <glog/logging.h>
 #include <filesystem>
+#include <glog/logging.h>
 
 namespace logger_config {
     const std::string PROGRAM_NAME = "aws-rds-odbc";
@@ -63,4 +63,4 @@ private:
     bool init = false;
 };
 
-#endif /* __LOGGERWRAPPER_H__ */
+#endif // LOGGERWRAPPER_H_

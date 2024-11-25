@@ -27,13 +27,17 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __HTML_UTIL_H__
-#define __HTML_UTIL_H__
+#ifndef HTML_UTIL_H_
+#define HTML_UTIL_H_
 
 #include <string>
+#include <unordered_map>
 
-namespace HtmlUtil {
-    std::string escape_html_entity(const std::string& html);
+class HtmlUtil {
+public:
+    static std::string escape_html_entity(const std::string& html);
+private:
+    static const std::unordered_map<std::string, char> HTML_DECODE_MAP;
 };
 
-#endif  //__HTML_UTIL_H__
+#endif // HTML_UTIL_H_

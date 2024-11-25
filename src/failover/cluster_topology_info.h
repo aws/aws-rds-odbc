@@ -27,16 +27,16 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef __CLUSTERTOPOLOGYINFO_H__
-#define __CLUSTERTOPOLOGYINFO_H__
+#ifndef CLUSTERTOPOLOGYINFO_H_
+#define CLUSTERTOPOLOGYINFO_H_
 
 #include "host_info.h"
-
-#include "../util/logger_wrapper.h"
 
 #include <ctime>
 #include <set>
 #include <vector>
+
+#include "../util/logger_wrapper.h"
 
 // This class holds topology information for one cluster.
 // Cluster topology consists of an instance endpoint, a set of nodes in the cluster,
@@ -84,4 +84,4 @@ private:
     friend class TOPOLOGY_SERVICE;
 };
 
-#endif /* __CLUSTERTOPOLOGYINFO_H__ */
+#endif // CLUSTERTOPOLOGYINFO_H_

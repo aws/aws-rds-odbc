@@ -53,9 +53,9 @@ private:
         V value;
         std::chrono::steady_clock::time_point expiry;
     };
-    const int DEFAULT_EXPIRATION_ = 600; // 600s = 10m
-    std::unordered_map<K, CacheEntry> cache_;
-    std::mutex cache_lock_;
+    const int DEFAULT_EXPIRATION_SEC = 600; // 600s = 10m
+    std::unordered_map<K, CacheEntry> cache;
+    std::mutex cache_lock;
 };
 
 #endif // CACHE_MAP_H_
