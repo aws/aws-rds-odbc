@@ -52,6 +52,7 @@ set(SRC
   src/host_selector/round_robin_host_selector.cc
 
   src/limitless/limitless_query_helper.cc
+  src/limitless/limitless_router_monitor.cc
 
   src/util/cache_map.cc
   src/util/logger_wrapper.cc
@@ -76,6 +77,7 @@ set(INC
   src/host_selector/round_robin_host_selector.h
 
   src/limitless/limitless_query_helper.h
+  src/limitless/limitless_router_monitor.h
 
   src/util/cache_map.h
   src/util/logger_wrapper.h
@@ -94,6 +96,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src/authentication/adfs")
 include_directories("${CMAKE_SOURCE_DIR}/src/failover")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_availability")
 include_directories("${CMAKE_SOURCE_DIR}/src/host_selector")
+include_directories("${CMAKE_SOURCE_DIR}/src/limitless")
 include_directories("${CMAKE_SOURCE_DIR}/src/util")
 
 if(WIN32)

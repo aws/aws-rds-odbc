@@ -56,7 +56,7 @@ public:
 
     ~HostInfo() = default;
 
-    bool equal_host_port_pair(HostInfo& hi) const;
+    bool equal_host_port_pair(const HostInfo& hi) const;
     bool is_host_down() const;
     bool is_host_up() const;
     bool is_host_writer() const;
@@ -76,7 +76,6 @@ public:
     std::string session_id;
     std::string last_updated;
     std::string replica_lag;
-
 private:
     std::string host_port_separator = ":";
     std::string host;

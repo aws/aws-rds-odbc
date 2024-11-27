@@ -38,7 +38,7 @@
 const std::string LimitlessQueryHelper::LIMITLESS_ROUTER_ENDPOINT_QUERY  =
       "SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()";
 
-std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC conn, const int host_port_to_map) {
+std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map) {
     HSTMT hstmt = SQL_NULL_HSTMT;
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
     if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", hstmt, SQL_HANDLE_STMT)) {
