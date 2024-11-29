@@ -31,7 +31,7 @@
 
 // Initialize static members
 std::mutex RoundRobinHostSelector::cache_mutex;
-CacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> RoundRobinHostSelector::round_robin_cache;
+SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> RoundRobinHostSelector::round_robin_cache;
 
 void RoundRobinHostSelector::set_round_robin_weight(std::vector<HostInfo> hosts,
     std::unordered_map<std::string, std::string>& properties) {

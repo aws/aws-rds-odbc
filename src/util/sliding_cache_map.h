@@ -27,8 +27,8 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef CACHE_MAP_H_
-#define CACHE_MAP_H_
+#ifndef SLIDING_CACHE_MAP_H_
+#define SLIDING_CACHE_MAP_H_
 
 #include <chrono>
 #include <iostream>
@@ -37,9 +37,9 @@
 #include <unordered_map>
 
 template <typename K, typename V>
-class CacheMap {
+class SlidingCacheMap {
 public:
-    CacheMap() = default;
+    SlidingCacheMap() = default;
 
     void put(const K& key, const V& value);
     void put(const K& key, const V& value, int sec_ttl);
@@ -52,10 +52,11 @@ private:
     struct CacheEntry {
         V value;
         std::chrono::steady_clock::time_point expiry;
+        int sec_ttl;
     };
     const int DEFAULT_EXPIRATION_SEC = 600; // 600s = 10m
     std::unordered_map<K, CacheEntry> cache;
     std::mutex cache_lock;
 };
 
-#endif // CACHE_MAP_H_
+#endif // SLIDING_CACHE_MAP_H_
