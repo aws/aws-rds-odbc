@@ -35,32 +35,44 @@
 #include <thread>
 #include <vector>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+#include <sql.h>
+#include <sqlext.h>
+
 #include "../host_info.h"
 
 class LimitlessRouterMonitor {
 public:
-    LimitlessRouterMonitor(
-        const char *connection_string,
-        int host_port,
-        unsigned int interval_ms,
-        std::shared_ptr<std::vector<HostInfo>> limitless_routers
-    );
+    LimitlessRouterMonitor();
 
     ~LimitlessRouterMonitor();
 
-    bool IsStopped();
-
     void Close();
-private:
+
+    virtual void Open(
+        const char *connection_string_c_str,
+        int host_port,
+        unsigned int interval_ms,
+        std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
+        std::shared_ptr<std::mutex>& limitless_routers_mutex
+    );
+
+    virtual bool IsStopped();
+protected:
     std::atomic_bool stopped = false;
 
     unsigned int interval_ms;
 
     std::shared_ptr<std::vector<HostInfo>> limitless_routers;
 
+    std::shared_ptr<std::mutex> limitless_routers_mutex;
+
     std::shared_ptr<std::thread> monitor_thread = nullptr;
 
-    void run(const char *connection_string, int host_port);
+    void run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
 };
 
-#endif
+#endif // LIMITLESSROUTERMONITOR_H_

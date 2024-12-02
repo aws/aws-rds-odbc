@@ -48,6 +48,8 @@ add_executable(
   host_selector/random_host_selector_test.cc
   host_selector/round_robin_host_selector_test.cc
 
+  limitless/limitless_monitor_service_test.cc
+
   util/sliding_cache_map_test.cc
   util/odbc_helper_test.cc
 )

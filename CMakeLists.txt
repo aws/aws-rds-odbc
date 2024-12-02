@@ -51,6 +51,7 @@ set(SRC
   src/host_selector/random_host_selector.cc
   src/host_selector/round_robin_host_selector.cc
 
+  src/limitless/limitless_monitor_service.cc
   src/limitless/limitless_query_helper.cc
   src/limitless/limitless_router_monitor.cc
 
@@ -76,6 +77,7 @@ set(INC
   src/host_selector/random_host_selector.h
   src/host_selector/round_robin_host_selector.h
 
+  src/limitless/limitless_monitor_service.h
   src/limitless/limitless_query_helper.h
   src/limitless/limitless_router_monitor.h
 

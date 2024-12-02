@@ -30,6 +30,9 @@
 #ifndef __MOCKOBJECTS_H__
 #define __MOCKOBJECTS_H__
 
+#include <mutex>
+#include <thread>
+
 #include <gmock/gmock.h>
 #ifdef WIN32
 #include <windows.h>
@@ -38,8 +41,9 @@
 #include <aws/secretsmanager/SecretsManagerClient.h>
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
 
-#include "federation.h"
 #include "authentication_provider.h"
+#include "federation.h"
+#include "limitless_monitor_service.h"
 
 class MOCK_SECRETS_MANAGER_CLIENT : public Aws::SecretsManager::SecretsManagerClient {
 public:
@@ -91,6 +95,32 @@ class MOCK_STS_CLIENT : public Aws::STS::STSClient {
 public:
     MOCK_METHOD(Aws::STS::Model::AssumeRoleWithSAMLOutcome, AssumeRoleWithSAML, (const Aws::STS::Model::AssumeRoleWithSAMLRequest&), (const));
     MOCK_METHOD(bool, SupportsChunkedTransferEncoding, (), (const));
+};
+
+class MOCK_LIMITLESS_ROUTER_MONITOR : public LimitlessRouterMonitor {
+public:
+    MOCK_METHOD(void, Open, (const char *, int, unsigned int, std::shared_ptr<std::vector<HostInfo>>&, std::shared_ptr<std::mutex>&), ());
+    MOCK_METHOD(bool, IsStopped, (), ());
+
+    std::vector<HostInfo> test_limitless_routers;
+
+    void mock_run(std::shared_ptr<std::vector<HostInfo>> limitless_routers, std::shared_ptr<std::mutex> limitless_routers_mutex) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(this->interval_ms));
+        std::lock_guard<std::mutex> guard(*limitless_routers_mutex);
+        *limitless_routers = this->test_limitless_routers;
+        // join
+    }
+
+    void MockOpen(
+        const char *conn_str, // unused
+        int port, // unused
+        unsigned int interval_ms,
+        std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
+        std::shared_ptr<std::mutex>& limitless_routers_mutex
+    ) {
+        this->interval_ms = TEST_LIMITLESS_MONITOR_INTERVAL;
+        this->monitor_thread = std::make_shared<std::thread>(&MOCK_LIMITLESS_ROUTER_MONITOR::mock_run, this, limitless_routers, limitless_routers_mutex);
+    }
 };
 
 #endif /* __MOCKOBJECTS_H__ */

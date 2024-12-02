@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		731C53882D0B15AC006D7569 /* sliding_cache_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 731C53862D0B15AC006D7569 /* sliding_cache_map.h */; };
 		731C53892D0B15AC006D7569 /* sliding_cache_map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C53872D0B15AC006D7569 /* sliding_cache_map.cc */; };
+		733C45ED2D12ED030034BF7E /* limitless_monitor_service.h in Headers */ = {isa = PBXBuildFile; fileRef = 733C45EB2D12ED030034BF7E /* limitless_monitor_service.h */; };
+		733C45EE2D12ED030034BF7E /* limitless_monitor_service.cc in Sources */ = {isa = PBXBuildFile; fileRef = 733C45EC2D12ED030034BF7E /* limitless_monitor_service.cc */; };
+		733C45FB2D12EE250034BF7E /* limitless_router_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 733C45F92D12EE250034BF7E /* limitless_router_monitor.h */; };
+		733C45FC2D12EE250034BF7E /* limitless_router_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = 733C45FA2D12EE250034BF7E /* limitless_router_monitor.cc */; };
 		734B1C222CC9611400FB6683 /* libaws-checksums.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C122CC9611400FB6683 /* libaws-checksums.a */; };
 		734B1C232CC9611400FB6683 /* libaws-c-mqtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C132CC9611400FB6683 /* libaws-c-mqtt.a */; };
 		734B1C242CC9611400FB6683 /* libaws-cpp-sdk-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C142CC9611400FB6683 /* libaws-cpp-sdk-core.a */; };

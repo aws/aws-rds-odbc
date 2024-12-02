@@ -30,6 +30,15 @@
 #include "odbc_helper.h"
 #include "logger_wrapper.h"
 
+#define CHECK_LIMITLESS_CLUSTER_QUERY\
+    "SELECT EXISTS ("\
+    "   SELECT 1"\
+    "   FROM pg_catalog.pg_class c"\
+    "   JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid"\
+    "   WHERE c.relname = 'limitless_subclusters'"\
+    "   AND n.nspname = 'rds_aurora'"\
+    ");"
+
 bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     if (SQL_SUCCEEDED(rc)) {
         return true;
@@ -54,6 +63,42 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
     SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 
     return SQL_SUCCEEDED(rc);
+}
+
+bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
+    HSTMT hstmt = SQL_NULL_HSTMT;
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
+    if (!SQL_SUCCEEDED(rc)) {
+        return false;
+    }
+
+    rc = SQLExecDirect(hstmt, const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(CHECK_LIMITLESS_CLUSTER_QUERY)), SQL_NTS);
+
+    if (SQL_SUCCEEDED(rc)) {
+        SQLINTEGER result;
+        SQLLEN len;
+        rc = SQLGetData(hstmt, 1, SQL_C_SLONG, &result, sizeof(result), &len);
+        SQLFreeStmt(hstmt, SQL_CLOSE);
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+        return SQL_SUCCEEDED(rc) && result == 1;
+    }
+
+    SQLFreeStmt(hstmt, SQL_CLOSE);
+    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+    return false;
+}
+
+void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
+    if (hstmt != SQL_NULL_HANDLE) {
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+    }
+    if (conn != SQL_NULL_HANDLE) {
+        SQLDisconnect(conn);
+        SQLFreeHandle(SQL_HANDLE_DBC, conn);
+    }
+    if (henv != SQL_NULL_HANDLE) {
+        SQLFreeHandle(SQL_HANDLE_ENV, henv);
+    }
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
