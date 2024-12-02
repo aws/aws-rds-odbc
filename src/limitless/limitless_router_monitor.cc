@@ -36,19 +36,49 @@
 #include "limitless_router_monitor.h"
 
 LimitlessRouterMonitor::LimitlessRouterMonitor(
-    const char *connection_string,
+    const char *connection_string_c_str,
     int host_port,
     unsigned int interval_ms,
-    std::shared_ptr<std::vector<HostInfo>> limitless_routers
+    std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
+        std::shared_ptr<std::mutex>& limitless_routers_mutex
 ) :
     interval_ms(interval_ms),
-    limitless_routers(std::move(limitless_routers)),
-    monitor_thread(std::make_shared<std::thread>(&LimitlessRouterMonitor::run, this, connection_string, host_port))
+    limitless_routers(limitless_routers),
+    limitless_routers_mutex(limitless_routers_mutex)
 {
+    SQLHENV henv = SQL_NULL_HANDLE;
+    SQLHDBC conn = SQL_NULL_HANDLE;
+    auto *connection_string = const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string_c_str));
+    SQLSMALLINT connection_string_len = strlen(connection_string_c_str);
+    SQLSMALLINT out_connection_string_len; // unused
+
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
+    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", henv, SQL_HANDLE_ENV)) {
+        return; // fatal error; don't open thread
+    }
+
+    rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
+    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
+        return; // fatal error; don't open thread
+    }
+
+    rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+    if (SQL_SUCCEEDED(rc)) {
+        // initial connection was successful, immediately populate caller's limitless routers
+        *limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
+    } else {
+        // not successful, ensure limitless routers is empty 
+        limitless_routers->clear();
+    }
+
+    // start monitoring thread
+    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::run, this, henv, conn, connection_string, connection_string_len, host_port);
 }
 
 LimitlessRouterMonitor::~LimitlessRouterMonitor() {
     this->Close();
+    this->limitless_routers = nullptr;
+    this->limitless_routers_mutex = nullptr;
 }
 
 bool LimitlessRouterMonitor::IsStopped() {
@@ -62,59 +92,35 @@ void LimitlessRouterMonitor::Close() {
 
     this->stopped = true;
     this->monitor_thread->join();
+    this->monitor_thread = nullptr;
 }
 
-void LimitlessRouterMonitor::run(const char *connection_string, int host_port) {
-    SQLHENV henv = SQL_NULL_HANDLE;
-    SQLHDBC conn = SQL_NULL_HANDLE;
-    SQLSMALLINT connection_string_len = strlen(connection_string);
+void LimitlessRouterMonitor::run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port) {
     SQLSMALLINT out_connection_string_len; // unused
 
-    SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
-    SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-    SQLDriverConnect(
-        conn,
-        nullptr,
-        const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string)),
-        connection_string_len,
-        nullptr, // connection_string should be complete
-        0,
-        &out_connection_string_len,
-        SQL_DRIVER_NOPROMPT
-    );
-
     while (!this->stopped) {
-        if (conn != SQL_NULL_HANDLE && !OdbcHelper::CheckConnection(conn)) {
-            SQLFreeHandle(SQL_HANDLE_DBC, conn);
-            conn = SQL_NULL_HANDLE;
-        }
-        
-        if (conn == SQL_NULL_HANDLE) {
-            SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-            if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
-                break; // this is a fatal error
-            }
+        std::this_thread::sleep_for(std::chrono::milliseconds(this->interval_ms));
 
-            rc = SQLDriverConnect(
-                conn,
-                nullptr,
-                const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string)),
-                connection_string_len,
-                nullptr, // connection_string should be complete
-                0,
-                &out_connection_string_len,
-                SQL_DRIVER_NOPROMPT
-            );
-            if (!SQL_SUCCEEDED(rc)) {
+        if (conn == SQL_NULL_HANDLE || !OdbcHelper::CheckConnection(conn)) {
+            // OdbcHelper::CheckConnection failed on a pre-existing handle, so free it
+            if (conn != SQL_NULL_HANDLE) {
                 SQLFreeHandle(SQL_HANDLE_DBC, conn);
                 conn = SQL_NULL_HANDLE;
-
-                // wait the full interval and then try to reconnect
-                std::this_thread::sleep_for(std::chrono::milliseconds(this->interval_ms));
-                continue;
             }
 
-            // connection was successful; query for limitless routers
+            SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
+            if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
+                break; // this is a fatal error; stop monitoring
+            }
+
+            rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+            if (!SQL_SUCCEEDED(rc)) {
+                SQLFreeHandle(SQL_HANDLE_DBC, conn);
+                conn = SQL_NULL_HANDLE; // next loop can re-attempt connection
+
+                // wait the full interval and then try to reconnect
+                continue;
+            } // else, connection was successful, proceed below
         }
 
         std::vector<HostInfo> new_limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
@@ -122,10 +128,9 @@ void LimitlessRouterMonitor::run(const char *connection_string, int host_port) {
         // LimitlessQueryHelper::QueryForLimitlessRouters will return an empty vector on an error
         // if it was a connection error, then the next loop will catch it and attempt to reconnect
         if (!new_limitless_routers.empty()) {
+            std::lock_guard<std::mutex> guard(*(this->limitless_routers_mutex));
             *(this->limitless_routers) = new_limitless_routers;
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(this->interval_ms));
     }
 
     if (conn != SQL_NULL_HANDLE) {

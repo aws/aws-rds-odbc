@@ -27,50 +27,24 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef LIMITLESSROUTERMONITOR_H_
-#define LIMITLESSROUTERMONITOR_H_
+#ifndef LIMITLESSMONITORSERVICE_H_
+#define LIMITLESSMONITORSERVICE_H_
 
-#include <atomic>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-#ifdef WIN32
-#include <windows.h>
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#include <sql.h>
-#include <sqlext.h>
+typedef struct {
+    char *server;
+    unsigned int server_size;
+} LimitlessInstance;
 
-#include "../host_info.h"
+bool CheckLimitlessCluster(const char *connection_string_c_str);
+bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, LimitlessInstance *db_instance);
+void StopLimitlessMonitorService(const char *service_id_c_str);
 
-class LimitlessRouterMonitor {
-public:
-    LimitlessRouterMonitor(
-        const char *connection_string_c_str,
-        int host_port,
-        unsigned int interval_ms,
-        std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
-        std::shared_ptr<std::mutex>& limitless_routers_mutex
-    );
+#ifdef __cplusplus
+}
+#endif
 
-    ~LimitlessRouterMonitor();
-
-    bool IsStopped();
-
-    void Close();
-private:
-    std::atomic_bool stopped = false;
-
-    unsigned int interval_ms;
-
-    std::shared_ptr<std::vector<HostInfo>> limitless_routers;
-
-    std::shared_ptr<std::mutex> limitless_routers_mutex;
-
-    std::shared_ptr<std::thread> monitor_thread = nullptr;
-
-    void run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
-};
-
-#endif // LIMITLESSROUTERMONITOR_H_
+#endif // LIMITLESSMONITORSERVICE_H_

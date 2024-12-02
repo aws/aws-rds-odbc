@@ -47,6 +47,8 @@ public:
 
     static bool CheckConnection(SQLHDBC conn);
 
+    static bool CheckLimitlessCluster(SQLHDBC conn);
+
 private:
     static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
 };
