@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "../host_info.h"
-#include "../util/cache_map.h"
+#include "../util/sliding_cache_map.h"
 #include "host_selector.h"
 #include "round_robin_property.h"
 
@@ -51,7 +51,7 @@ private:
     const int NO_HOST_IDX = -1;
 
     static std::mutex cache_mutex;
-    static CacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> round_robin_cache;
+    static SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> round_robin_cache;
 
     virtual int convert_to_int(const std::string& str);
 

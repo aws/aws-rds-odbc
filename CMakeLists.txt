@@ -54,7 +54,7 @@ set(SRC
   src/limitless/limitless_query_helper.cc
   src/limitless/limitless_router_monitor.cc
 
-  src/util/cache_map.cc
+  src/util/sliding_cache_map.cc
   src/util/logger_wrapper.cc
   src/util/odbc_helper.cc
 )
@@ -79,7 +79,7 @@ set(INC
   src/limitless/limitless_query_helper.h
   src/limitless/limitless_router_monitor.h
 
-  src/util/cache_map.h
+  src/util/sliding_cache_map.h
   src/util/logger_wrapper.h
   src/util/odbc_helper.h
 )

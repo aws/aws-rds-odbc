@@ -27,40 +27,48 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include "cache_map.h"
+#include "sliding_cache_map.h"
 #include "host_selector/round_robin_property.h"
 
 template <typename K, typename V>
-void CacheMap<K, V>::put(const K& key, const V& value) {
+void SlidingCacheMap<K, V>::put(const K& key, const V& value) {
     put(key, value, DEFAULT_EXPIRATION_SEC);
 }
 
 template <typename K, typename V>
-void CacheMap<K, V>::put(const K& key, const V& value, int sec_ttl) {
+void SlidingCacheMap<K, V>::put(const K& key, const V& value, int sec_ttl) {
     std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point expiry_time =
         std::chrono::steady_clock::now() + std::chrono::seconds(sec_ttl);
-    cache[key] = CacheEntry{value, expiry_time};
+    cache[key] = CacheEntry{value, expiry_time, sec_ttl};
 }
 
 template <typename K, typename V>
-V CacheMap<K, V>::get(const K& key) {
+V SlidingCacheMap<K, V>::get(const K& key) {
+    std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     if (auto itr = cache.find(key); itr != cache.end()) {
-        if (itr->second.expiry > now) {
-            return itr->second.value;
+        CacheEntry& entry = itr->second;
+        if (entry.expiry > now) {
+            // Update TTL & Return value
+            entry.expiry = now + std::chrono::seconds(entry.sec_ttl);
+            return entry.value;
         }
         // Expired, remove from cache
-        cache.erase(itr);        
+        cache.erase(itr);
     }
     return {};
 }
 
 template <typename K, typename V>
-bool CacheMap<K, V>::find(const K& key) {
+bool SlidingCacheMap<K, V>::find(const K& key) {
+    std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     if (auto itr = cache.find(key); itr != cache.end()) {
-        if (itr->second.expiry > now) {
+        CacheEntry& entry = itr->second;
+        if (entry.expiry > now) {
+            // Update TTL & Return found
+            entry.expiry = now + std::chrono::seconds(entry.sec_ttl);
             return true;
         }
         // Expired, remove from cache
@@ -70,7 +78,8 @@ bool CacheMap<K, V>::find(const K& key) {
 }
 
 template <typename K, typename V>
-unsigned int CacheMap<K, V>::size() {
+unsigned int SlidingCacheMap<K, V>::size() {
+    std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     for (auto itr = cache.begin(); itr != cache.end();) {
         if (itr->second.expiry < now) {
@@ -83,11 +92,11 @@ unsigned int CacheMap<K, V>::size() {
 }
 
 template <typename K, typename V>
-void CacheMap<K, V>::clear() {
+void SlidingCacheMap<K, V>::clear() {
     std::lock_guard<std::mutex> lock(cache_lock);
     cache.clear();
 }
 
 // Explicit Template Instantiations
-template class CacheMap<std::string, std::string>;
-template class CacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>>;
+template class SlidingCacheMap<std::string, std::string>;
+template class SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>>;
