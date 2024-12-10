@@ -255,16 +255,14 @@ bool GenerateConnectAuthToken(char* token, unsigned int max_size, const char* db
 }
 
 bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region, Credentials* credentials) {
+    LoggerWrapper::initialize();
     if (1 == ++sdk_ref_count) {
         std::lock_guard<std::mutex> lock(sdk_mutex);
         Aws::InitAPI(sdk_opts);
     }
 
     std::string region_str = region;
-
-    if (region_str.empty() && !SecretsManagerHelper::TryParseRegionFromSecretId(secret_id, region_str)) {
-        region_str = Aws::Region::US_EAST_1;
-    }
+    SecretsManagerHelper::ParseRegionFromSecretId(secret_id, region_str);
 
     // configure the secrets manager client according to the region determined
     Aws::SecretsManager::SecretsManagerClientConfiguration sm_client_cfg;
