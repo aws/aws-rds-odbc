@@ -38,8 +38,8 @@ class SecretsManagerHelper {
             : sm_client(std::move(sm_client)) {}
         ~SecretsManagerHelper() = default;
 
-        // attempts to match secret_ID to a secrets ARN regex and parses the region portion; returns true if parsed, false if not
-        static bool TryParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region);
+        // Tries to parse region from secret id or from user input, else default to us-east-1
+        static void ParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region);
 
         // fetches credentials from the configured secrets manager client and stored the retrieved values into username and password
         bool FetchCredentials(const Aws::String& secret_id);

@@ -104,11 +104,34 @@ TEST_F(SecretsManagerHelperTest, FetchCredentialsError) {
   EXPECT_FALSE(res);
 }
 
-TEST_F(SecretsManagerHelperTest, TryParseRegionFromSecretIdOK) {
-  Aws::String secretIdWithRegion = "arn:aws:secretsmanager:us-east-2:otherthings";
+TEST_F(SecretsManagerHelperTest, ParseRegionFromSecretId_FullArn_NoRegion) {
+  Aws::String secretIdWithRegion = "arn:aws:secretsmanager:us-east-2:secretId";
   Aws::String region = "";
 
-  bool res = SecretsManagerHelper::TryParseRegionFromSecretId(secretIdWithRegion, region);
-  EXPECT_TRUE(res);
+  SecretsManagerHelper::ParseRegionFromSecretId(secretIdWithRegion, region);
   EXPECT_EQ(region, "us-east-2");
+}
+
+TEST_F(SecretsManagerHelperTest, ParseRegionFromSecretId_FullArn_RegionInput) {
+  Aws::String secretIdWithRegion = "arn:aws:secretsmanager:us-east-2:secretId";
+  Aws::String region = "us-west-1";
+
+  SecretsManagerHelper::ParseRegionFromSecretId(secretIdWithRegion, region);
+  EXPECT_EQ(region, "us-east-2");
+}
+
+TEST_F(SecretsManagerHelperTest, ParseRegionFromSecretId_IdOnly_RegionInput) {
+  Aws::String secretIdWithRegion = "secretId";
+  Aws::String region = "us-west-1";
+
+  SecretsManagerHelper::ParseRegionFromSecretId(secretIdWithRegion, region);
+  EXPECT_EQ(region, "us-west-1");
+}
+
+TEST_F(SecretsManagerHelperTest, ParseRegionFromSecretId_IdOnly_Default) {
+  Aws::String secretIdWithRegion = "secretId";
+  Aws::String region = "";
+
+  SecretsManagerHelper::ParseRegionFromSecretId(secretIdWithRegion, region);
+  EXPECT_EQ(region, "us-east-1");
 }

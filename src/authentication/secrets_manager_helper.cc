@@ -47,16 +47,20 @@ namespace {
     const std::string SECRETS_ARN_PATTERN{ "arn:aws:secretsmanager:([-a-zA-Z0-9]+):.*" };
 }
 
-bool SecretsManagerHelper::TryParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region) {
+void SecretsManagerHelper::ParseRegionFromSecretId(const Aws::String& secret_id, Aws::String& region) {
     std::regex rgx(SECRETS_ARN_PATTERN);
     std::smatch matches;
 
     if (std::regex_search(secret_id, matches, rgx) && matches.size() > 1) {
+        // Attempt to parse out region from Secret Id
+        // Region from full ARN will guarantee the correct region
         region = matches[1].str();
-        return true;
+    } else if (region.empty()) {
+        // No region match in secret arn, fallback to user input
+        // If user does not supply any value, default to us-east-1
+        LOG(WARNING) << "Unable to parse region from SecretId & no passed in region. Defaulting to us-east-1";
+        region = Aws::Region::US_EAST_1;
     }
-
-    return false;
 }
 
 bool SecretsManagerHelper::FetchCredentials(const Aws::String& secret_id) {
@@ -76,7 +80,7 @@ bool SecretsManagerHelper::FetchCredentials(const Aws::String& secret_id) {
 
             return true;
         }
-
+        LOG(ERROR) << "Secret missing expected key value pairs";
         return false;
     }
 
