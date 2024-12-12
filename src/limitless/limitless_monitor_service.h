@@ -31,6 +31,43 @@
 #define LIMITLESSMONITORSERVICE_H_
 
 #ifdef __cplusplus
+#include <map>
+#include <mutex>
+#include <string>
+
+#include "limitless_router_monitor.h"
+#include "round_robin_host_selector.h"
+
+typedef struct {
+    unsigned int reference_counter;
+    std::shared_ptr<std::vector<HostInfo>> limitless_routers;
+    std::shared_ptr<std::mutex> limitless_routers_mutex;
+    std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor;
+} IndividualLimitlessMonitorService; // temp name
+
+class LimitlessMonitorService {
+public:
+    LimitlessMonitorService();
+
+    ~LimitlessMonitorService();
+
+    bool CheckService(std::string service_id);
+
+    void NewService(std::string service_id, const char *connection_string_c_str, int host_port, std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor);
+
+    void IncrementReferenceCounter(std::string service_id);
+
+    void DecrementReferenceCounter(std::string service_id);
+
+    std::shared_ptr<HostInfo> GetHostInfo(std::string service_id);
+private:
+    std::map<std::string, std::shared_ptr<IndividualLimitlessMonitorService>> services;
+
+    std::shared_ptr<std::mutex> services_mutex;
+
+    RoundRobinHostSelector round_robin;
+};
+
 extern "C" {
 #endif
 

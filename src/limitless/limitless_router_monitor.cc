@@ -35,17 +35,25 @@
 #include "limitless_query_helper.h"
 #include "limitless_router_monitor.h"
 
-LimitlessRouterMonitor::LimitlessRouterMonitor(
+LimitlessRouterMonitor::LimitlessRouterMonitor() {}
+
+LimitlessRouterMonitor::~LimitlessRouterMonitor() {
+    this->Close();
+    this->limitless_routers = nullptr;
+    this->limitless_routers_mutex = nullptr;
+}
+
+void LimitlessRouterMonitor::Open(
     const char *connection_string_c_str,
     int host_port,
     unsigned int interval_ms,
     std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
         std::shared_ptr<std::mutex>& limitless_routers_mutex
-) :
-    interval_ms(interval_ms),
-    limitless_routers(limitless_routers),
-    limitless_routers_mutex(limitless_routers_mutex)
-{
+) {
+    this->interval_ms = interval_ms;
+    this->limitless_routers = limitless_routers;
+    this->limitless_routers_mutex = limitless_routers_mutex;
+
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
     auto *connection_string = const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string_c_str));
@@ -73,12 +81,6 @@ LimitlessRouterMonitor::LimitlessRouterMonitor(
 
     // start monitoring thread
     this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::run, this, henv, conn, connection_string, connection_string_len, host_port);
-}
-
-LimitlessRouterMonitor::~LimitlessRouterMonitor() {
-    this->Close();
-    this->limitless_routers = nullptr;
-    this->limitless_routers_mutex = nullptr;
 }
 
 bool LimitlessRouterMonitor::IsStopped() {

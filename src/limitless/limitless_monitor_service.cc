@@ -28,30 +28,79 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include <cstring>
-#include <map>
-#include <mutex>
-#include <string>
 
 #include "limitless_monitor_service.h"
-#include "limitless_router_monitor.h"
 #include "odbc_helper.h"
-#include "round_robin_host_selector.h"
 
 enum LIMITLESS_MONITOR_INTERVAL {
     DEFAULT_LIMITLESS_MONITOR_INTERVAL = 1000
 };
 
-typedef struct {
-    unsigned int depth_counter;
-    std::shared_ptr<std::vector<HostInfo>> limitless_routers;
-    std::shared_ptr<std::mutex> limitless_routers_mutex;
-    std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor;
-} LimitlessMonitorService;
+LimitlessMonitorService::LimitlessMonitorService() {
+    this->services_mutex = std::make_shared<std::mutex>();
+}
 
-static std::map<std::string, std::shared_ptr<LimitlessMonitorService>> services;
-static std::shared_ptr<std::mutex> services_mutex = std::make_shared<std::mutex>();
+LimitlessMonitorService::~LimitlessMonitorService() {
+    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+    this->services.clear(); // destroys everything
+}
 
-static RoundRobinHostSelector round_robin;
+bool LimitlessMonitorService::CheckService(std::string service_id) {
+    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+    return this->services.contains(service_id);
+}
+
+void LimitlessMonitorService::NewService(
+    std::string service_id,
+    const char *connection_string_c_str,
+    int host_port,
+    std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor
+) {
+    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+    this->services[service_id] = std::make_shared<IndividualLimitlessMonitorService>();
+    
+    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+    service->reference_counter = 0; // caller should call IncrementReferenceCounter for this service ID
+    service->limitless_routers = std::make_shared<std::vector<HostInfo>>();
+    service->limitless_routers_mutex = std::make_shared<std::mutex>();
+    service->limitless_router_monitor = limitless_router_monitor;
+
+    // start monitoring; will block until first set of limitless routers is retrieved or until an error occurs (leaving limitless_routers is empty)
+    limitless_router_monitor->Open(connection_string_c_str, host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, service->limitless_routers, service->limitless_routers_mutex);
+}
+
+void LimitlessMonitorService::IncrementReferenceCounter(std::string service_id) {
+    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+    service->reference_counter++;
+}
+
+void LimitlessMonitorService::DecrementReferenceCounter(std::string service_id) {
+    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+    service->reference_counter--;
+
+    if (service->reference_counter <= 0) {
+        service = nullptr;
+        services.erase(service_id); // destroys std::shared_ptr<LimitlessRouterMonitor>
+    }
+}
+
+std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(std::string service_id) {
+    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+
+    std::lock_guard<std::mutex> limitless_routers_guard(*(service->limitless_routers_mutex));
+    std::vector<HostInfo> hosts = *(service->limitless_routers);
+    if (hosts.empty()) {
+        return nullptr;
+    }
+
+    std::unordered_map<std::string, std::string> properties;
+    RoundRobinHostSelector::set_round_robin_weight(hosts, properties);
+    std::shared_ptr<HostInfo> host = std::make_shared<HostInfo>(round_robin.get_host(hosts, true, properties));
+    return host;
+}
 
 bool CheckLimitlessCluster(const char *connection_string_c_str) {
     SQLHENV henv = SQL_NULL_HANDLE;
@@ -78,61 +127,27 @@ bool CheckLimitlessCluster(const char *connection_string_c_str) {
     return OdbcHelper::CheckLimitlessCluster(conn);
 }
 
+// global class used by the below functions
+static LimitlessMonitorService limitless_monitor_service;
+
 bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, LimitlessInstance *db_instance) {
-    std::vector<HostInfo> hosts;
+    std::string service_id(service_id_c_str);
 
-    {
-        std::lock_guard<std::mutex> services_guard(*services_mutex);
-        std::shared_ptr<LimitlessMonitorService> service;
-        std::string service_id(service_id_c_str);
-
-        if (services.contains(service_id)) {
-            service = services[service_id];
-            service->depth_counter++;
-        } else {
-            services[service_id] = std::make_shared<LimitlessMonitorService>();
-            service = services[service_id];
-
-            service->depth_counter = 1;
-            service->limitless_routers = std::make_shared<std::vector<HostInfo>>();
-            service->limitless_routers_mutex = std::make_shared<std::mutex>();
-            service->limitless_router_monitor = std::make_shared<LimitlessRouterMonitor>(
-                connection_string_c_str,
-                host_port,
-                DEFAULT_LIMITLESS_MONITOR_INTERVAL,
-                service->limitless_routers,
-                service->limitless_routers_mutex
-            );
-        }
-
-        std::lock_guard<std::mutex> limitless_routers_guard(*(service->limitless_routers_mutex));
-        hosts = *(service->limitless_routers);
+    if (!limitless_monitor_service.CheckService(service_id)) {
+        limitless_monitor_service.NewService(service_id, connection_string_c_str, host_port, std::make_shared<LimitlessRouterMonitor>());
     }
 
-    if (hosts.empty()) {
+    limitless_monitor_service.IncrementReferenceCounter(service_id);
+    std::shared_ptr<HostInfo> host = limitless_monitor_service.GetHostInfo(service_id);
+    if (host == nullptr) {
         return false;
     }
 
-    std::unordered_map<std::string, std::string> properties;
-    RoundRobinHostSelector::set_round_robin_weight(hosts, properties);
-    HostInfo host_info = round_robin.get_host(hosts, true, properties);
-
-    strncpy(db_instance->server, host_info.get_host().c_str(), db_instance->server_size);
-
+    strncpy(db_instance->server, host->get_host().c_str(), db_instance->server_size);
     return true;
 }
 
 void StopLimitlessMonitorService(const char *service_id_c_str) {
-    std::lock_guard<std::mutex> guard(*services_mutex);
     std::string service_id(service_id_c_str);
-
-    if (services.contains(service_id)) {
-        std::shared_ptr<LimitlessMonitorService> service = services[service_id];
-        service->depth_counter--;
-
-        if (service->depth_counter == 0) {
-            service = nullptr;
-            services.erase(service_id); // destroys std::shared_ptr<LimitlessRouterMonitor>
-        }
-    }
+    limitless_monitor_service.DecrementReferenceCounter(service_id);
 }

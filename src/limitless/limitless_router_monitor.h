@@ -46,15 +46,17 @@
 
 class LimitlessRouterMonitor {
 public:
-    LimitlessRouterMonitor(
+    LimitlessRouterMonitor();
+
+    ~LimitlessRouterMonitor();
+
+    void Open(
         const char *connection_string_c_str,
         int host_port,
         unsigned int interval_ms,
         std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
         std::shared_ptr<std::mutex>& limitless_routers_mutex
     );
-
-    ~LimitlessRouterMonitor();
 
     bool IsStopped();
 
