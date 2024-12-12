@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		731C538C2D0B15CC006D7569 /* sliding_cache_map_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */; };
 		734B1D382CC97CF900FB6683 /* libaws-rds-odbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D372CC97C4400FB6683 /* libaws-rds-odbc.a */; };
 		734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3E2CC97FA800FB6683 /* host_info_test.cc */; };
 		734B1D442CC97FA800FB6683 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3F2CC97FA800FB6683 /* main.cc */; };
@@ -20,7 +21,6 @@
 		7369B62F2CDE677300C98EDF /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7369B62E2CDE677300C98EDF /* libiconv.tbd */; };
 		7369B6312CDE680600C98EDF /* libltdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7369B6302CDE680600C98EDF /* libltdl.a */; };
 		738543EC2CEE0E050019F6C6 /* round_robin_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543EB2CEE0E050019F6C6 /* round_robin_host_selector_test.cc */; };
-		738543EF2CEE0E290019F6C6 /* cache_map_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543EE2CEE0E290019F6C6 /* cache_map_test.cc */; };
 		73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */; };
 		73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9EF2CC92FD5005B92C0 /* Security.framework */; };
 		73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EC2CD3C3D1002268BF /* adfs_test.cc */; };
@@ -53,6 +53,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sliding_cache_map_test.cc; sourceTree = "<group>"; };
 		734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "../../aws-rds-odbc.xcodeproj"; sourceTree = "<group>"; };
 		734B1D3E2CC97FA800FB6683 /* host_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = host_info_test.cc; sourceTree = "<group>"; };
 		734B1D3F2CC97FA800FB6683 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
@@ -68,7 +69,6 @@
 		7369B62E2CDE677300C98EDF /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		7369B6302CDE680600C98EDF /* libltdl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libltdl.a; path = ../../../../../../../../../opt/homebrew/Cellar/libtool/2.5.3/lib/libltdl.a; sourceTree = "<group>"; };
 		738543EB2CEE0E050019F6C6 /* round_robin_host_selector_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = round_robin_host_selector_test.cc; sourceTree = "<group>"; };
-		738543EE2CEE0E290019F6C6 /* cache_map_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cache_map_test.cc; sourceTree = "<group>"; };
 		73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "aws-rds-odbc-unit-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		73CFD9EF2CC92FD5005B92C0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -110,7 +110,7 @@
 		7369B6132CDE5CBC00C98EDF /* util */ = {
 			isa = PBXGroup;
 			children = (
-				738543EE2CEE0E290019F6C6 /* cache_map_test.cc */,
+				731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */,
 				7369B6122CDE5CBC00C98EDF /* odbc_helper_test.cc */,
 			);
 			path = util;
@@ -238,7 +238,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					73BD677B2CC92229000817A9 = {
 						CreatedOnToolsVersion = 16.0;
@@ -286,12 +286,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
-				738543EF2CEE0E290019F6C6 /* cache_map_test.cc in Sources */,
 				73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */,
 				7369B62D2CDE669D00C98EDF /* okta_test.cc in Sources */,
 				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
 				738543EC2CEE0E050019F6C6 /* round_robin_host_selector_test.cc in Sources */,
 				73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */,
+				731C538C2D0B15CC006D7569 /* sliding_cache_map_test.cc in Sources */,
 				73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */,
 				7369B6142CDE5CBC00C98EDF /* odbc_helper_test.cc in Sources */,
 				73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */,
@@ -337,6 +337,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -398,6 +399,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -422,6 +424,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = XCODE_BUILD;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/**",
@@ -446,6 +449,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = XCODE_BUILD;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/**",
