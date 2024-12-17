@@ -34,16 +34,28 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <cstdio>
 
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
 
-typedef struct {
+enum LIMITLESS_MONITOR_INTERVAL {
+    DEFAULT_LIMITLESS_MONITOR_INTERVAL = 1000
+};
+
+typedef struct LimitlessMonitor {
+    ~LimitlessMonitor() {
+        printf("48 (.h)\n");
+        this->limitless_router_monitor = nullptr;
+        this->limitless_routers_mutex = nullptr;
+        this->limitless_routers = nullptr;
+    }
+
     unsigned int reference_counter;
     std::shared_ptr<std::vector<HostInfo>> limitless_routers;
     std::shared_ptr<std::mutex> limitless_routers_mutex;
     std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor;
-} IndividualLimitlessMonitorService; // temp name
+} LimitlessMonitor;
 
 class LimitlessMonitorService {
 public:
@@ -61,7 +73,7 @@ public:
 
     std::shared_ptr<HostInfo> GetHostInfo(std::string service_id);
 private:
-    std::map<std::string, std::shared_ptr<IndividualLimitlessMonitorService>> services;
+    std::map<std::string, std::shared_ptr<LimitlessMonitor>> services;
 
     std::shared_ptr<std::mutex> services_mutex;
 

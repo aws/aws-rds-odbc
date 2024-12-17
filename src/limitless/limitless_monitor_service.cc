@@ -27,14 +27,14 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#include <cstdio>
 #include <cstring>
 
+#include "../util/logger_wrapper.h"
 #include "limitless_monitor_service.h"
 #include "odbc_helper.h"
 
-enum LIMITLESS_MONITOR_INTERVAL {
-    DEFAULT_LIMITLESS_MONITOR_INTERVAL = 1000
-};
+static LimitlessMonitorService limitless_monitor_service;
 
 LimitlessMonitorService::LimitlessMonitorService() {
     this->services_mutex = std::make_shared<std::mutex>();
@@ -56,39 +56,51 @@ void LimitlessMonitorService::NewService(
     int host_port,
     std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor
 ) {
+    printf("59\n");
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
-    this->services[service_id] = std::make_shared<IndividualLimitlessMonitorService>();
     
-    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+    printf("62\n");
+    std::shared_ptr<LimitlessMonitor> service = std::make_shared<LimitlessMonitor>();
     service->reference_counter = 0; // caller should call IncrementReferenceCounter for this service ID
     service->limitless_routers = std::make_shared<std::vector<HostInfo>>();
     service->limitless_routers_mutex = std::make_shared<std::mutex>();
     service->limitless_router_monitor = limitless_router_monitor;
+    this->services[service_id] = service;
 
+    printf("70\n");
     // start monitoring; will block until first set of limitless routers is retrieved or until an error occurs (leaving limitless_routers is empty)
     limitless_router_monitor->Open(connection_string_c_str, host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, service->limitless_routers, service->limitless_routers_mutex);
+    LOG(INFO) << "Limitless Monitor Service: started monitoring with service ID " << service_id;
 }
 
 void LimitlessMonitorService::IncrementReferenceCounter(std::string service_id) {
+    printf("77\n");
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
-    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+    std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
     service->reference_counter++;
 }
 
 void LimitlessMonitorService::DecrementReferenceCounter(std::string service_id) {
+    printf("84\n");
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
-    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
-    service->reference_counter--;
+    std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
+    
+    if (service->reference_counter > 0) {
+        service->reference_counter--;
+    } else {
+        LOG(ERROR) << "Limitless Monitor Service: monitor with service ID " << service_id << " has improper reference counter";
+    }
 
-    if (service->reference_counter <= 0) {
+    if (service->reference_counter == 0) {
         service = nullptr;
-        services.erase(service_id); // destroys std::shared_ptr<LimitlessRouterMonitor>
+        services.erase(service_id);
+        LOG(INFO) << "Limitless Monitor Service: stopped monitoring with service ID " << service_id;
     }
 }
 
 std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(std::string service_id) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
-    std::shared_ptr<IndividualLimitlessMonitorService> service = this->services[service_id];
+    std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
 
     std::lock_guard<std::mutex> limitless_routers_guard(*(service->limitless_routers_mutex));
     std::vector<HostInfo> hosts = *(service->limitless_routers);
@@ -110,25 +122,27 @@ bool CheckLimitlessCluster(const char *connection_string_c_str) {
     SQLSMALLINT out_connection_string_len; // unused
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
-    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", henv, SQL_HANDLE_ENV)) {
+    if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLAllocHandle failed in CheckLimitlessCluster", henv, SQL_HANDLE_ENV)) {
+        OdbcHelper::Cleanup(henv, NULL, NULL);
         return false;
     }
 
     rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
+    if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLAllocHandle failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
+        OdbcHelper::Cleanup(henv, conn, NULL);
         return false;
     }
 
     rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-    if (!OdbcHelper::CheckResult(rc, "SQLDriverConnect failed", conn, SQL_HANDLE_DBC)) {
+    if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLDriverConnect failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
+        OdbcHelper::Cleanup(henv, conn, NULL);
         return false;
     }
 
-    return OdbcHelper::CheckLimitlessCluster(conn);
+    bool result = OdbcHelper::CheckLimitlessCluster(conn);
+    OdbcHelper::Cleanup(henv, conn, NULL);
+    return result;
 }
-
-// global class used by the below functions
-static LimitlessMonitorService limitless_monitor_service;
 
 bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, LimitlessInstance *db_instance) {
     std::string service_id(service_id_c_str);

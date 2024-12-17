@@ -50,7 +50,7 @@ public:
 
     ~LimitlessRouterMonitor();
 
-    void Open(
+    virtual void Open(
         const char *connection_string_c_str,
         int host_port,
         unsigned int interval_ms,
@@ -58,9 +58,9 @@ public:
         std::shared_ptr<std::mutex>& limitless_routers_mutex
     );
 
-    bool IsStopped();
+    virtual bool IsStopped();
 
-    void Close();
+    virtual void Close();
 private:
     std::atomic_bool stopped = false;
 

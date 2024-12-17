@@ -38,8 +38,9 @@
 #include <aws/secretsmanager/SecretsManagerClient.h>
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
 
-#include "federation.h"
 #include "authentication_provider.h"
+#include "federation.h"
+#include "limitless_router_monitor.h"
 
 class MOCK_SECRETS_MANAGER_CLIENT : public Aws::SecretsManager::SecretsManagerClient {
 public:
@@ -91,6 +92,13 @@ class MOCK_STS_CLIENT : public Aws::STS::STSClient {
 public:
     MOCK_METHOD(Aws::STS::Model::AssumeRoleWithSAMLOutcome, AssumeRoleWithSAML, (const Aws::STS::Model::AssumeRoleWithSAMLRequest&), (const));
     MOCK_METHOD(bool, SupportsChunkedTransferEncoding, (), (const));
+};
+
+class MOCK_LIMITLESS_ROUTER_MONITOR : public LimitlessRouterMonitor {
+public:
+    MOCK_METHOD(void, Open, (const char *, int, unsigned int, std::shared_ptr<std::vector<HostInfo>>&, std::shared_ptr<std::mutex>&), ());
+    MOCK_METHOD(bool, IsStopped, (), ());
+    MOCK_METHOD(void, Close, (), ());
 };
 
 #endif /* __MOCKOBJECTS_H__ */

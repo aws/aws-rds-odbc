@@ -73,17 +73,32 @@ bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
     }
 
     rc = SQLExecDirect(hstmt, const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(CHECK_LIMITLESS_CLUSTER_QUERY)), SQL_NTS);
-    SQLFreeStmt(hstmt, SQL_CLOSE);
-    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 
     if (SQL_SUCCEEDED(rc)) {
         SQLINTEGER result;
         SQLLEN len;
         rc = SQLGetData(hstmt, 1, SQL_C_SLONG, &result, sizeof(result), &len);
+        SQLFreeStmt(hstmt, SQL_CLOSE);
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
         return SQL_SUCCEEDED(rc) && result == 1;
     }
 
+    SQLFreeStmt(hstmt, SQL_CLOSE);
+    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
     return false;
+}
+
+void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
+    if (hstmt != NULL) {
+        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+    }
+    if (conn != NULL) {
+        SQLDisconnect(conn);
+        SQLFreeHandle(SQL_HANDLE_DBC, conn);
+    }
+    if (henv != NULL) {
+        SQLFreeHandle(SQL_HANDLE_ENV, henv);
+    }
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
