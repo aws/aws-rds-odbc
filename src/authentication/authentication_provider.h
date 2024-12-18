@@ -80,12 +80,66 @@ typedef struct Credentials {
     unsigned int password_size;
 } Credentials;
 
+/**
+ * Given a string, checks if it is a supported federated authentication type.
+ * 
+ * @param str a string representing authentication type
+ * @return Enum of a valid authentication type
+ */
 FederatedAuthType GetFedAuthTypeEnum(const char *str);
 
+/**
+ * Checks and returns a cached value given the hostname, region, port, and username
+ * 
+ * @param token an allocated memory space to retrieve the cached token
+ * @param max_size the maximum size given to the token
+ * @param db_hostname the database hostname
+ * @param db_region the database region
+ * @param port the database port
+ * @param db_user the database username
+ * @return True if a cached value was returned in token
+ */
 bool GetCachedToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user);
+
+/**
+ * Updates the cache for a given hostname, region, port, and username
+ * with the new token and expiration time
+ * 
+ * @param db_hostname the database hostname
+ * @param db_region the database region
+ * @param port the database port
+ * @param db_user the database username
+ * @param token an allocated memory space to retrieve the cached token
+ * @param expiration_time the maximum size given to the token
+ */
 void UpdateCachedToken(const char* db_hostname, const char* db_region, const char* port, const char* db_user, const char* token, const char* expiration_time);
+
+/**
+ * Given the hostname, region, port, and username, generates a new token for the given authentication type
+ * Configuration for the authentication will specify which server to federate against
+ * 
+ * @param token an allocated memory space to retrieve the cached token
+ * @param max_size the maximum size given to the token
+ * @param db_hostname the database hostname
+ * @param db_region the database region
+ * @param port the database port
+ * @param db_user the username
+ * @param type the enum of the authentication type
+ * @param config a struct with 
+ * @return True if a cached value was returned in token
+ */
 bool GenerateConnectAuthToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config);
 
+/**
+ * Given a secret ID and region, retrieves secrets for Username and Password from Secrets Manager
+ * If the given Secret ID is a full ARN, the region will be parsed from the ARN and user input is ignored
+ * If the secret ID is not a full ARN, and the user does not provide a region, region will default to us-east-1
+ * 
+ * @param secret_id the full ARN or secret ID of a Secret, given a full
+ * @param region the region of the Secret ID
+ * @param credentials a struct containing allocated memory space to return the username and password from Secrets Manager
+ * @return True if credentials were retrieved and updated
+ */
 bool GetCredentialsFromSecretsManager(const char* secret_id, const char* region, Credentials* credentials);
 
 #ifdef __cplusplus
