@@ -42,7 +42,7 @@ HostInfo RandomHostSelector::get_host(std::vector<HostInfo> hosts, bool is_write
     });
 
     if (selection.empty()) {
-        throw std::runtime_error("No avaiable hosts found in list");
+        throw std::runtime_error("No available hosts found in list");
     }
 
     std::random_device rd;
