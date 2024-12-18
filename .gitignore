@@ -443,6 +443,7 @@ aws_sdk/
 # Build output directory
 build
 build-debug
+cmake-build-debug
 
 # CodeChecker static analysis reports directory
 reports
