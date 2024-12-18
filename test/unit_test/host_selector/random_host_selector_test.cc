@@ -33,13 +33,13 @@
 #include <random_host_selector.h>
 
 namespace {
-    const int base_port = 1234;
-    HostInfo writer_host_info_a("writer_a", base_port, HOST_STATE::UP, true, nullptr);
-    HostInfo writer_host_info_b("writer_b", base_port, HOST_STATE::UP, true, nullptr);
-    HostInfo writer_host_info_down("writer_down", base_port, HOST_STATE::DOWN, true, nullptr);
-    HostInfo reader_host_info_a("reader_a", base_port, HOST_STATE::UP, false, nullptr);
-    HostInfo reader_host_info_b("reader_b", base_port, HOST_STATE::UP, false, nullptr);
-    HostInfo reader_host_info_down("reader_down", base_port, HOST_STATE::DOWN, false, nullptr);
+    constexpr int base_port = 1234;
+    HostInfo writer_host_info_a("writer_a", base_port, UP, true, nullptr);
+    HostInfo writer_host_info_b("writer_b", base_port, UP, true, nullptr);
+    HostInfo writer_host_info_down("writer_down", base_port, DOWN, true, nullptr);
+    HostInfo reader_host_info_a("reader_a", base_port, UP, false, nullptr);
+    HostInfo reader_host_info_b("reader_b", base_port, UP, false, nullptr);
+    HostInfo reader_host_info_down("reader_down", base_port, DOWN, false, nullptr);
     std::unordered_map<std::string, std::string> empty_map;
 }
 
