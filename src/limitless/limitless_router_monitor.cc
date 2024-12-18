@@ -93,8 +93,10 @@ void LimitlessRouterMonitor::Close() {
     }
 
     this->stopped = true;
-    this->monitor_thread->join();
-    this->monitor_thread = nullptr;
+    if (this->monitor_thread != nullptr) {
+        this->monitor_thread->join();
+        this->monitor_thread = nullptr;
+    }
 }
 
 void LimitlessRouterMonitor::run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port) {
