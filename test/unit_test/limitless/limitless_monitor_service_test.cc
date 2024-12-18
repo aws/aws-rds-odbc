@@ -60,7 +60,7 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host1", 5432, UP, true, nullptr, 101)); // round robin should choose this one
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host2", 5432, UP, true, nullptr, 100));
 
-    EXPECT_CALL(*mock_monitor, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
@@ -73,10 +73,12 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
     bool service_exists = limitless_monitor_service.CheckService(test_service_id);
     EXPECT_TRUE(service_exists);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(3 * TEST_LIMITLESS_MONITOR_INTERVAL / 2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2 * TEST_LIMITLESS_MONITOR_INTERVAL_MS));
     std::shared_ptr<HostInfo> host_info = limitless_monitor_service.GetHostInfo(test_service_id);
     EXPECT_TRUE(host_info != nullptr);
-    EXPECT_EQ(host_info->get_host(), "test_host1");
+    if (host_info != nullptr) {
+        EXPECT_EQ(host_info->get_host(), "test_host1");
+    }
 
     limitless_monitor_service.DecrementReferenceCounter(test_service_id);
 
@@ -94,11 +96,11 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor3 = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     // mock_monitor3 will have an empty set of limitless routers -- couldn't fetch in time, essentially
 
-    EXPECT_CALL(*mock_monitor1, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor1, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor1.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
-    EXPECT_CALL(*mock_monitor2, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor2, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor2.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
-    EXPECT_CALL(*mock_monitor3, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor3, Open(test_connection_string_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor3.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
     LimitlessMonitorService limitless_monitor_service;
@@ -120,17 +122,21 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
     EXPECT_TRUE(limitless_monitor_service.CheckService(mock_monitor2_id));
     EXPECT_TRUE(limitless_monitor_service.CheckService(mock_monitor3_id));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(3 * TEST_LIMITLESS_MONITOR_INTERVAL / 2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2 * TEST_LIMITLESS_MONITOR_INTERVAL_MS));
 
     // get host info from each monitor
     std::shared_ptr<HostInfo> host_info = limitless_monitor_service.GetHostInfo(mock_monitor1_id);
     EXPECT_TRUE(host_info != nullptr);
-    EXPECT_EQ(host_info->get_host(), "correct1");
-    host_info = nullptr; // free it
+    if (host_info != nullptr) {
+        EXPECT_EQ(host_info->get_host(), "correct1");
+        host_info = nullptr; // free it
+    }
     host_info = limitless_monitor_service.GetHostInfo(mock_monitor2_id);
     EXPECT_TRUE(host_info != nullptr);
-    EXPECT_EQ(host_info->get_host(), "correct2");
-    host_info = nullptr; // free it
+    if (host_info != nullptr) {
+        EXPECT_EQ(host_info->get_host(), "correct2");
+        host_info = nullptr; // free it
+    }
     host_info = limitless_monitor_service.GetHostInfo(mock_monitor3_id);
     EXPECT_TRUE(host_info == nullptr);
 

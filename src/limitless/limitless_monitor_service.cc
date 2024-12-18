@@ -72,8 +72,8 @@ bool LimitlessMonitorService::NewService(
     service->limitless_router_monitor = std::move(limitless_router_monitor);
     // limitless_router_monitor is now nullptr
 
-    // start monitoring; will block until first set of limitless routers is retrieved or until an error occurs (leaving limitless_routers is empty)
-    service->limitless_router_monitor->Open(connection_string_c_str, host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL, service->limitless_routers, service->limitless_routers_mutex);
+    // start monitoring: this will block until the first set of limitless routers is retrieved or an error occurs (in which case, limitless_routers will remain empty).
+    service->limitless_router_monitor->Open(connection_string_c_str, host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, service->limitless_routers, service->limitless_routers_mutex);
     LOG(INFO) << "Limitless Monitor Service: started monitoring with service ID " << service_id;
 
     return true;

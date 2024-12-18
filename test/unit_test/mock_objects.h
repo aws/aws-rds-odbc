@@ -118,7 +118,7 @@ public:
         std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
         std::shared_ptr<std::mutex>& limitless_routers_mutex
     ) {
-        this->interval_ms = TEST_LIMITLESS_MONITOR_INTERVAL;
+        this->interval_ms = TEST_LIMITLESS_MONITOR_INTERVAL_MS;
         this->monitor_thread = std::make_shared<std::thread>(&MOCK_LIMITLESS_ROUTER_MONITOR::mock_run, this, limitless_routers, limitless_routers_mutex);
     }
 };

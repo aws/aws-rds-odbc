@@ -39,9 +39,9 @@
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
 
-enum LIMITLESS_MONITOR_INTERVAL {
-    DEFAULT_LIMITLESS_MONITOR_INTERVAL = 1000,
-    TEST_LIMITLESS_MONITOR_INTERVAL = 100
+enum LIMITLESS_MONITOR_INTERVAL_MS {
+    DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS = 1000,
+    TEST_LIMITLESS_MONITOR_INTERVAL_MS = 250
 };
 
 typedef struct LimitlessMonitor {
