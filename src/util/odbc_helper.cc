@@ -89,14 +89,14 @@ bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
 }
 
 void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
-    if (hstmt != NULL) {
+    if (hstmt != SQL_NULL_HANDLE) {
         SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
     }
-    if (conn != NULL) {
+    if (conn != SQL_NULL_HANDLE) {
         SQLDisconnect(conn);
         SQLFreeHandle(SQL_HANDLE_DBC, conn);
     }
-    if (henv != NULL) {
+    if (henv != SQL_NULL_HANDLE) {
         SQLFreeHandle(SQL_HANDLE_ENV, henv);
     }
 }

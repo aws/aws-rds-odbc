@@ -45,16 +45,16 @@ LimitlessMonitorService::~LimitlessMonitorService() {
     this->services.clear(); // destroys everything
 }
 
-bool LimitlessMonitorService::CheckService(std::string service_id) {
+bool LimitlessMonitorService::CheckService(const std::string& service_id) const {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     return this->services.contains(service_id);
 }
 
 void LimitlessMonitorService::NewService(
-    std::string service_id,
+    const std::string& service_id,
     const char *connection_string_c_str,
     int host_port,
-    std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor
+    const std::shared_ptr<LimitlessRouterMonitor>& limitless_router_monitor
 ) {
     printf("59\n");
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
@@ -73,14 +73,14 @@ void LimitlessMonitorService::NewService(
     LOG(INFO) << "Limitless Monitor Service: started monitoring with service ID " << service_id;
 }
 
-void LimitlessMonitorService::IncrementReferenceCounter(std::string service_id) {
+void LimitlessMonitorService::IncrementReferenceCounter(const std::string& service_id) {
     printf("77\n");
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
     service->reference_counter++;
 }
 
-void LimitlessMonitorService::DecrementReferenceCounter(std::string service_id) {
+void LimitlessMonitorService::DecrementReferenceCounter(const std::string& service_id) {
     printf("84\n");
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
@@ -98,7 +98,7 @@ void LimitlessMonitorService::DecrementReferenceCounter(std::string service_id) 
     }
 }
 
-std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(std::string service_id) {
+std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string& service_id) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
 
@@ -115,36 +115,36 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(std::string servi
 }
 
 bool CheckLimitlessCluster(const char *connection_string_c_str) {
-    SQLHENV henv = SQL_NULL_HANDLE;
-    SQLHDBC conn = SQL_NULL_HANDLE;
+    SQLHENV henv = nullptr;
+    SQLHDBC conn = nullptr;
     auto *connection_string = const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string_c_str));
     SQLSMALLINT connection_string_len = strlen(connection_string_c_str);
     SQLSMALLINT out_connection_string_len; // unused
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
     if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLAllocHandle failed in CheckLimitlessCluster", henv, SQL_HANDLE_ENV)) {
-        OdbcHelper::Cleanup(henv, NULL, NULL);
+        OdbcHelper::Cleanup(henv, nullptr, nullptr);
         return false;
     }
 
     rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
     if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLAllocHandle failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
-        OdbcHelper::Cleanup(henv, conn, NULL);
+        OdbcHelper::Cleanup(henv, conn, nullptr);
         return false;
     }
 
     rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
     if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLDriverConnect failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
-        OdbcHelper::Cleanup(henv, conn, NULL);
+        OdbcHelper::Cleanup(henv, conn, nullptr);
         return false;
     }
 
     bool result = OdbcHelper::CheckLimitlessCluster(conn);
-    OdbcHelper::Cleanup(henv, conn, NULL);
+    OdbcHelper::Cleanup(henv, conn, nullptr);
     return result;
 }
 
-bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, LimitlessInstance *db_instance) {
+bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance) {
     std::string service_id(service_id_c_str);
 
     if (!limitless_monitor_service.CheckService(service_id)) {

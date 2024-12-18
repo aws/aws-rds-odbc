@@ -38,8 +38,8 @@ using testing::Property;
 using testing::Return;
 using testing::StrEq;
 
-const char *test_connection_string_c_str = "test_connection_string";
-int test_host_port = 5432;
+const static char *test_connection_string_c_str = "test_connection_string";
+static int test_host_port = 5432;
 
 class LimitlessMonitorServiceTest : public testing::Test {
   protected:

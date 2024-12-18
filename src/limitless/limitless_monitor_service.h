@@ -31,10 +31,10 @@
 #define LIMITLESSMONITORSERVICE_H_
 
 #ifdef __cplusplus
+#include <cstdio>
 #include <map>
 #include <mutex>
 #include <string>
-#include <cstdio>
 
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
@@ -63,15 +63,15 @@ public:
 
     ~LimitlessMonitorService();
 
-    bool CheckService(std::string service_id);
+    bool CheckService(const std::string& service_id) const;
 
-    void NewService(std::string service_id, const char *connection_string_c_str, int host_port, std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor);
+    void NewService(const std::string& service_id, const char *connection_string_c_str, int host_port, const std::shared_ptr<LimitlessRouterMonitor>& limitless_router_monitor);
 
-    void IncrementReferenceCounter(std::string service_id);
+    void IncrementReferenceCounter(const std::string& service_id);
 
-    void DecrementReferenceCounter(std::string service_id);
+    void DecrementReferenceCounter(const std::string& service_id);
 
-    std::shared_ptr<HostInfo> GetHostInfo(std::string service_id);
+    std::shared_ptr<HostInfo> GetHostInfo(const std::string& service_id);
 private:
     std::map<std::string, std::shared_ptr<LimitlessMonitor>> services;
 
@@ -89,7 +89,7 @@ typedef struct {
 } LimitlessInstance;
 
 bool CheckLimitlessCluster(const char *connection_string_c_str);
-bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, LimitlessInstance *db_instance);
+bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance);
 void StopLimitlessMonitorService(const char *service_id_c_str);
 
 #ifdef __cplusplus

@@ -35,10 +35,10 @@
 #include "limitless_query_helper.h"
 #include "limitless_router_monitor.h"
 
-LimitlessRouterMonitor::LimitlessRouterMonitor() {}
+LimitlessRouterMonitor::LimitlessRouterMonitor() = default;
 
 LimitlessRouterMonitor::~LimitlessRouterMonitor() {
-    this->Close();
+    this->LimitlessRouterMonitor::Close();
     this->limitless_routers = nullptr;
     this->limitless_routers_mutex = nullptr;
 }
