@@ -39,6 +39,8 @@
 		738543F32CEE0E370019F6C6 /* round_robin_property.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F22CEE0E370019F6C6 /* round_robin_property.h */; };
 		738543F42CEE0E370019F6C6 /* round_robin_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */; };
 		738543F52CEE0E370019F6C6 /* round_robin_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */; };
+		73CB8C122D132772002671DA /* highest_weight_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73CB8C112D132772002671DA /* highest_weight_host_selector.cc */; };
+		73CB8C132D132772002671DA /* highest_weight_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 73CB8C102D132772002671DA /* highest_weight_host_selector.h */; };
 		73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E42CD3BC08002268BF /* host_availability_strategy.h */; };
 		73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */; };
 		73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */; };
@@ -106,6 +108,8 @@
 		738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = round_robin_host_selector.h; sourceTree = "<group>"; };
 		738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = round_robin_host_selector.cc; sourceTree = "<group>"; };
 		738543F22CEE0E370019F6C6 /* round_robin_property.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = round_robin_property.h; sourceTree = "<group>"; };
+		73CB8C102D132772002671DA /* highest_weight_host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = highest_weight_host_selector.h; sourceTree = "<group>"; };
+		73CB8C112D132772002671DA /* highest_weight_host_selector.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = highest_weight_host_selector.cc; sourceTree = "<group>"; };
 		73D322E22CD3A46E002268BF /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		73D322E32CD3A46E002268BF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		73D322E42CD3BC08002268BF /* host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_availability_strategy.h; sourceTree = "<group>"; };
@@ -202,6 +206,8 @@
 		7369B61B2CDE649B00C98EDF /* host_selector */ = {
 			isa = PBXGroup;
 			children = (
+				73CB8C102D132772002671DA /* highest_weight_host_selector.h */,
+				73CB8C112D132772002671DA /* highest_weight_host_selector.cc */,
 				738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */,
 				738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */,
 				738543F22CEE0E370019F6C6 /* round_robin_property.h */,
@@ -349,6 +355,7 @@
 				73D788352CC919070028B42F /* logger_wrapper.h in Headers */,
 				73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */,
 				73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */,
+				73CB8C132D132772002671DA /* highest_weight_host_selector.h in Headers */,
 				73D788362CC919070028B42F /* host_info.h in Headers */,
 				73D788372CC919070028B42F /* federation.h in Headers */,
 				7369B6112CDE5C9E00C98EDF /* odbc_helper.h in Headers */,
@@ -419,6 +426,7 @@
 				73DAE02C2CDBA7BB00225BE1 /* logger_wrapper.cc in Sources */,
 				73DAE0212CDA71DD00225BE1 /* limitless_query_helper.cc in Sources */,
 				73D7882D2CC919070028B42F /* adfs.cc in Sources */,
+				73CB8C122D132772002671DA /* highest_weight_host_selector.cc in Sources */,
 				73D7882E2CC919070028B42F /* authentication_provider.cc in Sources */,
 				73D7882F2CC919070028B42F /* host_info.cc in Sources */,
 				7369B6102CDE5C9E00C98EDF /* odbc_helper.cc in Sources */,
