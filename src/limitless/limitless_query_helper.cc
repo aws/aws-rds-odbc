@@ -41,7 +41,7 @@ const std::string LimitlessQueryHelper::LIMITLESS_ROUTER_ENDPOINT_QUERY  =
 std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map) {
     HSTMT hstmt = SQL_NULL_HSTMT;
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
-    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", hstmt, SQL_HANDLE_STMT)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLAllocHandle failed", hstmt, SQL_HANDLE_STMT)) {
         return std::vector<HostInfo>();
     }
 
@@ -54,19 +54,19 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
 
     rc = SQLBindCol(hstmt, 1, SQL_C_CHAR, &router_endpoint_value, sizeof(router_endpoint_value), &ind_router_endpoint_value);
     SQLRETURN rc2 = SQLBindCol(hstmt, 2, SQL_C_CHAR, &load_value, sizeof(load_value), &ind_load_value);
-    if (!OdbcHelper::CheckResult(rc, "SQLBindCol for router endpoint failed", hstmt, SQL_HANDLE_STMT) || 
-        !OdbcHelper::CheckResult(rc2, "SQLBindCol for load value failed", hstmt, SQL_HANDLE_STMT)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLBindCol for router endpoint failed", hstmt, SQL_HANDLE_STMT) ||
+        !OdbcHelper::CheckResult(rc2, "LimitlessQueryHelper: SQLBindCol for load value failed", hstmt, SQL_HANDLE_STMT)) {
         return std::vector<HostInfo>();
     }
 
     rc = SQLExecDirect(hstmt, const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(LimitlessQueryHelper::LIMITLESS_ROUTER_ENDPOINT_QUERY.c_str())), SQL_NTS);
-    if (!OdbcHelper::CheckResult(rc, "SQLExecDirect failed", hstmt, SQL_HANDLE_STMT)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLExecDirect failed", hstmt, SQL_HANDLE_STMT)) {
         return std::vector<HostInfo>();
     }
 
     SQLLEN row_count = 0;
     rc = SQLRowCount(hstmt, &row_count);
-    if (!OdbcHelper::CheckResult(rc, "SQLRowCount failed", hstmt, SQL_HANDLE_STMT)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLRowCount failed", hstmt, SQL_HANDLE_STMT)) {
         return std::vector<HostInfo>();
     }
     std::vector<HostInfo> limitless_routers;

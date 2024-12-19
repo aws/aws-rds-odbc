@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		731C538C2D0B15CC006D7569 /* sliding_cache_map_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */; };
+		733C45F12D12ED6A0034BF7E /* limitless_monitor_service_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 733C45EF2D12ED6A0034BF7E /* limitless_monitor_service_test.cc */; };
 		734B1D382CC97CF900FB6683 /* libaws-rds-odbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D372CC97C4400FB6683 /* libaws-rds-odbc.a */; };
 		734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3E2CC97FA800FB6683 /* host_info_test.cc */; };
 		734B1D442CC97FA800FB6683 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 734B1D3F2CC97FA800FB6683 /* main.cc */; };
@@ -54,6 +55,7 @@
 
 /* Begin PBXFileReference section */
 		731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sliding_cache_map_test.cc; sourceTree = "<group>"; };
+		733C45EF2D12ED6A0034BF7E /* limitless_monitor_service_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = limitless_monitor_service_test.cc; sourceTree = "<group>"; };
 		734B1D322CC97C4400FB6683 /* ../../aws-rds-odbc.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "../../aws-rds-odbc.xcodeproj"; sourceTree = "<group>"; };
 		734B1D3E2CC97FA800FB6683 /* host_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = host_info_test.cc; sourceTree = "<group>"; };
 		734B1D3F2CC97FA800FB6683 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
@@ -99,6 +101,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		733C45F02D12ED6A0034BF7E /* limitless */ = {
+			isa = PBXGroup;
+			children = (
+				733C45EF2D12ED6A0034BF7E /* limitless_monitor_service_test.cc */,
+			);
+			path = limitless;
+			sourceTree = "<group>";
+		};
 		734B1D332CC97C4400FB6683 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +150,7 @@
 				73D322F12CD3C3D1002268BF /* failover */,
 				73D322F62CD3CDBE002268BF /* host_availability */,
 				7369B6202CDE64AD00C98EDF /* host_selector */,
+				733C45F02D12ED6A0034BF7E /* limitless */,
 				7369B6132CDE5CBC00C98EDF /* util */,
 				734B1D3E2CC97FA800FB6683 /* host_info_test.cc */,
 				734B1D3F2CC97FA800FB6683 /* main.cc */,
@@ -286,6 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
+				733C45F12D12ED6A0034BF7E /* limitless_monitor_service_test.cc in Sources */,
 				73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */,
 				7369B62D2CDE669D00C98EDF /* okta_test.cc in Sources */,
 				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
@@ -297,6 +309,7 @@
 				73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */,
 				7369B6212CDE64AD00C98EDF /* random_host_selector_test.cc in Sources */,
 				734B1D442CC97FA800FB6683 /* main.cc in Sources */,
+				733C45F82D12EDE90034BF7E /* sliding_cache_map_test.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -27,8 +27,6 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include <cstdio>
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

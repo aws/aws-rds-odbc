@@ -59,6 +59,10 @@
 		73DAE02A2CDA8A0100225BE1 /* secrets_manager_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */; };
 		73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */; };
 		73DAE02C2CDBA7BB00225BE1 /* logger_wrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D7882A2CC919070028B42F /* logger_wrapper.cc */; };
+		73F467BE2D1355210083E758 /* limitless_router_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73F467BD2D1355210083E758 /* limitless_router_monitor.cc */; };
+		73F467BF2D1355210083E758 /* limitless_monitor_service.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73F467BB2D1355210083E758 /* limitless_monitor_service.cc */; };
+		73F467C02D1355210083E758 /* limitless_router_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 73F467BC2D1355210083E758 /* limitless_router_monitor.h */; };
+		73F467C12D1355210083E758 /* limitless_monitor_service.h in Headers */ = {isa = PBXBuildFile; fileRef = 73F467BA2D1355210083E758 /* limitless_monitor_service.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -125,6 +129,10 @@
 		73DAE0232CDA88EC00225BE1 /* libodbc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libodbc.a; path = ../../../../../../../opt/homebrew/Cellar/unixodbc/2.3.12/lib/libodbc.a; sourceTree = "<group>"; };
 		73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets_manager_helper.h; sourceTree = "<group>"; };
 		73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper.cc; sourceTree = "<group>"; };
+		73F467BA2D1355210083E758 /* limitless_monitor_service.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = limitless_monitor_service.h; sourceTree = "<group>"; };
+		73F467BB2D1355210083E758 /* limitless_monitor_service.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = limitless_monitor_service.cc; sourceTree = "<group>"; };
+		73F467BC2D1355210083E758 /* limitless_router_monitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = limitless_router_monitor.h; sourceTree = "<group>"; };
+		73F467BD2D1355210083E758 /* limitless_router_monitor.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = limitless_router_monitor.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -308,6 +316,10 @@
 		73DAE0202CDA71DD00225BE1 /* limitless */ = {
 			isa = PBXGroup;
 			children = (
+				73F467BA2D1355210083E758 /* limitless_monitor_service.h */,
+				73F467BB2D1355210083E758 /* limitless_monitor_service.cc */,
+				73F467BC2D1355210083E758 /* limitless_router_monitor.h */,
+				73F467BD2D1355210083E758 /* limitless_router_monitor.cc */,
 				73DAE01E2CDA71DD00225BE1 /* limitless_query_helper.h */,
 				73DAE01F2CDA71DD00225BE1 /* limitless_query_helper.cc */,
 			);
@@ -325,6 +337,8 @@
 				738543F42CEE0E370019F6C6 /* round_robin_host_selector.h in Headers */,
 				73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */,
 				7369B61D2CDE649B00C98EDF /* host_selector.h in Headers */,
+				73F467C02D1355210083E758 /* limitless_router_monitor.h in Headers */,
+				73F467C12D1355210083E758 /* limitless_monitor_service.h in Headers */,
 				7369B61E2CDE649B00C98EDF /* random_host_selector.h in Headers */,
 				731C53882D0B15AC006D7569 /* sliding_cache_map.h in Headers */,
 				73D788332CC919070028B42F /* authentication_provider.h in Headers */,
@@ -411,6 +425,8 @@
 				73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */,
 				731C53892D0B15AC006D7569 /* sliding_cache_map.cc in Sources */,
 				73D788302CC919070028B42F /* federation.cc in Sources */,
+				73F467BE2D1355210083E758 /* limitless_router_monitor.cc in Sources */,
+				73F467BF2D1355210083E758 /* limitless_monitor_service.cc in Sources */,
 				738543F52CEE0E370019F6C6 /* round_robin_host_selector.cc in Sources */,
 				7369B6272CDE666E00C98EDF /* okta.cc in Sources */,
 				7369B6282CDE666E00C98EDF /* html_util.cc in Sources */,
