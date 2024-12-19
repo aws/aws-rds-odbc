@@ -52,6 +52,7 @@ add_executable(
 
   util/sliding_cache_map_test.cc
   util/odbc_helper_test.cc
+        host_selector/highest_weight_host_selector_test.cc
 )
 
 #-----------------------------------------------------

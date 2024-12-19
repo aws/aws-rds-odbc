@@ -24,31 +24,31 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include "random_host_selector.h"
+#include "highest_weight_host_selector.h"
 
-#include <random>
+HostInfo HighestWeightHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer, std::unordered_map<std::string, std::string>) {
+    std::vector<HostInfo> eligible_hosts;
+    eligible_hosts.reserve(hosts.size());
 
-HostInfo RandomHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer,
-    std::unordered_map<std::string, std::string>) {
-
-    std::vector<HostInfo> selection;
-    selection.reserve(hosts.size());
-
-    std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(selection), [&is_writer](const HostInfo& host) {
-        return host.is_host_up() && (is_writer ? host.is_host_writer() : true);
+    std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(eligible_hosts), [&is_writer](const HostInfo& host) {
+        return host.is_host_up() && is_writer == host.is_host_writer();
     });
 
-    if (selection.empty()) {
-        throw std::runtime_error("No available hosts found in list");
+    if (eligible_hosts.empty()) {
+        throw std::runtime_error("No eligible hosts found in list");
     }
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, selection.size() - 1);
+    auto highest_weight_host =
+        std::ranges::max_element(eligible_hosts, [](const HostInfo& a, const HostInfo& b) {
+            return a.get_weight() < b.get_weight();
+        });
 
-    int rand_idx = dis(gen);
-    return selection[rand_idx];
+    if (highest_weight_host == eligible_hosts.end()) {
+        throw std::runtime_error("No eligible hosts found in list");
+    }
+
+    return *highest_weight_host;
 }

@@ -24,31 +24,19 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include "random_host_selector.h"
+#ifndef HIGHEST_WEIGHT_HOST_SELECTOR_H_
+#define HIGHEST_WEIGHT_HOST_SELECTOR_H_
 
-#include <random>
+#include "../host_info.h"
+#include "host_selector.h"
 
-HostInfo RandomHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer,
-    std::unordered_map<std::string, std::string>) {
+class HighestWeightHostSelector: public HostSelector {
+public:
+    HostInfo get_host(std::vector<HostInfo> hosts, bool is_writer,
+        std::unordered_map<std::string, std::string> properties) override;
+};
 
-    std::vector<HostInfo> selection;
-    selection.reserve(hosts.size());
-
-    std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(selection), [&is_writer](const HostInfo& host) {
-        return host.is_host_up() && (is_writer ? host.is_host_writer() : true);
-    });
-
-    if (selection.empty()) {
-        throw std::runtime_error("No available hosts found in list");
-    }
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, selection.size() - 1);
-
-    int rand_idx = dis(gen);
-    return selection[rand_idx];
-}
+#endif //HIGHEST_WEIGHT_HOST_SELECTOR_H_
