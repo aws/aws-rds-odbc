@@ -61,12 +61,12 @@ void LimitlessRouterMonitor::Open(
     SQLSMALLINT out_connection_string_len; // unused
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
-    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", henv, SQL_HANDLE_ENV)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", henv, SQL_HANDLE_ENV)) {
         return; // fatal error; don't open thread
     }
 
     rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-    if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
         return; // fatal error; don't open thread
     }
 
@@ -114,7 +114,7 @@ void LimitlessRouterMonitor::run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection
             }
 
             SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-            if (!OdbcHelper::CheckResult(rc, "SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
+            if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
                 break; // this is a fatal error; stop monitoring
             }
 

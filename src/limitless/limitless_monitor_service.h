@@ -46,10 +46,7 @@ enum LIMITLESS_MONITOR_INTERVAL_MS {
 
 typedef struct LimitlessMonitor {
     ~LimitlessMonitor() {
-        if (this->limitless_router_monitor != nullptr) {
-            this->limitless_router_monitor = nullptr;
-        }
-
+        this->limitless_router_monitor = nullptr;
         this->limitless_routers_mutex = nullptr;
         this->limitless_routers = nullptr;
     }

@@ -58,7 +58,7 @@ bool LimitlessMonitorService::NewService(
 ) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     if (this->services.contains(service_id)) {
-        LOG(ERROR) << "Limitless Monitor Service: attempted to recreate existing monitor with service ID " << service_id;
+        LOG(ERROR) << "Attempted to recreate existing monitor with service ID " << service_id;
         return false;
     }
 
@@ -74,7 +74,7 @@ bool LimitlessMonitorService::NewService(
 
     // start monitoring: this will block until the first set of limitless routers is retrieved or an error occurs (in which case, limitless_routers will remain empty).
     service->limitless_router_monitor->Open(connection_string_c_str, host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, service->limitless_routers, service->limitless_routers_mutex);
-    LOG(INFO) << "Limitless Monitor Service: started monitoring with service ID " << service_id;
+    LOG(INFO) << "Started monitoring with service ID " << service_id;
 
     return true;
 }
@@ -82,7 +82,7 @@ bool LimitlessMonitorService::NewService(
 void LimitlessMonitorService::IncrementReferenceCounter(const std::string& service_id) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     if (!this->services.contains(service_id)) {
-        LOG(ERROR) << "Limitless Monitor Service: attempted to increment reference counter for non-existent monitor with service ID " << service_id;
+        LOG(ERROR) << "Attempted to increment reference counter for non-existent monitor with service ID " << service_id;
         return;
     }
 
@@ -93,7 +93,7 @@ void LimitlessMonitorService::IncrementReferenceCounter(const std::string& servi
 void LimitlessMonitorService::DecrementReferenceCounter(const std::string& service_id) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     if (!this->services.contains(service_id)) {
-        LOG(ERROR) << "Limitless Monitor Service: attempted to decrement reference counter for non-existent monitor with service ID " << service_id;
+        LOG(ERROR) << "Attempted to decrement reference counter for non-existent monitor with service ID " << service_id;
         return;
     }
 
@@ -102,20 +102,20 @@ void LimitlessMonitorService::DecrementReferenceCounter(const std::string& servi
     if (service->reference_counter > 0) {
         service->reference_counter--;
     } else {
-        LOG(ERROR) << "Limitless Monitor Service: monitor with service ID " << service_id << " has improper reference counter";
+        LOG(ERROR) << "Monitor with service ID " << service_id << " has improper reference counter";
     }
 
     if (service->reference_counter == 0) {
         service = nullptr;
         services.erase(service_id);
-        LOG(INFO) << "Limitless Monitor Service: stopped monitoring with service ID " << service_id;
+        LOG(INFO) << "Stopped monitoring with service ID " << service_id;
     }
 }
 
 std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string& service_id) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
     if (!this->services.contains(service_id)) {
-        LOG(ERROR) << "Limitless Monitor Service: attempted to get host info for non-existent monitor with service ID " << service_id;
+        LOG(ERROR) << "Attempted to get host info for non-existent monitor with service ID " << service_id;
         return nullptr;
     }
 
@@ -141,19 +141,19 @@ bool CheckLimitlessCluster(const char *connection_string_c_str) {
     SQLSMALLINT out_connection_string_len; // unused
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
-    if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLAllocHandle failed in CheckLimitlessCluster", henv, SQL_HANDLE_ENV)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessMonitorService: SQLAllocHandle failed in CheckLimitlessCluster", henv, SQL_HANDLE_ENV)) {
         OdbcHelper::Cleanup(henv, nullptr, nullptr);
         return false;
     }
 
     rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-    if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLAllocHandle failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessMonitorService: SQLAllocHandle failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
         OdbcHelper::Cleanup(henv, conn, nullptr);
         return false;
     }
 
     rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-    if (!OdbcHelper::CheckResult(rc, "Limitless Monitor Service: SQLDriverConnect failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
+    if (!OdbcHelper::CheckResult(rc, "LimitlessMonitorService: SQLDriverConnect failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
         OdbcHelper::Cleanup(henv, conn, nullptr);
         return false;
     }
