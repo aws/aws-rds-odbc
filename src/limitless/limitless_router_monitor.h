@@ -53,7 +53,7 @@ public:
     void Close();
 
     virtual void Open(
-        const char *connection_string_c_str,
+        const SQLTCHAR *connection_string_c_str,
         int host_port,
         unsigned int interval_ms,
         std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
@@ -72,7 +72,7 @@ protected:
 
     std::shared_ptr<std::thread> monitor_thread = nullptr;
 
-    void run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
+    void run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
 };
 
 #endif // LIMITLESSROUTERMONITOR_H_

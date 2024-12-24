@@ -36,12 +36,15 @@
 
 #include <sql.h>
 #include <sqlext.h>
+#include <sqltypes.h>
 #include <string>
 
 class OdbcHelper {
 public:
     static const int MAX_STATE_LENGTH = 32;
     static const int MAX_MSG_LENGTH = 1024;
+    static SQLTCHAR *CHECK_CONNECTION_QUERY;
+    static SQLTCHAR *CHECK_LIMITLESS_CLUSTER_QUERY;
 
     static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
 

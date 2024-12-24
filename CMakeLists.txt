@@ -93,6 +93,25 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 else()
   add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
 endif()
+
+#-----------------------------------------------------
+
+# Create an option for selecting the Unicode build type
+option(UNICODE_BUILD "Enable Unicode build" OFF)
+
+# Set output directory suffix based on the build type
+if (UNICODE_BUILD)
+  set(BUILD_DIR_SUFFIX "unicode")
+  add_definitions(-DUNICODE -D_UNICODE)  # Enable UNICODE and _UNICODE macros
+else()
+  set(BUILD_DIR_SUFFIX "ansi")
+endif()
+
+# Output a message indicating the build type
+message(STATUS "Building ${BUILD_DIR_SUFFIX} version of ${PROJECT_NAME}")
+
+#-----------------------------------------------------
+
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories("${CMAKE_SOURCE_DIR}/src")
 include_directories("${CMAKE_SOURCE_DIR}/src/authentication")

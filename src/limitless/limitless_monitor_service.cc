@@ -52,7 +52,7 @@ bool LimitlessMonitorService::CheckService(const std::string& service_id) {
 
 bool LimitlessMonitorService::NewService(
     const std::string& service_id,
-    const char *connection_string_c_str,
+    const SQLTCHAR *connection_string_c_str,
     int host_port,
     std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor
 ) {
@@ -138,7 +138,7 @@ bool CheckLimitlessCluster(SQLHDBC hdbc) {
     return result;
 }
 
-bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance) {
+bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance) {
     std::string service_id(service_id_c_str);
 
     if (!limitless_monitor_service.CheckService(service_id)) {

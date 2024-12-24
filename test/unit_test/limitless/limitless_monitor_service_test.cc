@@ -29,6 +29,7 @@
 
 #include <cstdio>
 
+#include <tchar.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -41,7 +42,7 @@ using testing::Return;
 using testing::StrEq;
 using testing::Invoke;
 
-const static char *test_connection_string_c_str = "test_connection_string";
+static const SQLTCHAR *test_connection_string_c_str = (SQLTCHAR *)TEXT("test_connection_string");
 const static int test_host_port = 5432;
 
 class LimitlessMonitorServiceTest : public testing::Test {

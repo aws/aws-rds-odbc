@@ -27,8 +27,13 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#include <tchar.h>
 #include <chrono>
-#include <cstring>
+#ifdef UNICODE
+    #include <cwchar> // For wcslen in Unicode mode
+#else
+    #include <cstring> // For strlen in ANSI mode
+#endif
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
@@ -44,7 +49,7 @@ LimitlessRouterMonitor::~LimitlessRouterMonitor() {
 }
 
 void LimitlessRouterMonitor::Open(
-    const char *connection_string_c_str,
+    const SQLTCHAR *connection_string_c_str,
     int host_port,
     unsigned int interval_ms,
     std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
@@ -56,8 +61,13 @@ void LimitlessRouterMonitor::Open(
 
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
-    auto *connection_string = const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string_c_str));
-    SQLSMALLINT connection_string_len = strlen(connection_string_c_str);
+    auto *connection_string = const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(connection_string_c_str));
+
+#ifdef UNICODE
+    SQLSMALLINT connection_string_len = std::wcslen(connection_string_c_str);
+#else
+    SQLSMALLINT connection_string_len = std::strlen(reinterpret_cast<const char*>(connection_string_c_str));
+#endif
     SQLSMALLINT out_connection_string_len; // unused
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
@@ -100,7 +110,7 @@ void LimitlessRouterMonitor::Close() {
     }
 }
 
-void LimitlessRouterMonitor::run(SQLHENV henv, SQLHDBC conn, SQLCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port) {
+void LimitlessRouterMonitor::run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port) {
     SQLSMALLINT out_connection_string_len; // unused
 
     while (!this->stopped) {

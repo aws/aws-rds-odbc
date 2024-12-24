@@ -48,7 +48,7 @@ public:
     static const int WEIGHT_SCALING = 10;
     static const int MAX_WEIGHT = 10;
     static const int MIN_WEIGHT = 1;
-    static const std::string LIMITLESS_ROUTER_ENDPOINT_QUERY;
+    static SQLTCHAR *LIMITLESS_ROUTER_ENDPOINT_QUERY;
 
     static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map);
 
