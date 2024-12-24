@@ -29,10 +29,10 @@
 
 #include <cstdio>
 
-#include <tchar.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "text_helper.h"
 #include "../mock_objects.h"
 
 #include "limitless_monitor_service.h"

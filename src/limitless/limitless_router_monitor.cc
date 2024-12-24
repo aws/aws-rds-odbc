@@ -27,7 +27,6 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include <tchar.h>
 #include <chrono>
 #ifdef UNICODE
     #include <cwchar> // For wcslen in Unicode mode
@@ -64,7 +63,7 @@ void LimitlessRouterMonitor::Open(
     auto *connection_string = const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(connection_string_c_str));
 
 #ifdef UNICODE
-    SQLSMALLINT connection_string_len = std::wcslen(connection_string_c_str);
+    SQLSMALLINT connection_string_len = std::wcslen(reinterpret_cast<const wchar_t*>(connection_string_c_str));
 #else
     SQLSMALLINT connection_string_len = std::strlen(reinterpret_cast<const char*>(connection_string_c_str));
 #endif

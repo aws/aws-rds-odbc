@@ -86,6 +86,7 @@ set(INC
   src/util/sliding_cache_map.h
   src/util/logger_wrapper.h
   src/util/odbc_helper.h
+  src/util/text_helper.h
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

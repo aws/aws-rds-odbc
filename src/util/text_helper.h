@@ -27,31 +27,20 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include "highest_weight_host_selector.h"
+#ifndef TEXT_HELPER_H_
+#define TEXT_HELPER_H_
 
-HostInfo HighestWeightHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer, std::unordered_map<std::string, std::string>) {
-    std::vector<HostInfo> eligible_hosts;
-    eligible_hosts.reserve(hosts.size());
+#ifdef WIN32
+    #include <tchar.h>
+#else
+    // On non-Windows platforms:
+    #ifdef UNICODE
+        #define TEXT(x) L##x
+        #include <cwchar> // For wide string functions like wcslen, wcscpy
+    #else
+        #define TEXT(x) x
+        #include <cstring> // For narrow string functions like strlen, strcpy
+    #endif
+#endif
 
-    std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(eligible_hosts), [&is_writer](const HostInfo& host) {
-        return host.is_host_up() && is_writer == host.is_host_writer();
-    });
-
-    if (eligible_hosts.empty()) {
-        throw std::runtime_error("No eligible hosts found in list");
-    }
-
-    auto highest_weight_host = std::max_element(
-        eligible_hosts.begin(),
-        eligible_hosts.end(),
-        [](const HostInfo& a, const HostInfo& b) {
-            return a.get_weight() < b.get_weight();
-        }
-    );
-
-    if (highest_weight_host == eligible_hosts.end()) {
-        throw std::runtime_error("No eligible hosts found in list");
-    }
-
-    return *highest_weight_host;
-}
+#endif //TEXT_HELPER_H_

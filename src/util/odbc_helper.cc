@@ -27,9 +27,9 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include <tchar.h>
 #include "odbc_helper.h"
 #include "logger_wrapper.h"
+#include "text_helper.h"
 
 SQLTCHAR *OdbcHelper::CHECK_CONNECTION_QUERY = (SQLTCHAR *)TEXT("SELECT 1");
 SQLTCHAR *OdbcHelper::CHECK_LIMITLESS_CLUSTER_QUERY =
@@ -70,6 +70,8 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
 }
 
 bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
+    LoggerWrapper::initialize();
+
     HSTMT hstmt = SQL_NULL_HSTMT;
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
     if (!SQL_SUCCEEDED(rc)) {
@@ -95,7 +97,7 @@ bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
     rc = SQLGetData(hstmt, 1, SQL_C_CHAR, &result, sizeof(result), &result_len);
     if (SQL_SUCCEEDED(rc)) {
         Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
-        return result[0] == _T('1');
+        return result[0] == (SQLTCHAR)TEXT('1');
     } else {
         CheckResult(rc, "SQLGetData failed", hstmt, SQL_HANDLE_STMT);
         Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);

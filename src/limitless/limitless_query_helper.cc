@@ -29,12 +29,12 @@
 
 #include "limitless_query_helper.h"
 
-#include <tchar.h>
 #include <cmath>
 #include <string>
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
+#include "../util/text_helper.h"
 
 SQLTCHAR *LimitlessQueryHelper::LIMITLESS_ROUTER_ENDPOINT_QUERY = \
     (SQLTCHAR *)TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()");

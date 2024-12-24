@@ -31,7 +31,7 @@
 #define ODBCHELPER_H_
 
 #ifdef WIN32
-#include <windows.h>
+    #include <windows.h>
 #endif
 
 #include <sql.h>
