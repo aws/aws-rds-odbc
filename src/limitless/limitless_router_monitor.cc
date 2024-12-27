@@ -60,7 +60,7 @@ void LimitlessRouterMonitor::Open(
 
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
-    auto *connection_string = const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(connection_string_c_str));
+    auto *connection_string = const_cast<SQLTCHAR *>(connection_string_c_str);
 
 #ifdef UNICODE
     SQLSMALLINT connection_string_len = std::wcslen(reinterpret_cast<const wchar_t*>(connection_string_c_str));

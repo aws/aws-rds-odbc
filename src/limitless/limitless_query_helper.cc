@@ -36,8 +36,8 @@
 #include "../util/odbc_helper.h"
 #include "../util/text_helper.h"
 
-SQLTCHAR *LimitlessQueryHelper::LIMITLESS_ROUTER_ENDPOINT_QUERY = \
-    (SQLTCHAR *)TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()");
+SQLTCHAR *LimitlessQueryHelper::limitless_router_endpoint_query = \
+    const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()")));
 
 std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map) {
     HSTMT hstmt = SQL_NULL_HSTMT;
@@ -60,7 +60,7 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
         return std::vector<HostInfo>();
     }
 
-    rc = SQLExecDirect(hstmt, LIMITLESS_ROUTER_ENDPOINT_QUERY, SQL_NTS);
+    rc = SQLExecDirect(hstmt, limitless_router_endpoint_query, SQL_NTS);
     if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLExecDirect failed", hstmt, SQL_HANDLE_STMT)) {
         return std::vector<HostInfo>();
     }

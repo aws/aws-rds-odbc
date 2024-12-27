@@ -31,9 +31,9 @@
 #include "logger_wrapper.h"
 #include "text_helper.h"
 
-SQLTCHAR *OdbcHelper::CHECK_CONNECTION_QUERY = (SQLTCHAR *)TEXT("SELECT 1");
-SQLTCHAR *OdbcHelper::CHECK_LIMITLESS_CLUSTER_QUERY =
-    (SQLTCHAR *)TEXT(\
+SQLTCHAR *OdbcHelper::check_connection_query = const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("SELECT 1")));
+SQLTCHAR *OdbcHelper::check_limitless_cluster_query =
+    const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT(\
         "SELECT EXISTS ("\
         "   SELECT 1"\
         "   FROM pg_catalog.pg_class c"\
@@ -41,7 +41,7 @@ SQLTCHAR *OdbcHelper::CHECK_LIMITLESS_CLUSTER_QUERY =
         "   WHERE c.relname = 'limitless_subclusters'"\
         "   AND n.nspname = 'rds_aurora'"\
         ");"\
-    );
+    )));
 
 bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     if (SQL_SUCCEEDED(rc)) {
@@ -62,7 +62,7 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
         return false;
     }
 
-    rc = SQLExecDirect(hstmt, CHECK_CONNECTION_QUERY, SQL_NTS);
+    rc = SQLExecDirect(hstmt, check_connection_query, SQL_NTS);
     SQLFreeStmt(hstmt, SQL_CLOSE);
     SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 
@@ -78,7 +78,7 @@ bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
         return false;
     }
 
-    rc = SQLExecDirect(hstmt, CHECK_LIMITLESS_CLUSTER_QUERY, SQL_NTS);
+    rc = SQLExecDirect(hstmt, check_limitless_cluster_query, SQL_NTS);
     if (!SQL_SUCCEEDED(rc)) {
         CheckResult(rc, "SQLExecDirect failed", hstmt, SQL_HANDLE_STMT);
         Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
@@ -97,12 +97,12 @@ bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
     rc = SQLGetData(hstmt, 1, SQL_C_CHAR, &result, sizeof(result), &result_len);
     if (SQL_SUCCEEDED(rc)) {
         Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
-        return result[0] == (SQLTCHAR)TEXT('1');
-    } else {
-        CheckResult(rc, "SQLGetData failed", hstmt, SQL_HANDLE_STMT);
-        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
-        return false;
+        return result[0] == static_cast<SQLTCHAR>(TEXT('1'));
     }
+
+    CheckResult(rc, "SQLGetData failed", hstmt, SQL_HANDLE_STMT);
+    Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+    return false;
 }
 
 void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
