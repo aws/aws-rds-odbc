@@ -31,17 +31,20 @@
 #define ODBCHELPER_H_
 
 #ifdef WIN32
-#include <windows.h>
+    #include <windows.h>
 #endif
 
 #include <sql.h>
 #include <sqlext.h>
+#include <sqltypes.h>
 #include <string>
 
 class OdbcHelper {
 public:
     static const int MAX_STATE_LENGTH = 32;
     static const int MAX_MSG_LENGTH = 1024;
+    static SQLTCHAR *check_connection_query;
+    static SQLTCHAR *check_limitless_cluster_query;
 
     static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
 

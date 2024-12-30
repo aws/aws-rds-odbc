@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		731C53882D0B15AC006D7569 /* sliding_cache_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 731C53862D0B15AC006D7569 /* sliding_cache_map.h */; };
 		731C53892D0B15AC006D7569 /* sliding_cache_map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C53872D0B15AC006D7569 /* sliding_cache_map.cc */; };
+		733B9FE42D1DBEA100F2D918 /* text_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 733B9FE32D1DBEA100F2D918 /* text_helper.h */; };
 		734B1C222CC9611400FB6683 /* libaws-checksums.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C122CC9611400FB6683 /* libaws-checksums.a */; };
 		734B1C232CC9611400FB6683 /* libaws-c-mqtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C132CC9611400FB6683 /* libaws-c-mqtt.a */; };
 		734B1C242CC9611400FB6683 /* libaws-cpp-sdk-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C142CC9611400FB6683 /* libaws-cpp-sdk-core.a */; };
@@ -70,6 +71,7 @@
 /* Begin PBXFileReference section */
 		731C53862D0B15AC006D7569 /* sliding_cache_map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sliding_cache_map.h; sourceTree = "<group>"; };
 		731C53872D0B15AC006D7569 /* sliding_cache_map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sliding_cache_map.cc; sourceTree = "<group>"; };
+		733B9FE32D1DBEA100F2D918 /* text_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = text_helper.h; sourceTree = "<group>"; };
 		734B1B542CC956B100FB6683 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		734B1B562CC956B700FB6683 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		734B1C122CC9611400FB6683 /* libaws-checksums.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaws-checksums.a"; path = "aws_sdk/install/lib/libaws-checksums.a"; sourceTree = "<group>"; };
@@ -294,6 +296,7 @@
 		73D7882B2CC919070028B42F /* util */ = {
 			isa = PBXGroup;
 			children = (
+				733B9FE32D1DBEA100F2D918 /* text_helper.h */,
 				731C53862D0B15AC006D7569 /* sliding_cache_map.h */,
 				731C53872D0B15AC006D7569 /* sliding_cache_map.cc */,
 				7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */,
@@ -342,6 +345,7 @@
 				738543F32CEE0E370019F6C6 /* round_robin_property.h in Headers */,
 				738543F42CEE0E370019F6C6 /* round_robin_host_selector.h in Headers */,
 				73DAE02B2CDA8A0100225BE1 /* secrets_manager_helper.h in Headers */,
+				733B9FE42D1DBEA100F2D918 /* text_helper.h in Headers */,
 				7369B61D2CDE649B00C98EDF /* host_selector.h in Headers */,
 				73F467C02D1355210083E758 /* limitless_router_monitor.h in Headers */,
 				73F467C12D1355210083E758 /* limitless_monitor_service.h in Headers */,

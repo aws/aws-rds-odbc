@@ -5,6 +5,19 @@ set(CMAKE_CXX_STANDARD 20)
 
 #-----------------------------------------------------
 
+# Create an option for selecting the build type
+option(UNICODE_BUILD "Enable Unicode build" OFF)
+
+# Set compiler definitions for the library
+if (UNICODE_BUILD)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
+# Output a message indicating the build type
+message(STATUS "Building ${BUILD_DIR_SUFFIX} version of ${PROJECT_NAME}")
+
+#-----------------------------------------------------
+
 # External
 ## GoogleTest
 include(FetchContent)

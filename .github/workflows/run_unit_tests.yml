@@ -58,17 +58,29 @@ jobs:
           .\build_aws_sdk_win.ps1 x64 ${{env.BUILD_TYPE}} OFF "${{env.CMAKE_GENERATOR}}"
 
       - name: Create build environment
-        run: cmake -E make_directory ${{github.workspace}}/build
+        run:
+          cmake -E make_directory ${{github.workspace}}/build_ansi
+          cmake -E make_directory ${{github.workspace}}/build_unicode
 
-      - name: Configure CMake
-        run: cmake -S . -B build -DENABLE_UNIT_TESTS=TRUE
+      - name: Configure the ANSI build
+        run: cmake -S . -B build_ansi -DENABLE_UNIT_TESTS=TRUE
 
-      - name: Build Project
-        run: cmake --build build --config ${{env.BUILD_TYPE}}
+      - name: Build the ANSI library
+        run: cmake --build build_ansi --config ${{env.BUILD_TYPE}}
 
-      - name: Run unit tests
+      - name: Run the ANSI unit tests
         if: success()
-        run: .\build\test\unit_test\bin\Release\unit_test.exe
+        run: .\build_ansi\test\unit_test\bin\Release\unit_test.exe
+
+      - name: Configure the Unicode build
+        run: cmake -S . -B build_unicode -DUNICODE_BUILD=ON -DENABLE_UNIT_TESTS=TRUE
+
+      - name: Build the Unicode library
+        run: cmake --build build_unicode --config ${{env.BUILD_TYPE}}
+
+      - name: Run the Unicode unit tests
+        if: success()
+        run: .\build_unicode\test\unit_test\bin\Release\unit_test.exe
 
   build-mac:
     name: macOS
@@ -102,14 +114,26 @@ jobs:
           ./build_aws_sdk_macos Release
 
       - name: Create build environment
-        run: cmake -E make_directory ${{ github.workspace }}/build
+        run:
+          cmake -E make_directory ${{ github.workspace }}/build_ansi
+          cmake -E make_directory ${{ github.workspace }}/build_unicode
 
-      - name: Configure CMake
-        run: cmake -S . -B build -DENABLE_UNIT_TESTS=TRUE
+      - name: Configure the ANSI build
+        run: cmake -S . -B build_ansi -DENABLE_UNIT_TESTS=TRUE
 
-      - name: Build Project
-        run: cmake --build build --config $BUILD_TYPE
+      - name: Build the ANSI library
+        run: cmake --build build_ansi --config $BUILD_TYPE
 
-      - name: Run unit tests
+      - name: Run the ANSI unit tests
         if: success()
-        run: ./build/test/unit_test/bin/unit_test
+        run: ./build_ansi/test/unit_test/bin/unit_test
+
+      - name: Configure the Unicode build
+        run: cmake -S . -B build_unicode -DUNICODE_BUILD=ON -DENABLE_UNIT_TESTS=TRUE
+
+      - name: Build the Unicode library
+        run: cmake --build build_unicode --config $BUILD_TYPE
+
+      - name: Run the Unicode unit tests
+        if: success()
+        run: ./build_unicode/test/unit_test/bin/unit_test

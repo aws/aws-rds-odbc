@@ -52,7 +52,7 @@ bool LimitlessMonitorService::CheckService(const std::string& service_id) {
 
 bool LimitlessMonitorService::NewService(
     const std::string& service_id,
-    const char *connection_string_c_str,
+    const SQLTCHAR *connection_string_c_str,
     int host_port,
     std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor
 ) {
@@ -133,37 +133,12 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     return host;
 }
 
-bool CheckLimitlessCluster(const char *connection_string_c_str) {
-    SQLHENV henv = nullptr;
-    SQLHDBC conn = nullptr;
-    auto *connection_string = const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(connection_string_c_str));
-    SQLSMALLINT connection_string_len = strlen(connection_string_c_str);
-    SQLSMALLINT out_connection_string_len; // unused
-
-    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessMonitorService: SQLAllocHandle failed in CheckLimitlessCluster", henv, SQL_HANDLE_ENV)) {
-        OdbcHelper::Cleanup(henv, nullptr, nullptr);
-        return false;
-    }
-
-    rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessMonitorService: SQLAllocHandle failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
-        OdbcHelper::Cleanup(henv, conn, nullptr);
-        return false;
-    }
-
-    rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessMonitorService: SQLDriverConnect failed in CheckLimitlessCluster", conn, SQL_HANDLE_DBC)) {
-        OdbcHelper::Cleanup(henv, conn, nullptr);
-        return false;
-    }
-
-    bool result = OdbcHelper::CheckLimitlessCluster(conn);
-    OdbcHelper::Cleanup(henv, conn, nullptr);
+bool CheckLimitlessCluster(SQLHDBC hdbc) {
+    bool result = OdbcHelper::CheckLimitlessCluster(hdbc);
     return result;
 }
 
-bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance) {
+bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance) {
     std::string service_id(service_id_c_str);
 
     if (!limitless_monitor_service.CheckService(service_id)) {

@@ -41,10 +41,13 @@ HostInfo HighestWeightHostSelector::get_host(std::vector<HostInfo> hosts, bool i
         throw std::runtime_error("No eligible hosts found in list");
     }
 
-    auto highest_weight_host =
-        std::ranges::max_element(eligible_hosts, [](const HostInfo& a, const HostInfo& b) {
+    auto highest_weight_host = std::max_element(
+        eligible_hosts.begin(),
+        eligible_hosts.end(),
+        [](const HostInfo& a, const HostInfo& b) {
             return a.get_weight() < b.get_weight();
-        });
+        }
+    );
 
     if (highest_weight_host == eligible_hosts.end()) {
         throw std::runtime_error("No eligible hosts found in list");

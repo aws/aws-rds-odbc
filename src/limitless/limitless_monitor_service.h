@@ -36,6 +36,13 @@
 #include <mutex>
 #include <string>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+#include <sql.h>
+#include <sqlext.h>
+
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
 
@@ -65,7 +72,7 @@ public:
 
     bool CheckService(const std::string& service_id);
 
-    bool NewService(const std::string& service_id, const char *connection_string_c_str, int host_port, std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor);
+    bool NewService(const std::string& service_id, const SQLTCHAR *connection_string_c_str, int host_port, std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor);
 
     void IncrementReferenceCounter(const std::string& service_id);
 
@@ -91,29 +98,29 @@ typedef struct {
 /**
  * Checks the server of a given connection string if it is a Limitless Cluster
  * by connecting using the ODBC API to connect and check using a query
- * 
+ *
  * @param connection_string_c_str the connection string to specify the driver and server
  * @return True if the given connection string connects to a Limitless Cluster
  */
-bool CheckLimitlessCluster(const char *connection_string_c_str);
+bool CheckLimitlessCluster(SQLHDBC hdbc);
 
 /**
- * Increments a reference count for the given service ID, spinning a transaction router polling thread 
+ * Increments a reference count for the given service ID, spinning a transaction router polling thread
  * if service ID is unique. Once thread is ready, the given LimitlessInstance, db_instance, will get
  * an updated server host
- * 
+ *
  * @param connection_string_c_str the connection string to specify the driver and server
  * @param host_port the port to the database, used to create the host list
  * @param service_id_c_str an identifier used to track the reference count of the polling thread
  * @param db_instance a struct containing allocated memory space to return a transaction router
  * @return True if a transaction router was found and updated the LimitlessInstance object
  */
-bool GetLimitlessInstance(const char *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance);
+bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance);
 
 /**
- * Decrements the reference count of a given service ID. 
+ * Decrements the reference count of a given service ID.
  * Once it reaches 0, the polling thread will be joined and cleaned up
- * 
+ *
  * @param service_id_c_str service_id_c_str an identifier used to track the reference count of the polling thread
  */
 void StopLimitlessMonitorService(const char *service_id_c_str);

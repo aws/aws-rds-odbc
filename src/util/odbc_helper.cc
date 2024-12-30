@@ -29,15 +29,19 @@
 
 #include "odbc_helper.h"
 #include "logger_wrapper.h"
+#include "text_helper.h"
 
-#define CHECK_LIMITLESS_CLUSTER_QUERY\
-    "SELECT EXISTS ("\
-    "   SELECT 1"\
-    "   FROM pg_catalog.pg_class c"\
-    "   JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid"\
-    "   WHERE c.relname = 'limitless_subclusters'"\
-    "   AND n.nspname = 'rds_aurora'"\
-    ");"
+SQLTCHAR *OdbcHelper::check_connection_query = const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("SELECT 1")));
+SQLTCHAR *OdbcHelper::check_limitless_cluster_query =
+    const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT(\
+        "SELECT EXISTS ("\
+        "   SELECT 1"\
+        "   FROM pg_catalog.pg_class c"\
+        "   JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid"\
+        "   WHERE c.relname = 'limitless_subclusters'"\
+        "   AND n.nspname = 'rds_aurora'"\
+        ");"\
+    )));
 
 bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     if (SQL_SUCCEEDED(rc)) {
@@ -58,7 +62,7 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
         return false;
     }
 
-    rc = SQLExecDirect(hstmt, const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>("SELECT 1")), SQL_NTS);
+    rc = SQLExecDirect(hstmt, check_connection_query, SQL_NTS);
     SQLFreeStmt(hstmt, SQL_CLOSE);
     SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 
@@ -66,25 +70,38 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
 }
 
 bool OdbcHelper::CheckLimitlessCluster(SQLHDBC conn) {
+    LoggerWrapper::initialize();
+
     HSTMT hstmt = SQL_NULL_HSTMT;
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
     if (!SQL_SUCCEEDED(rc)) {
         return false;
     }
 
-    rc = SQLExecDirect(hstmt, const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(CHECK_LIMITLESS_CLUSTER_QUERY)), SQL_NTS);
-
-    if (SQL_SUCCEEDED(rc)) {
-        SQLINTEGER result;
-        SQLLEN len;
-        rc = SQLGetData(hstmt, 1, SQL_C_SLONG, &result, sizeof(result), &len);
-        SQLFreeStmt(hstmt, SQL_CLOSE);
-        SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-        return SQL_SUCCEEDED(rc) && result == 1;
+    rc = SQLExecDirect(hstmt, check_limitless_cluster_query, SQL_NTS);
+    if (!SQL_SUCCEEDED(rc)) {
+        CheckResult(rc, "SQLExecDirect failed", hstmt, SQL_HANDLE_STMT);
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+        return false;
     }
 
-    SQLFreeStmt(hstmt, SQL_CLOSE);
-    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+    rc = SQLFetch(hstmt);
+    if (!SQL_SUCCEEDED(rc)) {
+        CheckResult(rc, "SQLFetch failed", hstmt, SQL_HANDLE_STMT);
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+        return false;
+    }
+
+    SQLTCHAR result[2];
+    SQLLEN result_len = 0;
+    rc = SQLGetData(hstmt, 1, SQL_C_CHAR, &result, sizeof(result), &result_len);
+    if (SQL_SUCCEEDED(rc)) {
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+        return result[0] == static_cast<SQLTCHAR>(TEXT('1'));
+    }
+
+    CheckResult(rc, "SQLGetData failed", hstmt, SQL_HANDLE_STMT);
+    Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
     return false;
 }
 
@@ -102,12 +119,12 @@ void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
-    SQLCHAR     sqlstate[MAX_STATE_LENGTH];
-    SQLCHAR     message[MAX_MSG_LENGTH];
-    SQLINTEGER	nativeerror;
+    SQLTCHAR    sqlstate[MAX_STATE_LENGTH];
+    SQLTCHAR    message[MAX_MSG_LENGTH];
+    SQLINTEGER  nativeerror;
     SQLSMALLINT textlen;
-    SQLRETURN	ret;
-    SQLSMALLINT	recno = 0;
+    SQLRETURN   ret;
+    SQLSMALLINT recno = 0;
 
     LOG(ERROR) << log_message;
 
@@ -115,10 +132,16 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
         recno++;
         ret = SQLGetDiagRec(handle_type, handle, recno, sqlstate, &nativeerror,
                             message, sizeof(message), &textlen);
-        if (ret == SQL_INVALID_HANDLE)
+        if (ret == SQL_INVALID_HANDLE) {
             LOG(ERROR) << "Invalid handle";
-        else if (SQL_SUCCEEDED(ret))
+        } else if (SQL_SUCCEEDED(ret)) {
+#ifdef UNICODE
+            // TODO: Add logging of Unicode message
+#else
             LOG(ERROR) << sqlstate << message;
+#endif            
+        }
+            
     } while (ret == SQL_SUCCESS);
 
     if (ret == SQL_NO_DATA && recno == 1) {
