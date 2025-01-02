@@ -24,45 +24,27 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef LOGGERWRAPPER_H_
-#define LOGGERWRAPPER_H_
+#include <gtest/gtest.h>
+#include "logger_wrapper.h"
 
-#ifdef XCODE_BUILD
-// Setting this to a value greater than 3 strips out all of the
-// Google logging functionality
-#define GOOGLE_STRIP_LOG 4
-#endif /* XCODE_BUILD */
-
-#include <filesystem>
-#include <glog/logging.h>
-
-namespace logger_config {
-    const std::string PROGRAM_NAME = "aws-rds-odbc";
-    const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append("aws-rds-odbc").string();
-}  // namespace logger_config
-
-// Initializes glog once
-class LoggerWrapper {
-public:
-    static void initialize();
-
-    static std::string convert_wchar_to_char (const wchar_t* wstr);
-
-    // Prevent copy constructors
-    LoggerWrapper(const LoggerWrapper&) = delete;
-    LoggerWrapper(LoggerWrapper&&) = delete;
-    LoggerWrapper& operator=(const LoggerWrapper&) = delete;
-    LoggerWrapper& operator=(LoggerWrapper&&) = delete;
-
+class LoggerWrapperHelperTest : public testing::Test {
 protected:
-    LoggerWrapper() = default;
-
-private:
-    static void set_log_directory(const std::string& directory_path);
-    bool init = false;
+    // Runs once per suite
+    static void SetUpTestSuite() {}
+    static void TearDownTestSuite() {}
+    // Runs per test case
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
-#endif // LOGGERWRAPPER_H_
+TEST_F(LoggerWrapperHelperTest, convert_wchar_to_char_nullptr_returns_empty_string) {
+    EXPECT_EQ("", LoggerWrapper::convert_wchar_to_char(nullptr));
+}
+
+TEST_F(LoggerWrapperHelperTest, convert_wchar_to_char_wchar_converted) {
+    EXPECT_EQ("Wide character string", LoggerWrapper::convert_wchar_to_char(L"Wide character string"));
+}
+

@@ -107,6 +107,8 @@ bld/
 [Ll]og/
 [Ll]ogs/
 build_ansi/
+build_debug/
+build_release/
 build_unicode/
 
 # Visual Studio 2015/2017 cache/options directory
