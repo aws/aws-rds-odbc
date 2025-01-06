@@ -87,6 +87,10 @@ private:
     RoundRobinHostSelector round_robin;
 };
 
+#define LIMITLESS_MODE_KEY  "LIMITLESSMODE"
+
+#define LIMITLESS_MODE_VALUE_LAZY   "lazy"
+
 extern "C" {
 #endif
 

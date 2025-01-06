@@ -48,6 +48,7 @@ LimitlessRouterMonitor::~LimitlessRouterMonitor() {
 }
 
 void LimitlessRouterMonitor::Open(
+    bool block_and_query_immediately,
     const SQLTCHAR *connection_string_c_str,
     int host_port,
     unsigned int interval_ms,
@@ -79,16 +80,18 @@ void LimitlessRouterMonitor::Open(
         return; // fatal error; don't open thread
     }
 
-    rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-    if (SQL_SUCCEEDED(rc)) {
-        // initial connection was successful, immediately populate caller's limitless routers
-        *limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
-    } else {
-        // not successful, ensure limitless routers is empty 
-        limitless_routers->clear();
+    if (block_and_query_immediately) {
+        rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+        if (SQL_SUCCEEDED(rc)) {
+            // initial connection was successful, immediately populate caller's limitless routers
+            *limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
+        } else {
+            // not successful, ensure limitless routers is empty 
+            limitless_routers->clear();
+        }
     }
 
-    // start monitoring thread
+    // start monitoring thread; if block_and_query_immediately is false, then conn is SQL_NULL_HANDLE, and the thread will connect after the monitor interval has passed
     this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::run, this, henv, conn, connection_string, connection_string_len, host_port);
 }
 

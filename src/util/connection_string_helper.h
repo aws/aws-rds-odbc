@@ -24,16 +24,14 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef LIMITLESSROUTERMONITOR_H_
-#define LIMITLESSROUTERMONITOR_H_
+#ifndef CONNECTION_STRING_HELPER_H_
+#define CONNECTION_STRING_HELPER_H_
 
-#include <atomic>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include <map>
+#include <string>
 
 #ifdef WIN32
 #include <windows.h>
@@ -42,38 +40,13 @@
 #include <sql.h>
 #include <sqlext.h>
 
-#include "../host_info.h"
-
-class LimitlessRouterMonitor {
+class ConnectionStringHelper {
 public:
-    LimitlessRouterMonitor();
-
-    ~LimitlessRouterMonitor();
-
-    void Close();
-
-    virtual void Open(
-        bool block_and_query_immediately,
-        const SQLTCHAR *connection_string_c_str,
-        int host_port,
-        unsigned int interval_ms,
-        std::shared_ptr<std::vector<HostInfo>>& limitless_routers,
-        std::shared_ptr<std::mutex>& limitless_routers_mutex
-    );
-
-    virtual bool IsStopped();
-protected:
-    std::atomic_bool stopped = false;
-
-    unsigned int interval_ms;
-
-    std::shared_ptr<std::vector<HostInfo>> limitless_routers;
-
-    std::shared_ptr<std::mutex> limitless_routers_mutex;
-
-    std::shared_ptr<std::thread> monitor_thread = nullptr;
-
-    void run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
+    /**
+     * Parses the input connection string into the destination map as key-value pairs.
+     * Returns -1 on error and the number of items in dest_map on success.
+     */
+    static int ParseConnectionString(const SQLTCHAR *connection_string, std::map<std::string, std::string> &dest_map);
 };
 
-#endif // LIMITLESSROUTERMONITOR_H_
+#endif

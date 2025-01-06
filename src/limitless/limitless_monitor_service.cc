@@ -31,6 +31,7 @@
 #include <cstring>
 
 #include "../util/logger_wrapper.h"
+#include "connection_string_helper.h"
 #include "limitless_monitor_service.h"
 #include "odbc_helper.h"
 
@@ -62,7 +63,22 @@ bool LimitlessMonitorService::NewService(
         return false;
     }
 
-    // ensure that the owning scope of the shared pointer is not the scope of NewService
+    // parse the connection string to extract useful limitless information
+    std::map<std::string, std::string> connection_string_map;
+    if (ConnectionStringHelper::ParseConnectionString(connection_string_c_str, connection_string_map) < 0) {
+        return false; // bad connection string
+    }
+
+    bool block_and_query_immediately = true;
+    
+    if (connection_string_map.contains(LIMITLESS_MODE_KEY)) {
+        std::string limitless_mode = connection_string_map[LIMITLESS_MODE_KEY];
+        if (limitless_mode == LIMITLESS_MODE_VALUE_LAZY) {
+            block_and_query_immediately = false;
+        }
+    }
+
+    // ensure that the owning scope of the shared pointer is inside the map
     this->services[service_id] = std::make_shared<LimitlessMonitor>();
 
     std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
@@ -72,8 +88,16 @@ bool LimitlessMonitorService::NewService(
     service->limitless_router_monitor = std::move(limitless_router_monitor);
     // limitless_router_monitor is now nullptr
 
-    // start monitoring: this will block until the first set of limitless routers is retrieved or an error occurs (in which case, limitless_routers will remain empty).
-    service->limitless_router_monitor->Open(connection_string_c_str, host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, service->limitless_routers, service->limitless_routers_mutex);
+    // start monitoring; this will block until the first set of limitless routers
+    // is retrieved or an error occurs if block_and_query_immediately is true
+    service->limitless_router_monitor->Open(
+        block_and_query_immediately,
+        connection_string_c_str,
+        host_port,
+        DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS,
+        service->limitless_routers,
+        service->limitless_routers_mutex
+    );
     LOG(INFO) << "Started monitoring with service ID " << service_id;
 
     return true;

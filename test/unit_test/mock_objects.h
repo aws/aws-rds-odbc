@@ -99,7 +99,7 @@ public:
 
 class MOCK_LIMITLESS_ROUTER_MONITOR : public LimitlessRouterMonitor {
 public:
-    MOCK_METHOD(void, Open, (const SQLTCHAR *, int, unsigned int, std::shared_ptr<std::vector<HostInfo>>&, std::shared_ptr<std::mutex>&), ());
+    MOCK_METHOD(void, Open, (bool, const SQLTCHAR *, int, unsigned int, std::shared_ptr<std::vector<HostInfo>>&, std::shared_ptr<std::mutex>&), ());
     MOCK_METHOD(bool, IsStopped, (), ());
 
     std::vector<HostInfo> test_limitless_routers;
@@ -112,6 +112,7 @@ public:
     }
 
     void MockOpen(
+        bool block_and_query_immediately, // unused
         const SQLTCHAR *conn_str, // unused
         int port, // unused
         unsigned int interval_ms,
@@ -119,7 +120,13 @@ public:
         std::shared_ptr<std::mutex>& limitless_routers_mutex
     ) {
         this->interval_ms = TEST_LIMITLESS_MONITOR_INTERVAL_MS;
-        this->monitor_thread = std::make_shared<std::thread>(&MOCK_LIMITLESS_ROUTER_MONITOR::mock_run, this, limitless_routers, limitless_routers_mutex);
+
+        if (block_and_query_immediately) {
+            std::lock_guard<std::mutex> guard(*limitless_routers_mutex);
+            *limitless_routers = this->test_limitless_routers;
+        } else {
+            this->monitor_thread = std::make_shared<std::thread>(&MOCK_LIMITLESS_ROUTER_MONITOR::mock_run, this, limitless_routers, limitless_routers_mutex);
+        }
     }
 };
 
