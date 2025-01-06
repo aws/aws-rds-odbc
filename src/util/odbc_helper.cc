@@ -27,6 +27,10 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#ifdef UNICODE
+    #include <codecvt>
+#endif
+
 #include "odbc_helper.h"
 #include "logger_wrapper.h"
 #include "text_helper.h"
@@ -136,7 +140,9 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
             LOG(ERROR) << "Invalid handle";
         } else if (SQL_SUCCEEDED(ret)) {
 #ifdef UNICODE
-            // TODO: Add logging of Unicode message
+            std::string narrow_sqlstate = LoggerWrapper::convert_wchar_to_char(sqlstate);
+            std::string narrow_message = LoggerWrapper::convert_wchar_to_char(message);
+            LOG(ERROR) << narrow_sqlstate << narrow_message;
 #else
             LOG(ERROR) << sqlstate << message;
 #endif            

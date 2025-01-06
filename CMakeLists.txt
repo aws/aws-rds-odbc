@@ -125,6 +125,8 @@ include_directories("${CMAKE_SOURCE_DIR}/src/util")
 
 if(WIN32)
   add_compile_definitions(WIN32)
+else()
+  add_definitions(-DSQL_WCHART_CONVERT)
 endif()
 
 #-----------------------------------------------------
