@@ -10,6 +10,65 @@
 		731C53882D0B15AC006D7569 /* sliding_cache_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 731C53862D0B15AC006D7569 /* sliding_cache_map.h */; };
 		731C53892D0B15AC006D7569 /* sliding_cache_map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C53872D0B15AC006D7569 /* sliding_cache_map.cc */; };
 		733B9FE42D1DBEA100F2D918 /* text_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 733B9FE32D1DBEA100F2D918 /* text_helper.h */; };
+		733ED0832D285155001BAC9D /* round_robin_property.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F22CEE0E370019F6C6 /* round_robin_property.h */; };
+		733ED0842D285155001BAC9D /* round_robin_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */; };
+		733ED0852D285155001BAC9D /* secrets_manager_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73DAE0282CDA8A0100225BE1 /* secrets_manager_helper.h */; };
+		733ED0862D285155001BAC9D /* text_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 733B9FE32D1DBEA100F2D918 /* text_helper.h */; };
+		733ED0872D285155001BAC9D /* host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6182CDE649B00C98EDF /* host_selector.h */; };
+		733ED0882D285155001BAC9D /* limitless_router_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 73F467BC2D1355210083E758 /* limitless_router_monitor.h */; };
+		733ED0892D285155001BAC9D /* limitless_monitor_service.h in Headers */ = {isa = PBXBuildFile; fileRef = 73F467BA2D1355210083E758 /* limitless_monitor_service.h */; };
+		733ED08A2D285155001BAC9D /* random_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6192CDE649B00C98EDF /* random_host_selector.h */; };
+		733ED08B2D285155001BAC9D /* sliding_cache_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 731C53862D0B15AC006D7569 /* sliding_cache_map.h */; };
+		733ED08C2D285155001BAC9D /* authentication_provider.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D7881F2CC919070028B42F /* authentication_provider.h */; };
+		733ED08D2D285155001BAC9D /* html_util.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6222CDE666E00C98EDF /* html_util.h */; };
+		733ED08E2D285155001BAC9D /* okta.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B6242CDE666E00C98EDF /* okta.h */; };
+		733ED08F2D285155001BAC9D /* adfs.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D7881C2CC919070028B42F /* adfs.h */; };
+		733ED0902D285155001BAC9D /* limitless_query_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73DAE01E2CDA71DD00225BE1 /* limitless_query_helper.h */; };
+		733ED0912D285155001BAC9D /* logger_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788292CC919070028B42F /* logger_wrapper.h */; };
+		733ED0922D285155001BAC9D /* host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E42CD3BC08002268BF /* host_availability_strategy.h */; };
+		733ED0932D285155001BAC9D /* simple_host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */; };
+		733ED0942D285155001BAC9D /* highest_weight_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 73CB8C102D132772002671DA /* highest_weight_host_selector.h */; };
+		733ED0952D285155001BAC9D /* host_info.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788262CC919070028B42F /* host_info.h */; };
+		733ED0962D285155001BAC9D /* federation.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788212CC919070028B42F /* federation.h */; };
+		733ED0972D285155001BAC9D /* odbc_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */; };
+		733ED0982D285155001BAC9D /* cluster_topology_info.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D788242CC919070028B42F /* cluster_topology_info.h */; };
+		733ED09A2D285155001BAC9D /* logger_wrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D7882A2CC919070028B42F /* logger_wrapper.cc */; };
+		733ED09B2D285155001BAC9D /* limitless_query_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE01F2CDA71DD00225BE1 /* limitless_query_helper.cc */; };
+		733ED09C2D285155001BAC9D /* adfs.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D7881D2CC919070028B42F /* adfs.cc */; };
+		733ED09D2D285155001BAC9D /* highest_weight_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73CB8C112D132772002671DA /* highest_weight_host_selector.cc */; };
+		733ED09E2D285155001BAC9D /* authentication_provider.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D788202CC919070028B42F /* authentication_provider.cc */; };
+		733ED09F2D285155001BAC9D /* host_info.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D788272CC919070028B42F /* host_info.cc */; };
+		733ED0A02D285155001BAC9D /* odbc_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B60F2CDE5C9E00C98EDF /* odbc_helper.cc */; };
+		733ED0A12D285155001BAC9D /* simple_host_availability_strategy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */; };
+		733ED0A22D285155001BAC9D /* sliding_cache_map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C53872D0B15AC006D7569 /* sliding_cache_map.cc */; };
+		733ED0A32D285155001BAC9D /* federation.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D788222CC919070028B42F /* federation.cc */; };
+		733ED0A42D285155001BAC9D /* limitless_router_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73F467BD2D1355210083E758 /* limitless_router_monitor.cc */; };
+		733ED0A52D285155001BAC9D /* limitless_monitor_service.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73F467BB2D1355210083E758 /* limitless_monitor_service.cc */; };
+		733ED0A62D285155001BAC9D /* round_robin_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */; };
+		733ED0A72D285155001BAC9D /* okta.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6252CDE666E00C98EDF /* okta.cc */; };
+		733ED0A82D285155001BAC9D /* html_util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6232CDE666E00C98EDF /* html_util.cc */; };
+		733ED0A92D285155001BAC9D /* random_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B61A2CDE649B00C98EDF /* random_host_selector.cc */; };
+		733ED0AA2D285155001BAC9D /* cluster_topology_info.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D788252CC919070028B42F /* cluster_topology_info.cc */; };
+		733ED0AB2D285155001BAC9D /* secrets_manager_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0292CDA8A0100225BE1 /* secrets_manager_helper.cc */; };
+		733ED0AD2D285155001BAC9D /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D542CCA5D6F00FB6683 /* libcurl.tbd */; };
+		733ED0AE2D285155001BAC9D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1D522CCA5D6400FB6683 /* libz.tbd */; };
+		733ED0AF2D285155001BAC9D /* libodbc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73DAE0232CDA88EC00225BE1 /* libodbc.a */; };
+		733ED0B02D285155001BAC9D /* libaws-c-auth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C1B2CC9611400FB6683 /* libaws-c-auth.a */; };
+		733ED0B12D285155001BAC9D /* libaws-c-cal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C1C2CC9611400FB6683 /* libaws-c-cal.a */; };
+		733ED0B22D285155001BAC9D /* libaws-c-common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C162CC9611400FB6683 /* libaws-c-common.a */; };
+		733ED0B32D285155001BAC9D /* libaws-c-compression.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C212CC9611400FB6683 /* libaws-c-compression.a */; };
+		733ED0B42D285155001BAC9D /* libaws-c-event-stream.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C1F2CC9611400FB6683 /* libaws-c-event-stream.a */; };
+		733ED0B52D285155001BAC9D /* libaws-c-http.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C192CC9611400FB6683 /* libaws-c-http.a */; };
+		733ED0B62D285155001BAC9D /* libaws-c-io.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C152CC9611400FB6683 /* libaws-c-io.a */; };
+		733ED0B72D285155001BAC9D /* libaws-c-mqtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C132CC9611400FB6683 /* libaws-c-mqtt.a */; };
+		733ED0B82D285155001BAC9D /* libaws-c-s3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C202CC9611400FB6683 /* libaws-c-s3.a */; };
+		733ED0B92D285155001BAC9D /* libaws-c-sdkutils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C182CC9611400FB6683 /* libaws-c-sdkutils.a */; };
+		733ED0BA2D285155001BAC9D /* libaws-checksums.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C122CC9611400FB6683 /* libaws-checksums.a */; };
+		733ED0BB2D285155001BAC9D /* libaws-crt-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C1E2CC9611400FB6683 /* libaws-crt-cpp.a */; };
+		733ED0BC2D285155001BAC9D /* libaws-cpp-sdk-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C142CC9611400FB6683 /* libaws-cpp-sdk-core.a */; };
+		733ED0BD2D285155001BAC9D /* libaws-cpp-sdk-rds.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C1D2CC9611400FB6683 /* libaws-cpp-sdk-rds.a */; };
+		733ED0BE2D285155001BAC9D /* libaws-cpp-sdk-secretsmanager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C172CC9611400FB6683 /* libaws-cpp-sdk-secretsmanager.a */; };
+		733ED0BF2D285155001BAC9D /* libaws-cpp-sdk-sts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C1A2CC9611400FB6683 /* libaws-cpp-sdk-sts.a */; };
 		734B1C222CC9611400FB6683 /* libaws-checksums.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C122CC9611400FB6683 /* libaws-checksums.a */; };
 		734B1C232CC9611400FB6683 /* libaws-c-mqtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C132CC9611400FB6683 /* libaws-c-mqtt.a */; };
 		734B1C242CC9611400FB6683 /* libaws-cpp-sdk-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 734B1C142CC9611400FB6683 /* libaws-cpp-sdk-core.a */; };
@@ -72,6 +131,7 @@
 		731C53862D0B15AC006D7569 /* sliding_cache_map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sliding_cache_map.h; sourceTree = "<group>"; };
 		731C53872D0B15AC006D7569 /* sliding_cache_map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sliding_cache_map.cc; sourceTree = "<group>"; };
 		733B9FE32D1DBEA100F2D918 /* text_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = text_helper.h; sourceTree = "<group>"; };
+		733ED0C52D285155001BAC9D /* libaws-rds-odbc-unicode.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libaws-rds-odbc-unicode.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		734B1B542CC956B100FB6683 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		734B1B562CC956B700FB6683 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		734B1C122CC9611400FB6683 /* libaws-checksums.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaws-checksums.a"; path = "aws_sdk/install/lib/libaws-checksums.a"; sourceTree = "<group>"; };
@@ -90,13 +150,10 @@
 		734B1C1F2CC9611400FB6683 /* libaws-c-event-stream.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaws-c-event-stream.a"; path = "aws_sdk/install/lib/libaws-c-event-stream.a"; sourceTree = "<group>"; };
 		734B1C202CC9611400FB6683 /* libaws-c-s3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaws-c-s3.a"; path = "aws_sdk/install/lib/libaws-c-s3.a"; sourceTree = "<group>"; };
 		734B1C212CC9611400FB6683 /* libaws-c-compression.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaws-c-compression.a"; path = "aws_sdk/install/lib/libaws-c-compression.a"; sourceTree = "<group>"; };
-		734B1C322CC961C200FB6683 /* libglog.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglog.a; path = "build/_deps/glog-build/libglog.a"; sourceTree = "<group>"; };
 		734B1C342CC9693800FB6683 /* libgflags.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgflags.a; path = ../../../../../../../opt/homebrew/Cellar/gflags/2.2.2/lib/libgflags.a; sourceTree = "<group>"; };
 		734B1D4E2CC9967800FB6683 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../../../../../../../opt/homebrew/Cellar/zlib/1.3.1/lib/libz.a; sourceTree = "<group>"; };
-		734B1D502CC9969F00FB6683 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = ../../../../../../../opt/homebrew/Cellar/curl/8.10.1/lib/libcurl.a; sourceTree = "<group>"; };
 		734B1D522CCA5D6400FB6683 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		734B1D542CCA5D6F00FB6683 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
-		734B1D582CCA6FCE00FB6683 /* libglog.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglog.a; path = ../../../glog/build/libglog.a; sourceTree = "<group>"; };
 		7369B60E2CDE5C9E00C98EDF /* odbc_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = odbc_helper.h; sourceTree = "<group>"; };
 		7369B60F2CDE5C9E00C98EDF /* odbc_helper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = odbc_helper.cc; sourceTree = "<group>"; };
 		7369B6162CDE63E500C98EDF /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
@@ -117,7 +174,7 @@
 		73D322E42CD3BC08002268BF /* host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_availability_strategy.h; sourceTree = "<group>"; };
 		73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = simple_host_availability_strategy.h; sourceTree = "<group>"; };
 		73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy.cc; sourceTree = "<group>"; };
-		73D7880E2CC915A60028B42F /* libaws-rds-odbc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libaws-rds-odbc.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		73D7880E2CC915A60028B42F /* libaws-rds-odbc-ansi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libaws-rds-odbc-ansi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73D7881C2CC919070028B42F /* adfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = adfs.h; sourceTree = "<group>"; };
 		73D7881D2CC919070028B42F /* adfs.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs.cc; sourceTree = "<group>"; };
 		73D7881F2CC919070028B42F /* authentication_provider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authentication_provider.h; sourceTree = "<group>"; };
@@ -142,6 +199,32 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		733ED0AC2D285155001BAC9D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				733ED0AD2D285155001BAC9D /* libcurl.tbd in Frameworks */,
+				733ED0AE2D285155001BAC9D /* libz.tbd in Frameworks */,
+				733ED0AF2D285155001BAC9D /* libodbc.a in Frameworks */,
+				733ED0B02D285155001BAC9D /* libaws-c-auth.a in Frameworks */,
+				733ED0B12D285155001BAC9D /* libaws-c-cal.a in Frameworks */,
+				733ED0B22D285155001BAC9D /* libaws-c-common.a in Frameworks */,
+				733ED0B32D285155001BAC9D /* libaws-c-compression.a in Frameworks */,
+				733ED0B42D285155001BAC9D /* libaws-c-event-stream.a in Frameworks */,
+				733ED0B52D285155001BAC9D /* libaws-c-http.a in Frameworks */,
+				733ED0B62D285155001BAC9D /* libaws-c-io.a in Frameworks */,
+				733ED0B72D285155001BAC9D /* libaws-c-mqtt.a in Frameworks */,
+				733ED0B82D285155001BAC9D /* libaws-c-s3.a in Frameworks */,
+				733ED0B92D285155001BAC9D /* libaws-c-sdkutils.a in Frameworks */,
+				733ED0BA2D285155001BAC9D /* libaws-checksums.a in Frameworks */,
+				733ED0BB2D285155001BAC9D /* libaws-crt-cpp.a in Frameworks */,
+				733ED0BC2D285155001BAC9D /* libaws-cpp-sdk-core.a in Frameworks */,
+				733ED0BD2D285155001BAC9D /* libaws-cpp-sdk-rds.a in Frameworks */,
+				733ED0BE2D285155001BAC9D /* libaws-cpp-sdk-secretsmanager.a in Frameworks */,
+				733ED0BF2D285155001BAC9D /* libaws-cpp-sdk-sts.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		73D7880C2CC915A60028B42F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -176,13 +259,10 @@
 			children = (
 				7369B6162CDE63E500C98EDF /* libiconv.tbd */,
 				73DAE0232CDA88EC00225BE1 /* libodbc.a */,
-				734B1D582CCA6FCE00FB6683 /* libglog.a */,
 				734B1D542CCA5D6F00FB6683 /* libcurl.tbd */,
 				734B1D522CCA5D6400FB6683 /* libz.tbd */,
-				734B1D502CC9969F00FB6683 /* libcurl.a */,
 				734B1D4E2CC9967800FB6683 /* libz.a */,
 				734B1C342CC9693800FB6683 /* libgflags.a */,
-				734B1C322CC961C200FB6683 /* libglog.a */,
 				734B1C1B2CC9611400FB6683 /* libaws-c-auth.a */,
 				734B1C1C2CC9611400FB6683 /* libaws-c-cal.a */,
 				734B1C162CC9611400FB6683 /* libaws-c-common.a */,
@@ -253,7 +333,8 @@
 		73D7880F2CC915A60028B42F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				73D7880E2CC915A60028B42F /* libaws-rds-odbc.a */,
+				73D7880E2CC915A60028B42F /* libaws-rds-odbc-ansi.a */,
+				733ED0C52D285155001BAC9D /* libaws-rds-odbc-unicode.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -338,6 +419,35 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		733ED0822D285155001BAC9D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				733ED0832D285155001BAC9D /* round_robin_property.h in Headers */,
+				733ED0842D285155001BAC9D /* round_robin_host_selector.h in Headers */,
+				733ED0852D285155001BAC9D /* secrets_manager_helper.h in Headers */,
+				733ED0862D285155001BAC9D /* text_helper.h in Headers */,
+				733ED0872D285155001BAC9D /* host_selector.h in Headers */,
+				733ED0882D285155001BAC9D /* limitless_router_monitor.h in Headers */,
+				733ED0892D285155001BAC9D /* limitless_monitor_service.h in Headers */,
+				733ED08A2D285155001BAC9D /* random_host_selector.h in Headers */,
+				733ED08B2D285155001BAC9D /* sliding_cache_map.h in Headers */,
+				733ED08C2D285155001BAC9D /* authentication_provider.h in Headers */,
+				733ED08D2D285155001BAC9D /* html_util.h in Headers */,
+				733ED08E2D285155001BAC9D /* okta.h in Headers */,
+				733ED08F2D285155001BAC9D /* adfs.h in Headers */,
+				733ED0902D285155001BAC9D /* limitless_query_helper.h in Headers */,
+				733ED0912D285155001BAC9D /* logger_wrapper.h in Headers */,
+				733ED0922D285155001BAC9D /* host_availability_strategy.h in Headers */,
+				733ED0932D285155001BAC9D /* simple_host_availability_strategy.h in Headers */,
+				733ED0942D285155001BAC9D /* highest_weight_host_selector.h in Headers */,
+				733ED0952D285155001BAC9D /* host_info.h in Headers */,
+				733ED0962D285155001BAC9D /* federation.h in Headers */,
+				733ED0972D285155001BAC9D /* odbc_helper.h in Headers */,
+				733ED0982D285155001BAC9D /* cluster_topology_info.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		73D7880A2CC915A60028B42F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -370,9 +480,28 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		73D7880D2CC915A60028B42F /* aws-rds-odbc */ = {
+		733ED0812D285155001BAC9D /* aws-rds-odbc-unicode */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 73D788192CC915A60028B42F /* Build configuration list for PBXNativeTarget "aws-rds-odbc" */;
+			buildConfigurationList = 733ED0C02D285155001BAC9D /* Build configuration list for PBXNativeTarget "aws-rds-odbc-unicode" */;
+			buildPhases = (
+				733ED0822D285155001BAC9D /* Headers */,
+				733ED0992D285155001BAC9D /* Sources */,
+				733ED0AC2D285155001BAC9D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "aws-rds-odbc-unicode";
+			packageProductDependencies = (
+			);
+			productName = "aws-rds-odbc";
+			productReference = 733ED0C52D285155001BAC9D /* libaws-rds-odbc-unicode.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		73D7880D2CC915A60028B42F /* aws-rds-odbc-ansi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 73D788192CC915A60028B42F /* Build configuration list for PBXNativeTarget "aws-rds-odbc-ansi" */;
 			buildPhases = (
 				73D7880A2CC915A60028B42F /* Headers */,
 				73D7880B2CC915A60028B42F /* Sources */,
@@ -382,11 +511,11 @@
 			);
 			dependencies = (
 			);
-			name = "aws-rds-odbc";
+			name = "aws-rds-odbc-ansi";
 			packageProductDependencies = (
 			);
 			productName = "aws-rds-odbc";
-			productReference = 73D7880E2CC915A60028B42F /* libaws-rds-odbc.a */;
+			productReference = 73D7880E2CC915A60028B42F /* libaws-rds-odbc-ansi.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -417,12 +546,38 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				73D7880D2CC915A60028B42F /* aws-rds-odbc */,
+				73D7880D2CC915A60028B42F /* aws-rds-odbc-ansi */,
+				733ED0812D285155001BAC9D /* aws-rds-odbc-unicode */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		733ED0992D285155001BAC9D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				733ED09A2D285155001BAC9D /* logger_wrapper.cc in Sources */,
+				733ED09B2D285155001BAC9D /* limitless_query_helper.cc in Sources */,
+				733ED09C2D285155001BAC9D /* adfs.cc in Sources */,
+				733ED09D2D285155001BAC9D /* highest_weight_host_selector.cc in Sources */,
+				733ED09E2D285155001BAC9D /* authentication_provider.cc in Sources */,
+				733ED09F2D285155001BAC9D /* host_info.cc in Sources */,
+				733ED0A02D285155001BAC9D /* odbc_helper.cc in Sources */,
+				733ED0A12D285155001BAC9D /* simple_host_availability_strategy.cc in Sources */,
+				733ED0A22D285155001BAC9D /* sliding_cache_map.cc in Sources */,
+				733ED0A32D285155001BAC9D /* federation.cc in Sources */,
+				733ED0A42D285155001BAC9D /* limitless_router_monitor.cc in Sources */,
+				733ED0A52D285155001BAC9D /* limitless_monitor_service.cc in Sources */,
+				733ED0A62D285155001BAC9D /* round_robin_host_selector.cc in Sources */,
+				733ED0A72D285155001BAC9D /* okta.cc in Sources */,
+				733ED0A82D285155001BAC9D /* html_util.cc in Sources */,
+				733ED0A92D285155001BAC9D /* random_host_selector.cc in Sources */,
+				733ED0AA2D285155001BAC9D /* cluster_topology_info.cc in Sources */,
+				733ED0AB2D285155001BAC9D /* secrets_manager_helper.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		73D7880B2CC915A60028B42F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -451,6 +606,70 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		733ED0C12D285155001BAC9D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					XCODE_BUILD,
+					UNICODE,
+					SQL_WCHART_CONVERT,
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/src/**",
+					"$(SRCROOT)/aws_sdk/install/include",
+					/opt/homebrew/opt/glog/include,
+					/opt/homebrew/opt/gflags/include,
+					/opt/homebrew/opt/unixodbc/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/aws_sdk/install/lib",
+					/opt/homebrew/opt/unixodbc/lib,
+					/opt/homebrew/Cellar/unixodbc/2.3.12/lib,
+				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SYMROOT = "$(SRCROOT)/xcode_build_unicode";
+			};
+			name = Debug;
+		};
+		733ED0C32D285155001BAC9D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					XCODE_BUILD,
+					UNICODE,
+					SQL_WCHART_CONVERT,
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/src/**",
+					"$(SRCROOT)/aws_sdk/install/include",
+					/opt/homebrew/opt/glog/include,
+					/opt/homebrew/opt/gflags/include,
+					/opt/homebrew/opt/unixodbc/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/aws_sdk/install/lib",
+					/opt/homebrew/opt/unixodbc/lib,
+					/opt/homebrew/Cellar/unixodbc/2.3.12/lib,
+				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SYMROOT = "$(SRCROOT)/xcode_build_unicode";
+			};
+			name = Release;
+		};
 		73D788172CC915A60028B42F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -458,7 +677,7 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -490,14 +709,11 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = c17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -511,7 +727,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx15.2;
 			};
 			name = Debug;
 		};
@@ -522,7 +738,7 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -554,7 +770,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = c17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -568,7 +784,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx15.2;
 			};
 			name = Release;
 		};
@@ -596,7 +812,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SYMROOT = "$(SRCROOT)/xcode-build";
+				SYMROOT = "$(SRCROOT)/xcode_build_ansi";
 			};
 			name = Debug;
 		};
@@ -624,13 +840,22 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SYMROOT = "$(SRCROOT)/xcode-build";
+				SYMROOT = "$(SRCROOT)/xcode_build_ansi";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		733ED0C02D285155001BAC9D /* Build configuration list for PBXNativeTarget "aws-rds-odbc-unicode" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				733ED0C12D285155001BAC9D /* Debug */,
+				733ED0C32D285155001BAC9D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		73D788092CC915A60028B42F /* Build configuration list for PBXProject "aws-rds-odbc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -640,7 +865,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		73D788192CC915A60028B42F /* Build configuration list for PBXNativeTarget "aws-rds-odbc" */ = {
+		73D788192CC915A60028B42F /* Build configuration list for PBXNativeTarget "aws-rds-odbc-ansi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				73D7881A2CC915A60028B42F /* Debug */,

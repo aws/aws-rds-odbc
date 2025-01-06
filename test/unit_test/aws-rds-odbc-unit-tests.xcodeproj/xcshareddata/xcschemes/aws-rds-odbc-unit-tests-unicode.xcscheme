@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "73BD677B2CC92229000817A9"
-               BuildableName = "aws-rds-odbc-unit-tests"
-               BlueprintName = "aws-rds-odbc-unit-tests"
+               BlueprintIdentifier = "733ED0C72D28528D001BAC9D"
+               BuildableName = "aws-rds-odbc-unit-tests-unicode"
+               BlueprintName = "aws-rds-odbc-unit-tests-unicode"
                ReferencedContainer = "container:aws-rds-odbc-unit-tests.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -35,8 +35,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
-      useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/kwedinger/projects/amazon_rds/aws-pgsql-odbc/libs/aws-rds-odbc/test/unit_test"
+      useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -46,9 +45,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "73BD677B2CC92229000817A9"
-            BuildableName = "aws-rds-odbc-unit-tests"
-            BlueprintName = "aws-rds-odbc-unit-tests"
+            BlueprintIdentifier = "733ED0C72D28528D001BAC9D"
+            BuildableName = "aws-rds-odbc-unit-tests-unicode"
+            BlueprintName = "aws-rds-odbc-unit-tests-unicode"
             ReferencedContainer = "container:aws-rds-odbc-unit-tests.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,9 +62,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "73BD677B2CC92229000817A9"
-            BuildableName = "aws-rds-odbc-unit-tests"
-            BlueprintName = "aws-rds-odbc-unit-tests"
+            BlueprintIdentifier = "733ED0C72D28528D001BAC9D"
+            BuildableName = "aws-rds-odbc-unit-tests-unicode"
+            BlueprintName = "aws-rds-odbc-unit-tests-unicode"
             ReferencedContainer = "container:aws-rds-odbc-unit-tests.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "73D7880D2CC915A60028B42F"
-               BuildableName = "libaws-rds-odbc.a"
-               BlueprintName = "aws-rds-odbc"
+               BuildableName = "libaws-rds-odbc-ansi.a"
+               BlueprintName = "aws-rds-odbc-ansi"
                ReferencedContainer = "container:aws-rds-odbc.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -51,8 +51,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "73D7880D2CC915A60028B42F"
-            BuildableName = "libaws-rds-odbc.a"
-            BlueprintName = "aws-rds-odbc"
+            BuildableName = "libaws-rds-odbc-ansi.a"
+            BlueprintName = "aws-rds-odbc-ansi"
             ReferencedContainer = "container:aws-rds-odbc.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
