@@ -49,37 +49,17 @@ void LoggerWrapper::initialize() {
 #endif
 }
 
-std::string LoggerWrapper::convert_wchar_to_char(const wchar_t* wstr) {
-    if (wstr == nullptr) {
+std::string LoggerWrapper::sqlwchar_to_string(const SQLWCHAR* sqlwchar) {
+    if (!sqlwchar) {
         return "";
     }
 
-#ifdef WIN32
-    int size_needed = WideCharToMultiByte(CP_ACP, 0, wstr, -1, nullptr, 0, nullptr, nullptr);
-    std::string result(size_needed, '\0');
-    WideCharToMultiByte(CP_ACP, 0, wstr, -1, &result[0], size_needed, nullptr, nullptr);
-    result.pop_back(); // Remove the null terminator
-    return result;
-#else
-    iconv_t conv = iconv_open("UTF-8", "WCHAR_T");
-    if (reinterpret_cast<std::uintptr_t>(conv) == static_cast<std::uintptr_t>(-1)) {
-        throw std::runtime_error("iconv_open failed");
+    std::u16string u16_str(reinterpret_cast<const char16_t*>(sqlwchar));
+    std::ostringstream oss;
+    for (auto ch : u16_str) {
+        oss << static_cast<char>(ch);
     }
-
-    size_t in_bytes_left = wcslen(wstr) * sizeof(wchar_t);
-    size_t out_bytes_left = in_bytes_left * 4; // UTF-8 may use up to 4 bytes per wchar_t
-    std::vector<char> out_buf(out_bytes_left);
-    char* in_buf = const_cast<char *>(reinterpret_cast<const char *>(wstr));
-    char* out_ptr = out_buf.data();
-
-    if (iconv(conv, &in_buf, &in_bytes_left, &out_ptr, &out_bytes_left) == static_cast<size_t>(-1)) {
-        iconv_close(conv);
-        throw std::runtime_error("iconv failed");
-    }
-
-    iconv_close(conv);
-    return std::string(out_buf.data(), out_buf.size() - out_bytes_left);
-#endif
+    return oss.str();
 }
 
 void LoggerWrapper::set_log_directory(const std::string& directory_path) {

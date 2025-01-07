@@ -39,6 +39,12 @@
 #include <filesystem>
 #include <glog/logging.h>
 
+#ifdef WIN32
+    #include <windows.h>
+#endif
+
+#include <sqltypes.h>
+
 namespace logger_config {
     const std::string PROGRAM_NAME = "aws-rds-odbc";
     const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append("aws-rds-odbc").string();
@@ -50,6 +56,7 @@ public:
     static void initialize();
 
     static std::string convert_wchar_to_char (const wchar_t* wstr);
+    static std::string sqlwchar_to_string(const SQLWCHAR* sqlwchar);
 
     // Prevent copy constructors
     LoggerWrapper(const LoggerWrapper&) = delete;
