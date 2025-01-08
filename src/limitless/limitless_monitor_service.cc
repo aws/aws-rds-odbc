@@ -64,15 +64,22 @@ bool LimitlessMonitorService::NewService(
     }
 
     // parse the connection string to extract useful limitless information
+    #ifdef UNICODE
+    std::map<std::wstring, std::wstring> connection_string_map;
+    ConnectionStringHelper::ParseConnectionString(reinterpret_cast<const wchar_t *>(connection_string_c_str), connection_string_map);
+    #else
     std::map<std::string, std::string> connection_string_map;
-    if (ConnectionStringHelper::ParseConnectionString(connection_string_c_str, connection_string_map) < 0) {
-        return false; // bad connection string
-    }
+    ConnectionStringHelper::ParseConnectionString(reinterpret_cast<const char *>(connection_string_c_str), connection_string_map);
+    #endif
 
     bool block_and_query_immediately = true;
-    
+
     if (connection_string_map.contains(LIMITLESS_MODE_KEY)) {
+        #ifdef UNICODE
+        std::wstring limitless_mode = connection_string_map[LIMITLESS_MODE_KEY];
+        #else
         std::string limitless_mode = connection_string_map[LIMITLESS_MODE_KEY];
+        #endif
         if (limitless_mode == LIMITLESS_MODE_VALUE_LAZY) {
             block_and_query_immediately = false;
         }

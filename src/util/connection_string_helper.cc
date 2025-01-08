@@ -27,68 +27,34 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#include <regex>
+
 #include "connection_string_helper.h"
 
-// taken from aws-pgsql-odbc psqlodbc.h
-enum ConnectionStringSizes {
-    MAX_CONNECT_STRING = 4096,
-    MEDIUM_REGISTRY_LEN = 1024
-};
+void ConnectionStringHelper::ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map) {
+    std::regex pattern("([^;=]+)=([^;]+)");
+    std::cmatch match;
+    std::string conn_str = connection_string;
 
-int ConnectionStringHelper::ParseConnectionString(const SQLTCHAR *connection_string, std::map<std::string, std::string> &dest_map) {
-    std::string key;
-    std::string value;
-    SQLTCHAR buffer[MEDIUM_REGISTRY_LEN];
-    int j = 0;
-    enum { KEY, VALUE } reading_mode = KEY;
-    
-    for (int i = 0; connection_string[i] != '\0' && i < MAX_CONNECT_STRING; i++) {
-        // stop condition for keys are equals
-        if (reading_mode == KEY && connection_string[i] == '=') {
-            buffer[j] = '\0';
-            #ifdef UNICODE
-            std::wstring wide_key = reinterpret_cast<wchar_t *>(buffer);
-            key = std::string(wide_key.begin(), wide_key.end());
-            #else
-            key = reinterpret_cast<char *>(buffer);
-            #endif
-            j = 0;
-            reading_mode = VALUE;
-            continue; // done with '='
-        }
+    while (std::regex_search(conn_str.c_str(), match, pattern)) {
+        std::string key = match[1].str();
+        std::string val = match[2].str();
+        dest_map[key] = val;
 
-        // stop condition for values are semicolons
-        if (reading_mode == VALUE && connection_string[i] == ';') {
-            buffer[j] = '\0';
-            #ifdef UNICODE
-            std::wstring wide_value = reinterpret_cast<wchar_t *>(buffer);
-            value = std::string(wide_value.begin(), wide_value.end());
-            #else
-            value = reinterpret_cast<char *>(buffer);
-            #endif
-            j = 0;
-            reading_mode = KEY;
-            dest_map[key] = value;
-            continue; // done with ';'
-        }
-
-        buffer[j++] = connection_string[i];
-        if (j >= MEDIUM_REGISTRY_LEN - 1) {
-            return -1; // key/value too long
-        }
+        conn_str = match.suffix().str();
     }
+}
 
-    // accept a badly terminated value
-    if (reading_mode == VALUE) {
-        buffer[j] = '\0';
-        #ifdef UNICODE
-        std::wstring wide_value = reinterpret_cast<wchar_t *>(buffer);
-        value = std::string(wide_value.begin(), wide_value.end());
-        #else
-        value = reinterpret_cast<char *>(buffer);
-        #endif
-        dest_map[key] = value;
+void ConnectionStringHelper::ParseConnectionString(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map) {
+    std::wregex pattern(L"([^;=]+)=([^;]+)");
+    std::wsmatch match;
+    std::wstring conn_str = connection_string;
+
+    while (std::regex_search(conn_str, match, pattern)) {
+        std::wstring key = match[1].str();
+        std::wstring val = match[2].str();
+        dest_map[key] = val;
+
+        conn_str = match.suffix().str();
     }
-
-    return dest_map.size();
 }

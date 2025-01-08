@@ -43,25 +43,28 @@ protected:
     void TearDown() override {}
 };
 
-TEST_F(ConnectionStringHelperTest, parse_connection_string_success) {
+TEST_F(ConnectionStringHelperTest, parse_connection_string_ascii) {
     std::map<std::string, std::string> dest_map;
-    int ret = ConnectionStringHelper::ParseConnectionString(
-        const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("key1=value1;key2=value2;key3=value3;"))),
-        dest_map
-    );
-    EXPECT_EQ(ret, 3);
+    ConnectionStringHelper::ParseConnectionString("key1=value1;key2=value2;key3=value3;", dest_map);
+    EXPECT_EQ(dest_map.size(), 3);
     EXPECT_EQ(dest_map["key1"], "value1");
     EXPECT_EQ(dest_map["key2"], "value2");
     EXPECT_EQ(dest_map["key3"], "value3");
 }
 
+TEST_F(ConnectionStringHelperTest, parse_connection_string_unicode) {
+    std::map<std::wstring, std::wstring> dest_map;
+    ConnectionStringHelper::ParseConnectionString(L"key1=value1;key2=value2;key3=value3;", dest_map);
+    EXPECT_EQ(dest_map.size(), 3);
+    EXPECT_EQ(dest_map[L"key1"], L"value1");
+    EXPECT_EQ(dest_map[L"key2"], L"value2");
+    EXPECT_EQ(dest_map[L"key3"], L"value3");
+}
+
 TEST_F(ConnectionStringHelperTest, parse_connection_string_no_trailing_semicolon) {
     std::map<std::string, std::string> dest_map;
-    int ret = ConnectionStringHelper::ParseConnectionString(
-        const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("key1=value1;key2=value2;key3=value3"))),
-        dest_map
-    );
-    EXPECT_EQ(ret, 3);
+    ConnectionStringHelper::ParseConnectionString("key1=value1;key2=value2;key3=value3", dest_map);
+    EXPECT_EQ(dest_map.size(), 3);
     EXPECT_EQ(dest_map["key1"], "value1");
     EXPECT_EQ(dest_map["key2"], "value2");
     EXPECT_EQ(dest_map["key3"], "value3");
@@ -69,19 +72,6 @@ TEST_F(ConnectionStringHelperTest, parse_connection_string_no_trailing_semicolon
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_nothing) {
     std::map<std::string, std::string> dest_map;
-    int ret = ConnectionStringHelper::ParseConnectionString(
-        const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT(""))),
-        dest_map
-    );
-    EXPECT_EQ(ret, 0);
-}
-
-TEST_F(ConnectionStringHelperTest, parse_connection_string_empties) {
-    std::map<std::string, std::string> dest_map;
-    int ret = ConnectionStringHelper::ParseConnectionString(
-        const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("=;"))),
-        dest_map
-    );
-    EXPECT_EQ(ret, 1);
-    EXPECT_EQ(dest_map[""], "");
+    ConnectionStringHelper::ParseConnectionString("", dest_map);
+    EXPECT_EQ(dest_map.size(), 0);
 }

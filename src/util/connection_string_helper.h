@@ -33,20 +33,14 @@
 #include <map>
 #include <string>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-#include <sql.h>
-#include <sqlext.h>
-
 class ConnectionStringHelper {
 public:
     /**
      * Parses the input connection string into the destination map as key-value pairs.
      * Returns -1 on error and the number of items in dest_map on success.
      */
-    static int ParseConnectionString(const SQLTCHAR *connection_string, std::map<std::string, std::string> &dest_map);
+    static void ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map);
+    static void ParseConnectionString(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map);
 };
 
 #endif
