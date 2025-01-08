@@ -40,11 +40,13 @@ protected:
     void TearDown() override {}
 };
 
-TEST_F(LoggerWrapperHelperTest, convert_wchar_to_char_nullptr_returns_empty_string) {
-    EXPECT_EQ("", LoggerWrapper::convert_wchar_to_char(nullptr));
+TEST_F(LoggerWrapperHelperTest, sqlwchar_to_string_nullptr_returns_empty_string) {
+    EXPECT_EQ("", LoggerWrapper::sqlwchar_to_string(nullptr));
 }
 
-TEST_F(LoggerWrapperHelperTest, convert_wchar_to_char_wchar_converted) {
-    EXPECT_EQ("Wide character string", LoggerWrapper::convert_wchar_to_char(L"Wide character string"));
+#ifdef WIN32
+TEST_F(LoggerWrapperHelperTest, sqlwchar_to_string_converted) {
+    EXPECT_EQ("Wide character string", LoggerWrapper::sqlwchar_to_string(L"Wide character string"));
 }
+#endif
 
