@@ -43,7 +43,7 @@ protected:
     void TearDown() override {}
 };
 
-TEST_F(ConnectionStringHelperTest, parse_connection_string_ascii) {
+TEST_F(ConnectionStringHelperTest, parse_connection_string_ansi) {
     std::map<std::string, std::string> dest_map;
     ConnectionStringHelper::ParseConnectionString("key1=value1;key2=value2;key3=value3;", dest_map);
     EXPECT_EQ(dest_map.size(), 3);
