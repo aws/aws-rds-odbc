@@ -40,7 +40,7 @@ public:
      * Returns -1 on error and the number of items in dest_map on success.
      */
     static void ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map);
-    static void ParseConnectionString(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map);
+    static void ParseConnectionStringW(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map);
 };
 
 #endif

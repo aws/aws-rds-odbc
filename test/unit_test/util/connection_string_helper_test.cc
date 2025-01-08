@@ -54,7 +54,7 @@ TEST_F(ConnectionStringHelperTest, parse_connection_string_ascii) {
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_unicode) {
     std::map<std::wstring, std::wstring> dest_map;
-    ConnectionStringHelper::ParseConnectionString(L"key1=value1;key2=value2;key3=value3;", dest_map);
+    ConnectionStringHelper::ParseConnectionStringW(L"key1=value1;key2=value2;key3=value3;", dest_map);
     EXPECT_EQ(dest_map.size(), 3);
     EXPECT_EQ(dest_map[L"key1"], L"value1");
     EXPECT_EQ(dest_map[L"key2"], L"value2");

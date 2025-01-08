@@ -66,7 +66,7 @@ bool LimitlessMonitorService::NewService(
     // parse the connection string to extract useful limitless information
     #ifdef UNICODE
     std::map<std::wstring, std::wstring> connection_string_map;
-    ConnectionStringHelper::ParseConnectionString(reinterpret_cast<const wchar_t *>(connection_string_c_str), connection_string_map);
+    ConnectionStringHelper::ParseConnectionStringW(reinterpret_cast<const wchar_t *>(connection_string_c_str), connection_string_map);
     #else
     std::map<std::string, std::string> connection_string_map;
     ConnectionStringHelper::ParseConnectionString(reinterpret_cast<const char *>(connection_string_c_str), connection_string_map);

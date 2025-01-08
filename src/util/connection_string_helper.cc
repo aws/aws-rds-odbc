@@ -45,7 +45,7 @@ void ConnectionStringHelper::ParseConnectionString(const char *connection_string
     }
 }
 
-void ConnectionStringHelper::ParseConnectionString(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map) {
+void ConnectionStringHelper::ParseConnectionStringW(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map) {
     std::wregex pattern(L"([^;=]+)=([^;]+)");
     std::wsmatch match;
     std::wstring conn_str = connection_string;
