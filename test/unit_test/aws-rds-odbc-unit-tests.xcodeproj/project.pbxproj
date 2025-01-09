@@ -47,6 +47,8 @@
 		7369B62F2CDE677300C98EDF /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7369B62E2CDE677300C98EDF /* libiconv.tbd */; };
 		73778D292D26E8B6006859EE /* logger_wrapper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73778D282D26E8B6006859EE /* logger_wrapper_test.cc */; };
 		738543EC2CEE0E050019F6C6 /* round_robin_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543EB2CEE0E050019F6C6 /* round_robin_host_selector_test.cc */; };
+		73ABBC482D304A8000E34238 /* connection_string_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */; };
+		73ABBC492D304A8000E34238 /* connection_string_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */; };
 		73CB8C0E2D132764002671DA /* highest_weight_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73CB8C0D2D132764002671DA /* highest_weight_host_selector_test.cc */; };
 		73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */; };
 		73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9EF2CC92FD5005B92C0 /* Security.framework */; };
@@ -114,6 +116,7 @@
 		7369B62E2CDE677300C98EDF /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		73778D282D26E8B6006859EE /* logger_wrapper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = logger_wrapper_test.cc; sourceTree = "<group>"; };
 		738543EB2CEE0E050019F6C6 /* round_robin_host_selector_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = round_robin_host_selector_test.cc; sourceTree = "<group>"; };
+		73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = connection_string_helper_test.cc; sourceTree = "<group>"; };
 		73BD677C2CC92229000817A9 /* aws-rds-odbc-unit-tests-ansi */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "aws-rds-odbc-unit-tests-ansi"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73CB8C0D2D132764002671DA /* highest_weight_host_selector_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = highest_weight_host_selector_test.cc; sourceTree = "<group>"; };
 		73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -181,6 +184,7 @@
 		7369B6132CDE5CBC00C98EDF /* util */ = {
 			isa = PBXGroup;
 			children = (
+				73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */,
 				73778D282D26E8B6006859EE /* logger_wrapper_test.cc */,
 				731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */,
 				7369B6122CDE5CBC00C98EDF /* odbc_helper_test.cc */,
@@ -386,6 +390,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73ABBC492D304A8000E34238 /* connection_string_helper_test.cc in Sources */,
 				733ED0C92D28528D001BAC9D /* host_info_test.cc in Sources */,
 				733ED0CA2D28528D001BAC9D /* limitless_monitor_service_test.cc in Sources */,
 				733ED0CB2D28528D001BAC9D /* secrets_manager_helper_test.cc in Sources */,
@@ -408,6 +413,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73ABBC482D304A8000E34238 /* connection_string_helper_test.cc in Sources */,
 				734B1D422CC97FA800FB6683 /* host_info_test.cc in Sources */,
 				733C45F12D12ED6A0034BF7E /* limitless_monitor_service_test.cc in Sources */,
 				73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */,
