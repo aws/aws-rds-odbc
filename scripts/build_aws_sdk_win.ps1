@@ -33,7 +33,7 @@ $CURRENT_DIR = (Get-Location).Path
 $SRC_DIR = "${PSScriptRoot}\..\aws_sdk\aws_sdk_cpp"
 $BUILD_DIR = "${SRC_DIR}\..\build"
 $INSTALL_DIR = "${BUILD_DIR}\..\install"
-$AWS_SDK_CPP_TAG = "1.11.399"
+$AWS_SDK_CPP_TAG = "1.11.481"
 
 $WIN_ARCH = $args[0]
 $CONFIGURATION = $args[1]
