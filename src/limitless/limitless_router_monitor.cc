@@ -81,7 +81,11 @@ void LimitlessRouterMonitor::Open(
     }
 
     if (block_and_query_immediately) {
+#ifdef UNICODE
+        rc = SQLDriverConnectW(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+#else
         rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+#endif
         if (SQL_SUCCEEDED(rc)) {
             // initial connection was successful, immediately populate caller's limitless routers
             *limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
@@ -130,7 +134,11 @@ void LimitlessRouterMonitor::run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connectio
                 break; // this is a fatal error; stop monitoring
             }
 
+#ifdef UNICODE
+            rc = SQLDriverConnectW(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+#else
             rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+#endif
             if (!SQL_SUCCEEDED(rc)) {
                 SQLFreeHandle(SQL_HANDLE_DBC, conn);
                 conn = SQL_NULL_HANDLE; // next loop can re-attempt connection
