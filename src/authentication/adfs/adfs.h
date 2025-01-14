@@ -48,9 +48,9 @@ public:
 
     // constant pattern strings 
     static const std::string FORM_ACTION_PATTERN;
+    static const std::string INPUT_TAG_PATTERN;
     static const std::string SAML_RESPONSE_PATTERN;
     static const std::string URL_PATTERN;
-    static const std::string INPUT_TAG_PATTERN;
 
 protected:
     std::string GetSAMLAssertion(std::string& err_info) override;
