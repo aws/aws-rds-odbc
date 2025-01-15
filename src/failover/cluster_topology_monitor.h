@@ -1,36 +1,27 @@
 #ifndef CLUSTER_TOPOLOGY_MONITOR_H
 #define CLUSTER_TOPOLOGY_MONITOR_H
 
-// STD Libs
-// Threading
 #include <atomic>
-#include <condition_variable>
 #include <chrono>
-#include <mutex>
-#include <thread>
-
-// String & Input/Output
-#include <string>
-
-// Collections
-#include <vector>
-#include <map>
-
-#include <memory>
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
+#include <map>
+#include <memory>
+#include <mutex>
 #include <stdexcept>
+#include <string>
+#include <thread>
+#include <vector>
 
 // ODBC APIs
 #ifdef WIN32
     #include <windows.h>
 #endif
-
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
 
-// Util
 #include "../host_info.h"
 #include "../util/connection_string_helper.h"
 #include "../util/logger_wrapper.h"
@@ -68,10 +59,9 @@ protected:
     std::string conn_str_replace_host(std::string conn_in, std::string new_host);
 
 private:
+    class NodeMonitoringThread;
     bool in_panic_mode();
     std::vector<HostInfo> open_any_conn_get_hosts();
-
-    class NodeMonitoringThread;
 
     std::string cluster_id;
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map;
@@ -79,12 +69,9 @@ private:
     int default_port;
     std::string conn_str;
 
-    // To be passed in from caller
-
-    // <Instance-ID>.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
+    // Query & Template to be passed in from caller
     // ?.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
     std::string endpoint_template;
-
     // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0), LAST_UPDATE_TIMESTAMP FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL
     std::string topology_query;
     // SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' AND SERVER_ID = aurora_db_instance_identifier()
@@ -92,46 +79,49 @@ private:
     // SELECT aurora_db_instance_identifier()
     std::string node_id_query;
 
-    // TODO, review if could be normal bool
-    std::atomic<bool> is_running;
-
+    // Track Update Request
+    std::atomic<bool> request_update_topology;
     std::mutex request_update_topology_mutex;
     std::condition_variable request_update_topology_cv;
-    std::atomic<bool> request_update_topology;
+
+    // Track Topology Updated
     std::mutex topology_updated_mutex;
     std::condition_variable topology_updated;
+
     std::atomic<std::chrono::steady_clock::time_point> ignore_topology_request_end_ns;
     int ignore_topology_request_ns;
-
     std::chrono::steady_clock::time_point high_refresh_end_time;
     long high_refresh_rate_ns;
     const std::chrono::seconds high_refresh_rate_after_panic = std::chrono::seconds(30);
     long refresh_rate_ns;
     int default_topology_query_timeout;
-    // TODO, references? pointers? shared_ptrs? etc?
-    std::shared_ptr<std::thread> monitoring_thread; // Main Thread
-    std::map<std::string, std::shared_ptr<NodeMonitoringThread>> node_monitoring_threads; // Children Thread, per node/instance
+
+    // Main Thread
+    std::shared_ptr<std::thread> monitoring_thread; 
+    std::atomic<bool> is_running;
+    // Children / Node Threads
+    std::map<std::string, std::shared_ptr<NodeMonitoringThread>> node_monitoring_threads;
     std::atomic<bool> node_threads_stop;
 
-    // TODO, review using shared pointers
-    SQLHDBC node_threads_writer_hdbc;
+    // Children Thread Connections & Host Info
+    std::shared_ptr<SQLHDBC> node_threads_writer_hdbc;
+    std::shared_ptr<HostInfo> node_threads_writer_host_info;
+    std::shared_ptr<SQLHDBC> node_threads_reader_hdbc;
+    std::shared_ptr<std::vector<HostInfo>> node_threads_latest_topology;
+
     std::mutex node_threads_writer_hdbc_mutex;
-    HostInfo node_threads_writer_host_info;
     std::mutex node_threads_writer_host_info_mutex;
-    SQLHDBC node_threads_reader_hdbc;
     std::mutex node_threads_reader_hdbc_mutex;
-    std::vector<HostInfo> node_threads_latest_topology;
     std::mutex node_threads_latest_topology_mutex;
 
-    // TODO, can be normal bool?
+    // TODO, review if these can be done without mutex/atomics
+    // There should be only at most 1 thread interacting with these
+    // Connection Information for main thread
     std::atomic<bool> is_writer_connection;
-    // TODO - Will shared pointers be better?
-    // Will shared pointer work? These internally are just void*
     SQLHENV henv;
-    // TODO, need mutex?
     std::mutex hdbc_mutex;
     std::shared_ptr<SQLHDBC> main_hdbc;
-    HostInfo main_writer_host_info;
+    std::shared_ptr<HostInfo> main_writer_host_info;
 };
 
 #ifndef NODE_MONITORING_THREAD_H
@@ -139,14 +129,8 @@ private:
 
 class ClusterTopologyMonitor::NodeMonitoringThread {
 public:
-    NodeMonitoringThread(
-        ClusterTopologyMonitor* monitor,
-        HostInfo host_info,
-        HostInfo writer_host_info,
-        std::string conn_str
-    ): main_monitor(monitor), host_info(host_info), writer_host_info(writer_host_info), conn_str(conn_str) {
-        node_thread = std::make_shared<std::thread>(run, this);
-    };
+    NodeMonitoringThread(ClusterTopologyMonitor* monitor, std::shared_ptr<HostInfo> host_info,
+        std::shared_ptr<HostInfo> writer_host_info, std::string conn_str);
     ~NodeMonitoringThread();
 
 private:
@@ -154,10 +138,10 @@ private:
     void reader_thread_fetch_topology();
 
     ClusterTopologyMonitor* main_monitor;
-    HostInfo host_info;
-    HostInfo writer_host_info;
+    std::shared_ptr<HostInfo> host_info;
+    std::shared_ptr<HostInfo> writer_host_info;
     std::string conn_str;
-    bool writer_changed;
+    bool writer_changed = false;    
     std::shared_ptr<std::thread> node_thread;
     SQLHDBC hdbc;
 
