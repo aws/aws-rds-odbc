@@ -66,6 +66,7 @@ set(SRC
   src/failover/cluster_topology_info.cc
   src/failover/cluster_topology_monitor.cc
   src/failover/cluster_topology_query_helper.cc
+  src/failover/failover_service.cc
 
   src/host_availability/simple_host_availability_strategy.cc
   src/host_selector/highest_weight_host_selector.cc
@@ -94,9 +95,13 @@ set(INC
   src/authentication/okta/okta.h
   src/authentication/secrets_manager_helper.h
 
+  src/dialect/dialect_aurora_postgres.h
+  src/dialect/dialect.h
+
   src/failover/cluster_topology_info.h
   src/failover/cluster_topology_monitor.h
   src/failover/cluster_topology_query_helper.h
+  src/failover/failover_service.h
 
   src/host_availability/simple_host_availability_strategy.h
   src/host_selector/highest_weight_host_selector.h

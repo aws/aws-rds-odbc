@@ -23,7 +23,6 @@
 #include <sqlext.h>
 
 #include <cstring>
-#include <locale>
 #include <string>
 
 #define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))

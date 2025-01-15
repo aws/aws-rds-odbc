@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HOSTINFO_H_
-#define HOSTINFO_H_
+#ifndef HOST_INFO_H_
+#define HOST_INFO_H_
 
 #include <memory>
 #include <string>
@@ -31,17 +31,17 @@ class HostInfo {
 public:
     static constexpr uint64_t DEFAULT_WEIGHT = 100;
     static constexpr int NO_PORT = -1;
+    static constexpr int MAX_HOST_INFO_BUFFER_SIZE = 1024;
 
     HostInfo() = default;
 
     HostInfo(
-        std::string host,
+        const std::string& host,
         int port,
         HOST_STATE state,
         bool is_writer,
         std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy,
-        uint64_t weight = DEFAULT_WEIGHT,
-        SQL_TIMESTAMP_STRUCT last_updated_timestamp = SQL_TIMESTAMP_STRUCT()
+        uint64_t weight = DEFAULT_WEIGHT
     );
 
     ~HostInfo() = default;
@@ -57,7 +57,6 @@ public:
     int GetPort() const;
     std::string GetHostPortPair() const;
     uint64_t GetWeight() const;
-    SQL_TIMESTAMP_STRUCT GetLastUpdatedTime() const;
 
     void SetHostState(HOST_STATE state);
     HOST_STATE GetHostState() const;
@@ -68,12 +67,15 @@ public:
     std::string session_id;
     std::string replica_lag;
 
+    bool operator==(const HostInfo& other) const {
+        return this->EqualHostPortPair(other) && this->weight == other.GetWeight() && this->is_writer == other.IsHostWriter();
+    }
+
 private:
     std::string host_port_separator = ":";
     std::string host;
     int port = NO_PORT;
     uint64_t weight = DEFAULT_WEIGHT;
-    SQL_TIMESTAMP_STRUCT last_updated_timestamp;
 
     HOST_STATE host_state;
     bool is_writer;
@@ -81,4 +83,10 @@ private:
     std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy;
 };
 
-#endif /* HOSTINFO_H_ */
+inline std::ostream& operator<<(std::ostream& str, const HostInfo& v) {
+    char buf[HostInfo::MAX_HOST_INFO_BUFFER_SIZE];
+    sprintf(buf, "HostInfo[host=%s, port=%d, %s]", v.GetHost().c_str(), v.GetPort(), v.IsHostWriter() ? "WRITER" : "READER");
+    return str << std::string(buf);
+}
+
+#endif /* HOST_INFO_H_ */

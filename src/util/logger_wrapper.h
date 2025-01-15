@@ -45,6 +45,8 @@ public:
     LoggerWrapper& operator=(const LoggerWrapper&) = delete;
     LoggerWrapper& operator=(LoggerWrapper&&) = delete;
 
+    static std::string ToStringFromWchar(const SQLWCHAR* sqlwchar);
+
 private:
     static void set_log_directory(const std::string& directory_path);
     bool init = false;

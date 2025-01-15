@@ -27,6 +27,7 @@
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
 
 #include "authentication_provider.h"
+#include "cluster_topology_monitor.h"
 #include "cluster_topology_query_helper.h"
 #include "federation.h"
 #include "limitless_monitor_service.h"
@@ -122,6 +123,7 @@ public:
 
 class MOCK_ODBC_HELPER : public IOdbcHelper {
 public:
+    MOCK_METHOD(bool, ConnStrConnect, (SQLTCHAR*, SQLHDBC&), ());
     MOCK_METHOD(bool, CheckResult, (SQLRETURN, const std::string&, SQLHANDLE, int32_t), ());
     MOCK_METHOD(bool, CheckConnection, (SQLHDBC), ());
     MOCK_METHOD(void, Cleanup, (SQLHENV, SQLHDBC, SQLHSTMT), ());
@@ -133,11 +135,21 @@ public:
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
 public:
-    MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", "", "", "") {}
+    MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", TEXT(""), TEXT(""), TEXT("")) {}
     MOCK_METHOD(std::string, GetWriterId, (SQLHDBC), ());
     MOCK_METHOD(std::string, GetNodeId, (SQLHDBC), ());
     MOCK_METHOD(std::vector<HostInfo>, QueryTopology, (SQLHDBC), ());
     MOCK_METHOD(HostInfo, CreateHost, (SQLHDBC), ());
+};
+
+class MOCK_TOPOLOGY_MONITOR : public ClusterTopologyMonitor {
+public:
+    MOCK_TOPOLOGY_MONITOR(std::shared_ptr<IOdbcHelper> odbc_helper)
+        : ClusterTopologyMonitor("", nullptr, AS_SQLTCHAR(TEXT("")), odbc_helper, nullptr, 0, 0, 0) {}
+    MOCK_METHOD(void, SetClusterId, (const std::string&), ());
+    MOCK_METHOD(std::vector<HostInfo>, ForceRefresh, (bool, uint32_t), ());
+    MOCK_METHOD(std::vector<HostInfo>, ForceRefresh, (SQLHDBC, uint32_t), ());
+    MOCK_METHOD(void, StartMonitor, (), ());
 };
 
 #endif /* __MOCKOBJECTS_H__ */

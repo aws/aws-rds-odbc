@@ -13,13 +13,36 @@
 // limitations under the License.
 
 #include "odbc_helper.h"
+
 #include "logger_wrapper.h"
 
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));
 
+bool OdbcHelper::ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) {
+    if (SQL_NULL_HANDLE == out_conn) {
+        LOG(WARNING) << "Attempted to connect using null HDBC";
+        return false;
+    }
+
+    SQLRETURN rc = 0;
+#ifdef UNICODE
+    rc = SQLDriverConnectW(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+#else
+    rc = SQLDriverConnect(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+#endif
+
+    return CheckResult(rc, "Failed to connect to host.", out_conn, SQL_HANDLE_DBC);
+}
+
 bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     if (SQL_SUCCEEDED(rc)) {
+        // Successfully fetched row.
         return true;
+    }
+
+    if (rc == SQL_NO_DATA) {
+        // No more data to fetch.
+        return false;
     }
 
     if (!log_message.empty()) {
@@ -29,9 +52,13 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
     return false;
 }
 
-bool OdbcHelper::CheckConnection(SQLHDBC conn) {
+bool OdbcHelper::CheckConnection(SQLHDBC hdbc) {
+    if (SQL_NULL_HDBC == hdbc) {
+        return false;
+    }
+
     HSTMT hstmt = SQL_NULL_HSTMT;
-    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
     if (!SQL_SUCCEEDED(rc)) {
         return false;
     }
@@ -43,16 +70,19 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
     return SQL_SUCCEEDED(rc);
 }
 
-void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
-    if (hstmt != SQL_NULL_HANDLE) {
+void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC hdbc, SQLHSTMT hstmt) {
+    if (SQL_NULL_HANDLE != hstmt) {
         SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+        hstmt = SQL_NULL_HSTMT;
     }
-    if (conn != SQL_NULL_HANDLE) {
-        SQLDisconnect(conn);
-        SQLFreeHandle(SQL_HANDLE_DBC, conn);
+    if (SQL_NULL_HANDLE != hdbc) {
+        SQLDisconnect(hdbc);
+        SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+        hdbc = SQL_NULL_HDBC;
     }
-    if (henv != SQL_NULL_HANDLE) {
+    if (SQL_NULL_HANDLE != henv) {
         SQLFreeHandle(SQL_HANDLE_ENV, henv);
+        henv = SQL_NULL_HENV;
     }
 }
 
@@ -91,9 +121,10 @@ bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string&
 
 bool OdbcHelper::BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) {
     SQLRETURN rc;
-    rc = SQLBindCol(stmt, col_num, type, dest, dest_size, nullptr);
+    SQLLEN ret_len = 0;
+    rc = SQLBindCol(stmt, col_num, type, dest, dest_size, &ret_len);
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
-        Cleanup(nullptr, nullptr, stmt);
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
     };
     return true;
@@ -103,10 +134,10 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
     SQLRETURN rc;
     rc = SQLFetch(stmt);
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
-        Cleanup(nullptr, nullptr, stmt);
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
     }
-    return true;    
+    return true;
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
@@ -127,10 +158,11 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
             LOG(ERROR) << "Invalid handle";
         } else if (SQL_SUCCEEDED(ret)) {
             #ifdef UNICODE
-            LOG(ERROR) << StringHelper::ToString(sqlstate) << ": " << StringHelper::ToString(message);
+            LOG(ERROR) << StringHelper::ToString(AS_WCHAR(sqlstate)) << ": "
+                       << StringHelper::ToString(AS_WCHAR(message));
             #else
             LOG(ERROR) << sqlstate << ": " << message;
-            #endif            
+            #endif
         }
 
     } while (ret == SQL_SUCCESS);

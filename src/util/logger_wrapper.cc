@@ -53,3 +53,16 @@ void LoggerWrapper::set_log_directory(const std::string& directory_path) {
     }
     FLAGS_log_dir = directory_path;
 }
+
+std::string LoggerWrapper::ToStringFromWchar(const SQLWCHAR* sqlwchar) {
+    if (!sqlwchar) {
+        return "";
+    }
+
+    std::u16string u16_str(reinterpret_cast<const char16_t*>(sqlwchar));
+    std::ostringstream oss;
+    for (auto ch : u16_str) {
+        oss << static_cast<char>(ch);
+    }
+    return oss.str();
+}

@@ -39,6 +39,8 @@ static Aws::SDKOptions sdk_opts;
 static std::atomic<int> sdk_ref_count{0};
 static std::mutex sdk_mutex;
 
+static std::mutex global_auth_mutex;
+
 static constexpr uint64_t DEFAULT_SOCKET_TIMEOUT = 3000;
 static constexpr uint64_t DEFAULT_CONNECT_TIMEOUT = 5000;
 
@@ -216,6 +218,7 @@ void UpdateCachedToken(const char* db_hostname, const char* db_region, const cha
 }
 
 bool GenerateConnectAuthToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config) {
+    std::lock_guard<std::mutex> global_lock(global_auth_mutex);
     if (1 == ++sdk_ref_count) {
         std::lock_guard<std::mutex> lock(sdk_mutex);
         Aws::InitAPI(sdk_opts);
