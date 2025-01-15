@@ -33,6 +33,8 @@
 #include "../util/logger_wrapper.h"
 #include "connection_string_helper.h"
 #include "limitless_monitor_service.h"
+
+#include "limitless_query_helper.h"
 #include "odbc_helper.h"
 
 static LimitlessMonitorService limitless_monitor_service;
@@ -165,7 +167,7 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
 }
 
 bool CheckLimitlessCluster(SQLHDBC hdbc) {
-    bool result = OdbcHelper::CheckLimitlessCluster(hdbc);
+    bool result = LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
     return result;
 }
 
