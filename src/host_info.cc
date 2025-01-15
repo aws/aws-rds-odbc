@@ -14,14 +14,13 @@
 
 #include "host_info.h"
 
-HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer, std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy, uint64_t weight, SQL_TIMESTAMP_STRUCT last_updated_timestamp) :
+HostInfo::HostInfo(const std::string& host, int port, HOST_STATE state, bool is_writer, std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy, uint64_t weight) :
     host { std::move(host) },
     port { port },
     host_state { state },
     is_writer { is_writer },
     host_availability_strategy{ std::move(host_availability_strategy) },
-    weight { weight },
-    last_updated_timestamp { SQL_TIMESTAMP_STRUCT(last_updated_timestamp) }
+    weight { weight }
 {
 }
 
@@ -50,10 +49,6 @@ int HostInfo::GetPort() const {
  */
 uint64_t HostInfo::GetWeight() const {
     return weight;
-}
-
-SQL_TIMESTAMP_STRUCT HostInfo::GetLastUpdatedTime() const {
-    return last_updated_timestamp;
 }
 
 /**

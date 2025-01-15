@@ -13,13 +13,20 @@
 // limitations under the License.
 
 #include "odbc_helper.h"
+
 #include "logger_wrapper.h"
 
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));
 
 bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     if (SQL_SUCCEEDED(rc)) {
+        // Successfully fetched row.
         return true;
+    }
+
+    if (rc == SQL_NO_DATA) {
+        //No more data to fetch.
+        return false;
     }
 
     if (!log_message.empty()) {
@@ -30,6 +37,10 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
 }
 
 bool OdbcHelper::CheckConnection(SQLHDBC conn) {
+    if (conn == SQL_NULL_HDBC) {
+        return false;
+    }
+
     HSTMT hstmt = SQL_NULL_HSTMT;
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
     if (!SQL_SUCCEEDED(rc)) {
@@ -106,7 +117,7 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
         Cleanup(nullptr, nullptr, stmt);
         return false;
     }
-    return true;    
+    return true;
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
@@ -127,10 +138,11 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
             LOG(ERROR) << "Invalid handle";
         } else if (SQL_SUCCEEDED(ret)) {
             #ifdef UNICODE
-            LOG(ERROR) << StringHelper::ToString(sqlstate) << ": " << StringHelper::ToString(message);
+            LOG(ERROR) << LoggerWrapper::ToStringFromWchar(AS_CONST_WCHAR(sqlstate)) << ": "
+                       << LoggerWrapper::ToStringFromWchar(AS_CONST_WCHAR(message));
             #else
             LOG(ERROR) << sqlstate << ": " << message;
-            #endif            
+            #endif
         }
 
     } while (ret == SQL_SUCCESS);

@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef ROUND_ROBIN_PROPERTY_H
+#define ROUND_ROBIN_PROPERTY_H
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -31,3 +34,5 @@ namespace round_robin_property {
         std::string last_host_weight_str;
     };
 };
+
+#endif

@@ -13,8 +13,9 @@
 // limitations under the License.
 
 #include "sliding_cache_map.h"
+
+#include "failover/failover_service.h"
 #include "host_info.h"
-#include "host_selector/round_robin_property.h"
 
 template <typename K, typename V>
 void SlidingCacheMap<K, V>::Put(const K& key, const V& value) {
@@ -24,6 +25,30 @@ void SlidingCacheMap<K, V>::Put(const K& key, const V& value) {
 template <typename K, typename V>
 void SlidingCacheMap<K, V>::Put(const K& key, const V& value, int sec_ttl) {
     std::lock_guard<std::mutex> lock(cache_lock);
+    std::chrono::steady_clock::time_point expiry_time =
+        std::chrono::steady_clock::now() + std::chrono::seconds(sec_ttl);
+    cache[key] = CacheEntry{value, expiry_time, sec_ttl};
+}
+
+template <typename K, typename V>
+void SlidingCacheMap<K, V>::putIfAbsent(const K &key, const V &value) {
+    putIfAbsent(key, value, DEFAULT_EXPIRATION_SEC);
+}
+
+template <typename K, typename V>
+void SlidingCacheMap<K, V>::putIfAbsent(const K &key, const V &value, int sec_ttl) {
+    std::lock_guard<std::mutex> lock(cache_lock);
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    if (auto itr = cache.find(key); itr != cache.end()) {
+        CacheEntry& entry = itr->second;
+        // Already in cache & is not expired
+        if (entry.expiry > now) {
+            // Update TTL & Return value
+            entry.expiry = now + std::chrono::seconds(entry.sec_ttl);
+            return;
+        }
+    }
+    // Either not in cache or is expired, put new into cache
     std::chrono::steady_clock::time_point expiry_time =
         std::chrono::steady_clock::now() + std::chrono::seconds(sec_ttl);
     cache[key] = CacheEntry{value, expiry_time, sec_ttl};
@@ -84,6 +109,7 @@ void SlidingCacheMap<K, V>::Clear() {
 }
 
 // Explicit Template Instantiations
-template class SlidingCacheMap<std::string, std::string>;
+template class SlidingCacheMap<std::string, std::shared_ptr<FailoverServiceTracker>>;
 template class SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>>;
+template class SlidingCacheMap<std::string, std::string>;
 template class SlidingCacheMap<std::string, std::vector<HostInfo>>;

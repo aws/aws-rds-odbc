@@ -15,7 +15,7 @@
 #ifndef CLUSTER_TOPOLOGY_INFO_H_
 #define CLUSTER_TOPOLOGY_INFO_H_
 
-#include "host_info.h"
+#include "../host_info.h"
 
 #include <ctime>
 #include <set>
@@ -23,9 +23,11 @@
 
 #include "../util/logger_wrapper.h"
 
+class HostInfo;
 // This class holds topology information for one cluster.
 // Cluster topology consists of an instance endpoint, a set of nodes in the cluster,
 // the type of each node in the cluster, and the status of each node in the cluster.
+// TODO(karezche): refactor code as this class isn't being used right now.
 class ClusterTopologyInfo {
 public:
     ClusterTopologyInfo();
@@ -45,6 +47,9 @@ public:
     std::shared_ptr<HostInfo> GetReader(int i);
     std::vector<std::shared_ptr<HostInfo>> GetWriters();
     std::vector<std::shared_ptr<HostInfo>> GetReaders();
+    std::vector<std::shared_ptr<HostInfo>> GetHosts();
+    static std::string LogTopology(const std::shared_ptr<ClusterTopologyInfo>& topology);
+    static std::string LogTopology(const std::vector<HostInfo>& topology);
 
 private:
     int current_reader = -1;
@@ -64,7 +69,7 @@ private:
     void mark_host_down(const std::shared_ptr<HostInfo>& host);
     void mark_host_up(const std::shared_ptr<HostInfo>& host);
     std::set<std::string> get_down_hosts();
-    void update_time();
+    void UpdateTime();
 
     friend class TOPOLOGY_SERVICE;
 };

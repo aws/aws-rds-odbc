@@ -28,6 +28,8 @@ public:
 
     void Put(const K& key, const V& value);
     void Put(const K& key, const V& value, int sec_ttl);
+    void putIfAbsent(const K& key, const V& value);
+    void putIfAbsent(const K& key, const V& value, int sec_ttl);
     V Get(const K& key);
     bool Find(const K& key);
     unsigned int Size();

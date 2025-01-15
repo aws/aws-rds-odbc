@@ -31,7 +31,7 @@ These features include:
 5. Failover Support
 
 This library is not intended to be used on its own and is intended to work by integrating it with the AWS ODBC Driver for PostgreSQL.
-To learn more about how to use these features please visit the [AWS ODBC Driver for PostgreSQL GitHub page](https://github.com/aws/aws-pgsql-odbc).
+To learn more about how to use these features, please visit the [AWS ODBC Driver for PostgreSQL GitHub page](https://github.com/aws/aws-pgsql-odbc).
 
 ## Documentation
 

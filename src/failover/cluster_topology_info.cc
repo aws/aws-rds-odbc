@@ -14,6 +14,7 @@
 
 #include "cluster_topology_info.h"
 
+#include <sstream>
 #include <stdexcept>
 
 /**
@@ -28,7 +29,7 @@ static int get_random_number() {
 
 ClusterTopologyInfo::ClusterTopologyInfo() {
     DLOG(INFO) << "Constructor";
-    update_time();
+    UpdateTime();
 }
 
 // copy constructor
@@ -59,7 +60,7 @@ ClusterTopologyInfo::~ClusterTopologyInfo() {
 
 void ClusterTopologyInfo::AddHost(const std::shared_ptr<HostInfo>& host_info) {
     host_info->IsHostWriter() ? writers.push_back(host_info) : readers.push_back(host_info);
-    update_time();
+    UpdateTime();
     DLOG(INFO) << (host_info->IsHostWriter() ? "Writer" : "Reader" ) << ", " << host_info->GetHostPortPair() << " added to cluster topology.";
 }
 
@@ -76,7 +77,7 @@ std::time_t ClusterTopologyInfo::TimeLastUpdated() const {
 }
 
 // TODO(yuenhocol) harmonize time function across objects so the times are comparable
-void ClusterTopologyInfo::update_time() {
+void ClusterTopologyInfo::UpdateTime() {
     last_updated = time(nullptr);
 }
 
@@ -100,7 +101,7 @@ std::shared_ptr<HostInfo> ClusterTopologyInfo::GetNextReader() {
         current_reader = get_random_number() % num_readers;
     }
     else if (current_reader >= num_readers) {
-        // adjust current reader in case topology was refreshed.
+        // adjust the current reader in case topology was refreshed.
         current_reader = (current_reader) % num_readers;
     }
     else {
@@ -124,6 +125,41 @@ std::vector<std::shared_ptr<HostInfo>> ClusterTopologyInfo::GetReaders() {
 
 std::vector<std::shared_ptr<HostInfo>> ClusterTopologyInfo::GetWriters() {
     return writers;
+}
+
+std::vector<std::shared_ptr<HostInfo>> ClusterTopologyInfo::GetHosts() {
+    std::vector<std::shared_ptr<HostInfo>> instances(writers);
+    instances.insert(instances.end(), readers.begin(), readers.end());
+
+    return instances;
+}
+
+std::string ClusterTopologyInfo::LogTopology(const std::shared_ptr<ClusterTopologyInfo>& topology) {
+    std::stringstream topology_str;
+    if (topology->GetHosts().empty()) {
+        topology_str << "<empty topology>";
+        return topology_str.str();
+    }
+
+    for (const auto& host : topology->GetHosts()) {
+        topology_str << "\n\t" << host;
+    }
+
+    return topology_str.str();
+}
+
+std::string ClusterTopologyInfo::LogTopology(const std::vector<HostInfo>& topology) {
+    std::stringstream topology_str;
+    if (topology.empty()) {
+        topology_str << "<empty topology>";
+        return topology_str.str();
+    }
+
+    for (const auto& host : topology) {
+        topology_str << "\n\t" << host;
+    }
+
+    return topology_str.str();
 }
 
 std::shared_ptr<HostInfo> ClusterTopologyInfo::get_last_used_reader() {
