@@ -30,13 +30,13 @@
    **ANSI**
    ```PowerShell
    cmake -S . -B build_ansi -DENABLE_UNIT_TESTS=TRUE
-   cmake --build build_ansi
+   cmake --build build_ansi --config <configuration>
    ```
 
    **Unicode**
    ```PowerShell
    cmake -S . -B build_unicode -DUNICODE_BUILD=ON -DENABLE_UNIT_TESTS=TRUE
-   cmake --build build_unicode
+   cmake --build build_unicode --config <configuration>
    ```
 
 1. Run the following from the repository root folder.
