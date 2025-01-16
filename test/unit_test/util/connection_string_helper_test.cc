@@ -45,33 +45,63 @@ protected:
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_ansi) {
     std::map<std::string, std::string> dest_map;
-    ConnectionStringHelper::ParseConnectionString("key1=value1;key2=value2;key3=value3;", dest_map);
+    ConnectionStringHelper::ParseConnectionString("KEY1=value1;kEy2=value2;key3=value3;", dest_map);
     EXPECT_EQ(dest_map.size(), 3);
-    EXPECT_EQ(dest_map["key1"], "value1");
-    EXPECT_EQ(dest_map["key2"], "value2");
-    EXPECT_EQ(dest_map["key3"], "value3");
+    EXPECT_EQ(dest_map["KEY1"], "value1");
+    EXPECT_EQ(dest_map["KEY2"], "value2");
+    EXPECT_EQ(dest_map["KEY3"], "value3");
 }
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_unicode) {
     std::map<std::wstring, std::wstring> dest_map;
-    ConnectionStringHelper::ParseConnectionStringW(L"key1=value1;key2=value2;key3=value3;", dest_map);
+    ConnectionStringHelper::ParseConnectionStringW(L"KEY1=value1;kEy2=value2;key3=value3;", dest_map);
     EXPECT_EQ(dest_map.size(), 3);
-    EXPECT_EQ(dest_map[L"key1"], L"value1");
-    EXPECT_EQ(dest_map[L"key2"], L"value2");
-    EXPECT_EQ(dest_map[L"key3"], L"value3");
+    EXPECT_EQ(dest_map[L"KEY1"], L"value1");
+    EXPECT_EQ(dest_map[L"KEY2"], L"value2");
+    EXPECT_EQ(dest_map[L"KEY3"], L"value3");
 }
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_no_trailing_semicolon) {
     std::map<std::string, std::string> dest_map;
-    ConnectionStringHelper::ParseConnectionString("key1=value1;key2=value2;key3=value3", dest_map);
+    ConnectionStringHelper::ParseConnectionString("KEY1=value1;kEy2=value2;key3=value3", dest_map);
     EXPECT_EQ(dest_map.size(), 3);
-    EXPECT_EQ(dest_map["key1"], "value1");
-    EXPECT_EQ(dest_map["key2"], "value2");
-    EXPECT_EQ(dest_map["key3"], "value3");
+    EXPECT_EQ(dest_map["KEY1"], "value1");
+    EXPECT_EQ(dest_map["KEY2"], "value2");
+    EXPECT_EQ(dest_map["KEY3"], "value3");
 }
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_nothing) {
     std::map<std::string, std::string> dest_map;
     ConnectionStringHelper::ParseConnectionString("", dest_map);
     EXPECT_EQ(dest_map.size(), 0);
+}
+
+TEST_F(ConnectionStringHelperTest, build_connection_string_ansi) {
+    std::map<std::string, std::string> dest_map;
+    dest_map["KEY"] = "value";
+    std::string res = ConnectionStringHelper::BuildConnectionString(dest_map);
+    EXPECT_EQ("KEY=value", res);
+}
+
+TEST_F(ConnectionStringHelperTest, build_connection_string_long_ansi) {
+    std::map<std::string, std::string> dest_map;
+    dest_map["A"] = "1";
+    dest_map["B"] = "2";
+    std::string res = ConnectionStringHelper::BuildConnectionString(dest_map);
+    EXPECT_EQ("A=1;B=2", res);
+}
+
+TEST_F(ConnectionStringHelperTest, build_connection_string_unicode) {
+    std::map<std::wstring, std::wstring> dest_map;
+    dest_map[L"KEY"] = L"value";
+    std::wstring res = ConnectionStringHelper::BuildConnectionStringW(dest_map);
+    EXPECT_EQ(L"KEY=value", res);
+}
+
+TEST_F(ConnectionStringHelperTest, build_connection_string_long_unicode) {
+    std::map<std::wstring, std::wstring> dest_map;
+    dest_map[L"A"] = L"1";
+    dest_map[L"B"] = L"2";
+    std::wstring res = ConnectionStringHelper::BuildConnectionStringW(dest_map);
+    EXPECT_EQ(L"A=1;B=2", res);
 }

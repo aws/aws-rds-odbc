@@ -69,7 +69,7 @@ private:
     int default_port;
     std::string conn_str;
 
-    // Query & Template to be passed in from caller
+    // Query & Template to be passed in from caller, below are examples of APG
     // ?.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
     std::string endpoint_template;
     // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0), LAST_UPDATE_TIMESTAMP FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL

@@ -51,7 +51,8 @@ public:
         HOST_STATE state,
         bool is_writer,
         std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy,
-        uint64_t weight = DEFAULT_WEIGHT
+        uint64_t weight = DEFAULT_WEIGHT,
+        SQL_TIMESTAMP_STRUCT last_update_timestamp = SQL_TIMESTAMP_STRUCT()
     );
 
     ~HostInfo() = default;
@@ -61,26 +62,29 @@ public:
     bool is_host_up() const;
     bool is_host_writer() const;
 
-    std::string get_host_port_pair() const;
-    std::string get_host() const;
-    HOST_STATE get_host_state() const;
-    uint64_t get_weight() const;
-
-    int get_port() const;
     void mark_as_writer(bool writer);
-    void set_host_state(HOST_STATE state);
 
-    std::shared_ptr<HostAvailabilityStrategy> get_host_availability_strategy() const;
+    std::string get_host() const;
+    int get_port() const;
+    std::string get_host_port_pair() const;
+    uint64_t get_weight() const;
+    SQL_TIMESTAMP_STRUCT get_last_updated_time() const;
+
+    void set_host_state(HOST_STATE state);
+    HOST_STATE get_host_state() const;
+
     void set_host_availability_strategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy);
+    std::shared_ptr<HostAvailabilityStrategy> get_host_availability_strategy() const;
 
     std::string session_id;
-    std::string last_updated;
     std::string replica_lag;
+
 private:
     std::string host_port_separator = ":";
     std::string host;
     int port = NO_PORT;
     uint64_t weight = DEFAULT_WEIGHT;
+    SQL_TIMESTAMP_STRUCT last_updated_timestamp;
 
     HOST_STATE host_state;
     bool is_writer;
