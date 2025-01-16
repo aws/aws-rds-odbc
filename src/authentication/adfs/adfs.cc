@@ -36,9 +36,9 @@
 #include "../util/logger_wrapper.h"
 
 const std::string AdfsCredentialsProvider::FORM_ACTION_PATTERN = "<form.*?action=\"([^\"]+)\"";
-const std::string AdfsCredentialsProvider::SAML_RESPONSE_PATTERN = "SAMLResponse\\W+value=\"(.*)\"( />)";
-const std::string AdfsCredentialsProvider::URL_PATTERN = "^(https)://[-a-zA-Z0-9+&@#/%?=~_!:,.']*[-a-zA-Z0-9+&@#/%=~_']";
 const std::string AdfsCredentialsProvider::INPUT_TAG_PATTERN = "<input id=(.*)";
+const std::string AdfsCredentialsProvider::SAML_RESPONSE_PATTERN = "name=\"SAMLResponse\"\\s+value=\"([^\"]+)\"";
+const std::string AdfsCredentialsProvider::URL_PATTERN = "^(https)://[-a-zA-Z0-9+&@#/%?=~_!:,.']*[-a-zA-Z0-9+&@#/%=~_']";
 
 std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& err_info) {
     std::string url = get_signin_url();

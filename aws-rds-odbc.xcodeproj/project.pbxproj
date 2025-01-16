@@ -99,6 +99,10 @@
 		738543F32CEE0E370019F6C6 /* round_robin_property.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F22CEE0E370019F6C6 /* round_robin_property.h */; };
 		738543F42CEE0E370019F6C6 /* round_robin_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */; };
 		738543F52CEE0E370019F6C6 /* round_robin_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */; };
+		73ABBC432D304A7400E34238 /* connection_string_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73ABBC412D304A7400E34238 /* connection_string_helper.h */; };
+		73ABBC442D304A7400E34238 /* connection_string_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73ABBC422D304A7400E34238 /* connection_string_helper.cc */; };
+		73ABBC452D304A7400E34238 /* connection_string_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = 73ABBC412D304A7400E34238 /* connection_string_helper.h */; };
+		73ABBC462D304A7400E34238 /* connection_string_helper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73ABBC422D304A7400E34238 /* connection_string_helper.cc */; };
 		73CB8C122D132772002671DA /* highest_weight_host_selector.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73CB8C112D132772002671DA /* highest_weight_host_selector.cc */; };
 		73CB8C132D132772002671DA /* highest_weight_host_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = 73CB8C102D132772002671DA /* highest_weight_host_selector.h */; };
 		73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E42CD3BC08002268BF /* host_availability_strategy.h */; };
@@ -167,6 +171,8 @@
 		738543F02CEE0E370019F6C6 /* round_robin_host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = round_robin_host_selector.h; sourceTree = "<group>"; };
 		738543F12CEE0E370019F6C6 /* round_robin_host_selector.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = round_robin_host_selector.cc; sourceTree = "<group>"; };
 		738543F22CEE0E370019F6C6 /* round_robin_property.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = round_robin_property.h; sourceTree = "<group>"; };
+		73ABBC412D304A7400E34238 /* connection_string_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = connection_string_helper.h; sourceTree = "<group>"; };
+		73ABBC422D304A7400E34238 /* connection_string_helper.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = connection_string_helper.cc; sourceTree = "<group>"; };
 		73CB8C102D132772002671DA /* highest_weight_host_selector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = highest_weight_host_selector.h; sourceTree = "<group>"; };
 		73CB8C112D132772002671DA /* highest_weight_host_selector.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = highest_weight_host_selector.cc; sourceTree = "<group>"; };
 		73D322E22CD3A46E002268BF /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -377,6 +383,8 @@
 		73D7882B2CC919070028B42F /* util */ = {
 			isa = PBXGroup;
 			children = (
+				73ABBC412D304A7400E34238 /* connection_string_helper.h */,
+				73ABBC422D304A7400E34238 /* connection_string_helper.cc */,
 				733B9FE32D1DBEA100F2D918 /* text_helper.h */,
 				731C53862D0B15AC006D7569 /* sliding_cache_map.h */,
 				731C53872D0B15AC006D7569 /* sliding_cache_map.cc */,
@@ -443,6 +451,7 @@
 				733ED0942D285155001BAC9D /* highest_weight_host_selector.h in Headers */,
 				733ED0952D285155001BAC9D /* host_info.h in Headers */,
 				733ED0962D285155001BAC9D /* federation.h in Headers */,
+				73ABBC452D304A7400E34238 /* connection_string_helper.h in Headers */,
 				733ED0972D285155001BAC9D /* odbc_helper.h in Headers */,
 				733ED0982D285155001BAC9D /* cluster_topology_info.h in Headers */,
 			);
@@ -472,6 +481,7 @@
 				73CB8C132D132772002671DA /* highest_weight_host_selector.h in Headers */,
 				73D788362CC919070028B42F /* host_info.h in Headers */,
 				73D788372CC919070028B42F /* federation.h in Headers */,
+				73ABBC432D304A7400E34238 /* connection_string_helper.h in Headers */,
 				7369B6112CDE5C9E00C98EDF /* odbc_helper.h in Headers */,
 				73D788382CC919070028B42F /* cluster_topology_info.h in Headers */,
 			);
@@ -567,6 +577,7 @@
 				733ED0A12D285155001BAC9D /* simple_host_availability_strategy.cc in Sources */,
 				733ED0A22D285155001BAC9D /* sliding_cache_map.cc in Sources */,
 				733ED0A32D285155001BAC9D /* federation.cc in Sources */,
+				73ABBC462D304A7400E34238 /* connection_string_helper.cc in Sources */,
 				733ED0A42D285155001BAC9D /* limitless_router_monitor.cc in Sources */,
 				733ED0A52D285155001BAC9D /* limitless_monitor_service.cc in Sources */,
 				733ED0A62D285155001BAC9D /* round_robin_host_selector.cc in Sources */,
@@ -592,6 +603,7 @@
 				73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */,
 				731C53892D0B15AC006D7569 /* sliding_cache_map.cc in Sources */,
 				73D788302CC919070028B42F /* federation.cc in Sources */,
+				73ABBC442D304A7400E34238 /* connection_string_helper.cc in Sources */,
 				73F467BE2D1355210083E758 /* limitless_router_monitor.cc in Sources */,
 				73F467BF2D1355210083E758 /* limitless_monitor_service.cc in Sources */,
 				738543F52CEE0E370019F6C6 /* round_robin_host_selector.cc in Sources */,
