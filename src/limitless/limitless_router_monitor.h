@@ -63,6 +63,12 @@ public:
 
     virtual bool IsStopped();
 protected:
+#ifdef UNICODE
+    std::wstring connection_string;
+#else
+    std::string connection_string;
+#endif
+    
     std::atomic_bool stopped = false;
 
     unsigned int interval_ms;
@@ -75,5 +81,11 @@ protected:
 
     void run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
 };
+
+#ifdef UNICODE
+#define LIMITLESS_ENABLED_KEY   L"LIMITLESSENABLED"
+#else
+#define LIMITLESS_ENABLED_KEY   "LIMITLESSENABLED"
+#endif
 
 #endif // LIMITLESSROUTERMONITOR_H_

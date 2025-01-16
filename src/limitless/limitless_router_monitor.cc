@@ -33,6 +33,7 @@
 #else
     #include <cstring> // For strlen in ANSI mode
 #endif
+#include <regex>
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
@@ -61,12 +62,25 @@ void LimitlessRouterMonitor::Open(
 
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
-    auto *connection_string = const_cast<SQLTCHAR *>(connection_string_c_str);
 
 #ifdef UNICODE
-    SQLSMALLINT connection_string_len = std::wcslen(reinterpret_cast<const wchar_t*>(connection_string_c_str));
+    this->connection_string = reinterpret_cast<const wchar_t *>(connection_string_c_str);
+
+    // disable limitless for the monitor
+    std::wregex limitless_enabled_pattern(LIMITLESS_ENABLED_KEY L"=1");
+    std::wstring limitless_disabled = LIMITLESS_ENABLED_KEY L"=0";
+    this->connection_string = std::regex_replace(this->connection_string, limitless_enabled_pattern, limitless_disabled);
+
+    SQLSMALLINT connection_string_len = std::wcslen(this->connection_string.c_str());
 #else
-    SQLSMALLINT connection_string_len = std::strlen(reinterpret_cast<const char*>(connection_string_c_str));
+    this->connection_string = reinterpret_cast<const char *>(connection_string_c_str);
+
+    // disable limitless for the monitor
+    std::regex limitless_enabled_pattern(LIMITLESS_ENABLED_KEY "=1");
+    std::string limitless_disabled = LIMITLESS_ENABLED_KEY "=0";
+    this->connection_string = std::regex_replace(this->connection_string, limitless_enabled_pattern, limitless_disabled);
+
+    SQLSMALLINT connection_string_len = std::strlen(this->connection_string.c_str());
 #endif
     SQLSMALLINT out_connection_string_len; // unused
 
@@ -82,9 +96,9 @@ void LimitlessRouterMonitor::Open(
 
     if (block_and_query_immediately) {
 #ifdef UNICODE
-        rc = SQLDriverConnectW(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+        rc = SQLDriverConnectW(conn, nullptr, reinterpret_cast<SQLWCHAR *>(this->connection_string.data()), connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
 #else
-        rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
+        rc = SQLDriverConnect(conn, nullptr, reinterpret_cast<SQLCHAR *>(this->connection_string.data()), connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
 #endif
         if (SQL_SUCCEEDED(rc)) {
             // initial connection was successful, immediately populate caller's limitless routers
@@ -96,7 +110,7 @@ void LimitlessRouterMonitor::Open(
     }
 
     // start monitoring thread; if block_and_query_immediately is false, then conn is SQL_NULL_HANDLE, and the thread will connect after the monitor interval has passed
-    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::run, this, henv, conn, connection_string, connection_string_len, host_port);
+    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::run, this, henv, conn, reinterpret_cast<SQLTCHAR *>(this->connection_string.data()), connection_string_len, host_port);
 }
 
 bool LimitlessRouterMonitor::IsStopped() {
