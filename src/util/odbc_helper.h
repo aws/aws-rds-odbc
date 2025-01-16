@@ -43,14 +43,11 @@ class OdbcHelper {
 public:
     static const int MAX_STATE_LENGTH = 32;
     static const int MAX_MSG_LENGTH = 1024;
-    static SQLTCHAR *check_connection_query;
-    static SQLTCHAR *check_limitless_cluster_query;
+    static SQLCHAR *check_connection_query;
 
     static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
 
     static bool CheckConnection(SQLHDBC conn);
-
-    static bool CheckLimitlessCluster(SQLHDBC conn);
 
     static void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt);
 

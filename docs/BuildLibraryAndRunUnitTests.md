@@ -30,13 +30,13 @@
    **ANSI**
    ```PowerShell
    cmake -S . -B build_ansi -DENABLE_UNIT_TESTS=TRUE
-   cmake --build build_ansi --config <configuration>
+   cmake --build build_ansi
    ```
 
    **Unicode**
    ```PowerShell
    cmake -S . -B build_unicode -DUNICODE_BUILD=ON -DENABLE_UNIT_TESTS=TRUE
-   cmake --build build_unicode --config <configuration>
+   cmake --build build_unicode
    ```
 
 1. Run the following from the repository root folder.
@@ -52,7 +52,8 @@
    ```
 
 ### Debugging with Visual Studio
-1. Follow the steps under [Build the library and run the tests](#build-library-and-run-unit-tests) above, replacing `<configuration>` with `Debug`.
+1. Follow the steps under [Build the library and run the tests](#build-library-and-run-unit-tests) above,
+   adding `-DCMAKE_BUILD_TYPE=Debug` to the first `cmake` command under ANSI and Unicode.
 1. Start Visual Studio 2022.
 1. Open one of these solutions
    - **ANSI**: `<root repository folder>\build_ansi\test\unit_test\unit_test.sln`.
@@ -90,13 +91,13 @@
    **ANSI**
    ```bash
    cmake -S . -B build_ansi -DENABLE_UNIT_TESTS=TRUE
-   cmake --build build_ansi --config Release
+   cmake --build build_ansi
    ```
 
    **Unicode**
    ```bash
    cmake -S . -B build_unicode -DUNICODE_BUILD=ON -DENABLE_UNIT_TESTS=TRUE
-   cmake --build build_unicode --config Release
+   cmake --build build_unicode
    ```
 
 1. Run the following to run the unit tests.

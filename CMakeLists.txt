@@ -31,7 +31,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build as shared library")
 else()
   set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build as static library")
-endif()  
+endif()
+
+#-----------------------------------------------------
+# Build type
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+endif()
+
+# Print the current build type
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 #-----------------------------------------------------
 
@@ -88,7 +98,6 @@ set(INC
   src/util/sliding_cache_map.h
   src/util/logger_wrapper.h
   src/util/odbc_helper.h
-  src/util/text_helper.h
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -140,12 +149,18 @@ elseif(ENABLE_UNIT_TESTS AND NOT ENABLE_INTEGRATION_TESTS)
 endif()
 
 #-----------------------------------------------------
+# Set compiler flags based on the build type
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message(STATUS "Adding debug compiler flags")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -fno-inline -fno-omit-frame-pointer")
+endif()
+
+#-----------------------------------------------------
 # macOS specific configuration
 
 if(APPLE)
-  #-----------------------------------------------------
   # ZLIB needs to be explicity required
-
   find_package(ZLIB REQUIRED)
 endif()
 

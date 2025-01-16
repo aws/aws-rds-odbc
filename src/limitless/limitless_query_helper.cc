@@ -27,6 +27,10 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
+#ifdef UNICODE
+    #undef UNICODE
+#endif
+
 #include "limitless_query_helper.h"
 
 #include <cmath>
@@ -34,10 +38,56 @@
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
-#include "../util/text_helper.h"
 
-SQLTCHAR *LimitlessQueryHelper::limitless_router_endpoint_query = \
-    const_cast<SQLTCHAR *>(reinterpret_cast<const SQLTCHAR *>(TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()")));
+SQLCHAR *LimitlessQueryHelper::check_limitless_cluster_query =
+    const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>(
+        "SELECT EXISTS ("\
+        "   SELECT 1"\
+        "   FROM pg_catalog.pg_class c"\
+        "   JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid"\
+        "   WHERE c.relname = 'limitless_subclusters'"\
+        "   AND n.nspname = 'rds_aurora'"\
+        ");"\
+    ));
+
+SQLCHAR *LimitlessQueryHelper::limitless_router_endpoint_query = \
+    const_cast<SQLCHAR *>(reinterpret_cast<const SQLCHAR *>("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()"));
+
+bool LimitlessQueryHelper::CheckLimitlessCluster(SQLHDBC conn) {
+    LoggerWrapper::initialize();
+
+    HSTMT hstmt = SQL_NULL_HSTMT;
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
+    if (!SQL_SUCCEEDED(rc)) {
+        return false;
+    }
+
+    rc = SQLExecDirect(hstmt, check_limitless_cluster_query, SQL_NTS);
+    if (!SQL_SUCCEEDED(rc)) {
+        OdbcHelper::CheckResult(rc, "SQLExecDirect failed", hstmt, SQL_HANDLE_STMT);
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+        return false;
+    }
+
+    rc = SQLFetch(hstmt);
+    if (!SQL_SUCCEEDED(rc)) {
+        OdbcHelper::CheckResult(rc, "SQLFetch failed", hstmt, SQL_HANDLE_STMT);
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+        return false;
+    }
+
+    SQLCHAR result[2];
+    SQLLEN result_len = 0;
+    rc = SQLGetData(hstmt, 1, SQL_C_CHAR, &result, sizeof(result), &result_len);
+    if (SQL_SUCCEEDED(rc)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+        return result[0] == '1';
+    }
+
+    OdbcHelper::CheckResult(rc, "SQLGetData failed", hstmt, SQL_HANDLE_STMT);
+    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+    return false;
+}
 
 std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map) {
     HSTMT hstmt = SQL_NULL_HSTMT;
