@@ -55,6 +55,8 @@ add_executable(
   authentication/secrets_manager_helper_test.cc
 
   failover/cluster_topology_info_test.cc
+  failover/cluster_topology_monitor_test.cc
+  failover/cluster_topology_query_helper_test.cc
 
   host_availability/simple_host_availability_strategy_test.cc
 

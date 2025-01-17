@@ -1,18 +1,55 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License, version 2.0
+// (GPLv2), as published by the Free Software Foundation, with the
+// following additional permissions:
+//
+// This program is distributed with certain software that is licensed
+// under separate terms, as designated in a particular file or component
+// or in the license documentation. Without limiting your rights under
+// the GPLv2, the authors of this program hereby grant you an additional
+// permission to link the program and your derivative works with the
+// separately licensed software that they have included with the program.
+//
+// Without limiting the foregoing grant of rights under the GPLv2 and
+// additional permission as to separately licensed software, this
+// program is also subject to the Universal FOSS Exception, version 1.0,
+// a copy of which can be found along with its FAQ at
+// http://oss.oracle.com/licenses/universal-foss-exception.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License, version 2.0, for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see 
+// http://www.gnu.org/licenses/gpl-2.0.html.
+
 #include "cluster_topology_monitor.h"
 
 ClusterTopologyMonitor::ClusterTopologyMonitor(
-        const std::string& cluster_id, const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-        const int port, const std::string& conn_str, const std::string& endpoint_template, const std::string& topology_query,
-        const std::string& writer_topology_query, const std::string& node_id_query): cluster_id{ cluster_id },
-        topology_map { std::move(topology_map) }, default_port { default_port }, conn_str{ conn_str }, endpoint_template{ endpoint_template },
-        topology_query { topology_query }, writer_topology_query { writer_topology_query }, node_id_query { node_id_query } {
+        const std::string& cluster_id,
+        const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
+        const std::string& conn_str,
+        std::shared_ptr<ClusterTopologyQueryHelper> query_helper,
+        const long ignore_topology_request_ns,
+        const long high_refresh_rate_ns,
+        const long refresh_rate_ns):
+        cluster_id{ std::move(cluster_id) },
+        topology_map { std::move(topology_map) },
+        conn_str { std::move(conn_str) },
+        query_helper { query_helper },
+        ignore_topology_request_ns { ignore_topology_request_ns },
+        high_refresh_rate_ns { high_refresh_rate_ns },
+        refresh_rate_ns { refresh_rate_ns } {
 
     if (!OdbcHelper::CheckResult(SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv),
         std::string("Cluster Topology Monitor unable to allocate environment handle for: ") + cluster_id,
         henv, SQL_HANDLE_ENV)) {
         return;
     }
-
     is_running = true;
     this->monitoring_thread = std::make_shared<std::thread>(&ClusterTopologyMonitor::run, this);
 }
@@ -226,8 +263,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(long time
     return new_hosts;
 }
 
-void ClusterTopologyMonitor::delay(bool use_high_refresh_rate)
-{
+void ClusterTopologyMonitor::delay(bool use_high_refresh_rate) {
     std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
     if (high_refresh_end_time != std::chrono::steady_clock::time_point() &&
             now < high_refresh_end_time) {
@@ -249,14 +285,13 @@ void ClusterTopologyMonitor::delay(bool use_high_refresh_rate)
         !is_running.load());
 }
 
-std::vector<HostInfo> ClusterTopologyMonitor::fetch_topology_update_cache(const SQLHDBC hdbc)
-{
+std::vector<HostInfo> ClusterTopologyMonitor::fetch_topology_update_cache(const SQLHDBC hdbc) {
     std::vector<HostInfo> hosts;
     if (!OdbcHelper::CheckConnection(hdbc)) {
         LOG(ERROR) << "Cluster Monitor invalid connection for querying for ClusterId: " << cluster_id;
         return hosts;
     }
-    hosts = query_topology(hdbc);
+    hosts = query_helper->query_topology(hdbc);
     if (hosts.empty()) {
         LOG(ERROR) << "Cluster Monitor queried and found no topology for ClusterId: " << cluster_id;
     }
@@ -285,113 +320,6 @@ void ClusterTopologyMonitor::update_topology_cache(const std::vector<HostInfo>& 
     // Release lock & notify next CV if other threads are waiting
     request_lock.unlock();
     request_update_topology_cv.notify_one();
-}
-
-std::string ClusterTopologyMonitor::get_writer_id(const SQLHDBC hdbc) const {
-    SQLRETURN rc;
-    SQLHSTMT stmt = SQL_NULL_HANDLE;
-    SQLTCHAR writer_id[BUFFER_SIZE];
-    SQLLEN out_length = 0;
-
-    rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &stmt);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to allocate handle for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::string();
-    }
-
-    rc = SQLExecDirect(stmt, AS_SQLCHAR(writer_topology_query.c_str()), SQL_NTS);    
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to execute writer query for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::string();
-    }
-
-    rc = SQLBindCol(stmt, 1, SQL_C_CHAR, writer_id, sizeof(writer_id), &out_length);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to bind writer_id column for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::string();
-    }
-
-    rc = SQLFetch(stmt);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to fetch writer from results for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::string();
-    }
-
-    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-    return std::string(AS_CHAR(writer_id), out_length);
-}
-
-std::vector<HostInfo> ClusterTopologyMonitor::query_topology(const SQLHDBC hdbc) const {
-    SQLRETURN rc;
-    SQLHSTMT stmt = SQL_NULL_HANDLE;
-    SQLTCHAR node_id[BUFFER_SIZE];
-    SQLLEN out_length = 0;
-    SQLINTEGER is_writer;
-    SQLFLOAT cpu_usage;
-    SQLFLOAT replica_lag_ms;
-    SQL_TIMESTAMP_STRUCT last_update_timestamp;
-
-    rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &stmt);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to allocate handle for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-
-    rc = SQLExecDirect(stmt, AS_SQLCHAR(topology_query.c_str()), SQL_NTS);    
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to execute topology query for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-
-    rc = SQLBindCol(stmt, 1, SQL_C_CHAR, node_id, sizeof(node_id), &out_length);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to bind node_id column for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-    rc = SQLBindCol(stmt, 2, SQL_C_SLONG, &is_writer, sizeof(is_writer), nullptr);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to bind is_writer column for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-    rc = SQLBindCol(stmt, 3, SQL_INTEGER, &cpu_usage, sizeof(cpu_usage), nullptr);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to bind cpu_usage column for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-    rc = SQLBindCol(stmt, 4, SQL_C_SLONG, &replica_lag_ms, sizeof(replica_lag_ms), nullptr);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to bind replica_lag_ms column for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-    rc = SQLBindCol(stmt, 5, SQL_C_TIMESTAMP, &last_update_timestamp, sizeof(last_update_timestamp), nullptr);
-    if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to bind last_update_timestamp column for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-        return std::vector<HostInfo>();
-    }
-
-    std::vector<HostInfo> hosts;
-    while (OdbcHelper::CheckResult(SQLFetch(stmt), std::string("ClusterTopologyMonitor failed to fetch topology from results for clusterId: ") + cluster_id, stmt, SQL_HANDLE_STMT)) {
-        hosts.push_back(create_host(node_id, is_writer, cpu_usage, replica_lag_ms, last_update_timestamp));
-    }
-
-    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-    return hosts;
-}
-
-std::string ClusterTopologyMonitor::get_endpoint(SQLTCHAR* node_id) const {
-    std::string res(endpoint_template);
-    int pos = res.find(REPLACE_CHAR);
-    if (pos != std::string::npos) {
-        res.replace(pos, 1, AS_CHAR(node_id));
-    }
-    return res;
-}
-
-HostInfo ClusterTopologyMonitor::create_host(SQLTCHAR* node_id, bool is_writer, SQLFLOAT cpu_usage, SQLFLOAT replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp) const {
-    long weight = std::round(replica_lag_ms) * 100L + std::round(cpu_usage);
-    std::string endpoint_url = get_endpoint(node_id);
-    HostInfo hi = HostInfo(endpoint_url, default_port, HOST_STATE::UP, true, nullptr, weight, update_timestamp);
-    return hi;
 }
 
 std::string ClusterTopologyMonitor::conn_str_replace_host(std::string conn_in, std::string new_host) {
@@ -430,7 +358,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         std::lock_guard<std::mutex> hdbc_lock(hdbc_mutex);
         if (!main_hdbc) {
             main_hdbc = std::make_shared<SQLHDBC>(&local_hdbc);
-            std::string writer_id = get_writer_id(local_hdbc);
+            std::string writer_id = query_helper->get_writer_id(local_hdbc);
             if (!writer_id.empty()) {
                 thread_writer_verified = true;
                 is_writer_connection.store(true);
@@ -440,7 +368,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
                 writer_id_cstr[writer_id.size()] = '\0';
                 SQL_TIMESTAMP_STRUCT last_update_timestamp;
                 main_writer_host_info = std::make_shared<HostInfo>(
-                    create_host(writer_id_cstr, true, 0, 0, last_update_timestamp));
+                    query_helper->create_host(writer_id_cstr, true, 0, 0, last_update_timestamp));
             }
         } else {
             // Connection already set, close local HDBC
@@ -513,7 +441,7 @@ void ClusterTopologyMonitor::NodeMonitoringThread::run() {
                     nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
             } else {
                 // Get Writer ID
-                std::string writer_id = main_monitor->get_writer_id(hdbc);
+                std::string writer_id = main_monitor->query_helper->get_writer_id(hdbc);
                 if (!writer_id.empty()) { // Connected to a Writer
                     std::lock_guard<std::mutex> hdbc_lock(main_monitor->node_threads_writer_hdbc_mutex);
                     if (main_monitor->node_threads_writer_hdbc != nullptr) {
@@ -574,7 +502,7 @@ void ClusterTopologyMonitor::NodeMonitoringThread::reader_thread_fetch_topology(
     };
     // Query for hosts
     std::vector<HostInfo> hosts;
-    hosts = main_monitor->query_topology(hdbc);
+    hosts = main_monitor->query_helper->query_topology(hdbc);
 
     // Share / update topology to main monitor
     {

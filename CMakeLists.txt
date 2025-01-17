@@ -75,6 +75,7 @@ set(SRC
 
   src/failover/cluster_topology_info.cc
   src/failover/cluster_topology_monitor.cc
+  src/failover/cluster_topology_query_helper.cc
 
   src/host_availability/simple_host_availability_strategy.cc
   src/host_selector/highest_weight_host_selector.cc
@@ -103,6 +104,7 @@ set(INC
 
   src/failover/cluster_topology_info.h
   src/failover/cluster_topology_monitor.h
+  src/failover/cluster_topology_query_helper.h
 
   src/host_availability/simple_host_availability_strategy.h
   src/host_selector/highest_weight_host_selector.h

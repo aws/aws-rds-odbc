@@ -42,6 +42,7 @@
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
 
 #include "authentication_provider.h"
+#include "cluster_topology_query_helper.h"
 #include "federation.h"
 #include "limitless_monitor_service.h"
 
@@ -128,6 +129,14 @@ public:
             this->monitor_thread = std::make_shared<std::thread>(&MOCK_LIMITLESS_ROUTER_MONITOR::mock_run, this, limitless_routers, limitless_routers_mutex);
         }
     }
+};
+
+class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
+public:
+    MOCK_METHOD(std::string, get_writer_id, (SQLHDBC hdbc), ());
+    MOCK_METHOD(std::string, get_node_id, (SQLHDBC hdbc), ());
+    MOCK_METHOD(std::vector<HostInfo>, query_topology, (SQLHDBC hdbc), ());
+    MOCK_METHOD(HostInfo, create_host, (SQLHDBC hdbc), ());
 };
 
 #endif /* __MOCKOBJECTS_H__ */

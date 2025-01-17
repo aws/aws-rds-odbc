@@ -1,3 +1,32 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License, version 2.0
+// (GPLv2), as published by the Free Software Foundation, with the
+// following additional permissions:
+//
+// This program is distributed with certain software that is licensed
+// under separate terms, as designated in a particular file or component
+// or in the license documentation. Without limiting your rights under
+// the GPLv2, the authors of this program hereby grant you an additional
+// permission to link the program and your derivative works with the
+// separately licensed software that they have included with the program.
+//
+// Without limiting the foregoing grant of rights under the GPLv2 and
+// additional permission as to separately licensed software, this
+// program is also subject to the Universal FOSS Exception, version 1.0,
+// a copy of which can be found along with its FAQ at
+// http://oss.oracle.com/licenses/universal-foss-exception.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License, version 2.0, for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see 
+// http://www.gnu.org/licenses/gpl-2.0.html.
+
 #ifndef CLUSTER_TOPOLOGY_MONITOR_H
 #define CLUSTER_TOPOLOGY_MONITOR_H
 
@@ -22,22 +51,19 @@
 #include <sqlext.h>
 #include <sqltypes.h>
 
+#include "cluster_topology_query_helper.h"
 #include "../host_info.h"
 #include "../util/connection_string_helper.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"
 
-#define AS_SQLCHAR(str) const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
-#define AS_CHAR(str) reinterpret_cast<char*>(str)
-#define BUFFER_SIZE 1024
-#define REPLACE_CHAR "?"
-
 class ClusterTopologyMonitor {
 public:
-    ClusterTopologyMonitor(const std::string& cluster_id, const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-        const int default_port, const std::string& conn_str, const std::string& endpoint_template,
-        const std::string& topology_query, const std::string& writer_topology_query, const std::string& node_id_query
+    ClusterTopologyMonitor(const std::string& cluster_id,
+        const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
+        const std::string& conn_str, std::shared_ptr<ClusterTopologyQueryHelper> query_helper,
+        const long ignore_topology_request_ns, const long high_refresh_rate_ns, const long refresh_rate_ns
     );
     ~ClusterTopologyMonitor();
 
@@ -52,32 +78,18 @@ protected:
     void delay(bool use_high_refresh_rate);
     std::vector<HostInfo> fetch_topology_update_cache(const SQLHDBC hdbc);
     void update_topology_cache(const std::vector<HostInfo>& hosts);
-    std::string get_writer_id(const SQLHDBC hdbc) const;
-    std::vector<HostInfo> query_topology(const SQLHDBC hdbc) const;
-    std::string get_endpoint(SQLTCHAR* node_id) const;
-    HostInfo create_host(SQLTCHAR* node_id, bool is_writer, SQLFLOAT cpu_usage, SQLFLOAT replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp) const;
     std::string conn_str_replace_host(std::string conn_in, std::string new_host);
 
 private:
     class NodeMonitoringThread;
+    std::shared_ptr<ClusterTopologyQueryHelper> query_helper;
     bool in_panic_mode();
     std::vector<HostInfo> open_any_conn_get_hosts();
 
+    // Topology Tracking
     std::string cluster_id;
-    std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map;
-
-    int default_port;
     std::string conn_str;
-
-    // Query & Template to be passed in from caller, below are examples of APG
-    // ?.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
-    std::string endpoint_template;
-    // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0), LAST_UPDATE_TIMESTAMP FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL
-    std::string topology_query;
-    // SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' AND SERVER_ID = aurora_db_instance_identifier()
-    std::string writer_topology_query;
-    // SELECT aurora_db_instance_identifier()
-    std::string node_id_query;
+    std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map;
 
     // Track Update Request
     std::atomic<bool> request_update_topology;
@@ -89,12 +101,11 @@ private:
     std::condition_variable topology_updated;
 
     std::atomic<std::chrono::steady_clock::time_point> ignore_topology_request_end_ns;
-    int ignore_topology_request_ns;
+    long ignore_topology_request_ns;
     std::chrono::steady_clock::time_point high_refresh_end_time;
     long high_refresh_rate_ns;
     const std::chrono::seconds high_refresh_rate_after_panic = std::chrono::seconds(30);
     long refresh_rate_ns;
-    int default_topology_query_timeout;
 
     // Main Thread
     std::shared_ptr<std::thread> monitoring_thread; 
