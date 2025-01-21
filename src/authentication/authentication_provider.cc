@@ -204,6 +204,7 @@ FederatedAuthType GetFedAuthTypeEnum(const char *str) {
 }
 
 bool GetCachedToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, const char* port, const char* db_user) {
+    LoggerWrapper::initialize();
     std::string key;
     uint64_t curr_time_in_sec = 0;
     GenKeyAndTime(db_hostname, db_region, port, db_user, key, curr_time_in_sec);
@@ -220,6 +221,7 @@ bool GetCachedToken(char* token, unsigned int max_size, const char* db_hostname,
 }
 
 void UpdateCachedToken(const char* db_hostname, const char* db_region, const char* port, const char* db_user, const char* token, const char* expiration_time) {
+    LoggerWrapper::initialize();
     std::string key;
     uint64_t curr_time_in_sec = 0;
     GenKeyAndTime(db_hostname, db_region, port, db_user, key, curr_time_in_sec);
@@ -231,7 +233,6 @@ void UpdateCachedToken(const char* db_hostname, const char* db_region, const cha
 }
 
 bool GenerateConnectAuthToken(char* token, unsigned int max_size, const char* db_hostname, const char* db_region, unsigned port, const char* db_user, FederatedAuthType type, FederatedAuthConfig config) {
-    // TODO(yuenhcol) - Need to move logger initializer to a central location
     LoggerWrapper::initialize();
     if (1 == ++sdk_ref_count) {
         std::lock_guard<std::mutex> lock(sdk_mutex);
