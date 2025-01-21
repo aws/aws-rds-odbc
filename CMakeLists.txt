@@ -114,7 +114,7 @@ option(UNICODE_BUILD "Enable Unicode build" OFF)
 # Set output directory suffix based on the build type
 if (UNICODE_BUILD)
   set(BUILD_DIR_SUFFIX "unicode")
-  add_definitions(-DUNICODE -D_UNICODE)  # Enable UNICODE and _UNICODE macros
+  add_definitions(-DUNICODE)
 else()
   set(BUILD_DIR_SUFFIX "ansi")
 endif()
