@@ -33,29 +33,30 @@ ClusterTopologyMonitor::ClusterTopologyMonitor(
         const std::string& cluster_id,
         const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
         const std::string& conn_str,
+        std::shared_ptr<IOdbcHelper> odbc_helper,
         std::shared_ptr<ClusterTopologyQueryHelper> query_helper,
-        const long ignore_topology_request_ns,
-        const long high_refresh_rate_ns,
-        const long refresh_rate_ns):
-        cluster_id{ std::move(cluster_id) },
-        topology_map { std::move(topology_map) },
-        conn_str { std::move(conn_str) },
-        query_helper { query_helper },
+        long ignore_topology_request_ns,
+        long high_refresh_rate_ns,
+        long refresh_rate_ns):
+        cluster_id{ cluster_id },
+        topology_map { topology_map },
+        conn_str { conn_str },
+        odbc_helper { std::move(odbc_helper) },
+        query_helper { std::move(query_helper) },
         ignore_topology_request_ns { ignore_topology_request_ns },
         high_refresh_rate_ns { high_refresh_rate_ns },
         refresh_rate_ns { refresh_rate_ns } {
 
-    if (!OdbcHelper::CheckResult(SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv),
+    if (!this->odbc_helper->CheckResult(SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv),
         std::string("Cluster Topology Monitor unable to allocate environment handle for: ") + cluster_id,
-        henv, SQL_HANDLE_ENV)) {
-        return;
+            henv, SQL_HANDLE_ENV)) {
+        throw std::runtime_error(std::string("Cluster Topology Monitor unable to allocate HENV for ClusterId: ") + cluster_id);
     }
-    is_running = true;
-    this->monitoring_thread = std::make_shared<std::thread>(&ClusterTopologyMonitor::run, this);
 }
 
 ClusterTopologyMonitor::~ClusterTopologyMonitor() {
     is_running.store(false);
+    node_threads_stop.store(true);
 
     // Notify node threads if they are stuck waiting
     {
@@ -71,16 +72,11 @@ ClusterTopologyMonitor::~ClusterTopologyMonitor() {
     monitoring_thread = nullptr;
 
     // Cleanup Handles
-    if (main_hdbc) {
-        SQLHDBC dbc_to_delete = main_hdbc.get();
-        SQLDisconnect(dbc_to_delete);
-        SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-        main_hdbc = nullptr;
-    }
-    OdbcHelper::Cleanup(henv, nullptr, nullptr);
+    dbc_clean_up(main_hdbc);
+    odbc_helper->Cleanup(henv, nullptr, nullptr);
 }
 
-void ClusterTopologyMonitor::set_cluster_id(std::string cluster_id) {
+void ClusterTopologyMonitor::set_cluster_id(const std::string& cluster_id) {
     this->cluster_id = cluster_id;
 }
 
@@ -97,12 +93,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::force_refresh(const bool verify_wr
     }
 
     if (verify_writer) {
-        if (main_hdbc) {
-            SQLHDBC dbc_to_delete = main_hdbc.get();
-            SQLDisconnect(dbc_to_delete);
-            SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-            main_hdbc = nullptr;
-        }
+        dbc_clean_up(main_hdbc);
         is_writer_connection.store(false);
     }
 
@@ -119,112 +110,26 @@ std::vector<HostInfo> ClusterTopologyMonitor::force_refresh(SQLHDBC hdbc, const 
     return fetch_topology_update_cache(hdbc);
 }
 
+void ClusterTopologyMonitor::start_monitor() {
+    if (!is_running.load()) {
+        is_running.store(true);
+        this->monitoring_thread = std::make_shared<std::thread>(&ClusterTopologyMonitor::run, this);
+    }
+}
+
 void ClusterTopologyMonitor::run() {
     try {
         while (is_running) {
+            bool should_handle_topology_timing = true;
+            // Panic if main monitor is not connected to the writer instance
             if (in_panic_mode()) {
-                // Spin up node threads
-                if (node_monitoring_threads.empty()) {
-                    node_threads_stop.store(false);
-                    if (node_threads_writer_hdbc) {
-                        SQLHDBC dbc_to_delete = *node_threads_reader_hdbc.get();
-                        SQLDisconnect(dbc_to_delete);
-                        SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-                        node_threads_writer_hdbc = nullptr;
-                    }
-                    if (node_threads_reader_hdbc) {
-                        SQLHDBC dbc_to_delete = *node_threads_reader_hdbc.get();
-                        SQLDisconnect(dbc_to_delete);
-                        SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-                        node_threads_reader_hdbc = nullptr;                        
-                    }
-                    node_threads_writer_host_info = nullptr;
-                    node_threads_latest_topology = nullptr;
-
-                    std::vector<HostInfo> hosts = topology_map->get(cluster_id);
-                    if (hosts.empty()) {
-                        hosts = open_any_conn_get_hosts();
-                    }
-
-                    if (!hosts.empty() && !is_writer_connection.load()) {
-                        for (HostInfo hi : hosts) {
-                            node_monitoring_threads[hi.get_host()] =
-                                std::make_shared<NodeMonitoringThread>(this, std::make_shared<HostInfo>(hi), main_writer_host_info, conn_str);
-                        }
-                    }
-                } else {
-                    std::lock_guard<std::mutex> node_lock(node_threads_writer_hdbc_mutex);
-                    std::lock_guard<std::mutex> hostinfo_lock(node_threads_writer_host_info_mutex);
-                    SQLHDBC local_hdbc = *node_threads_writer_hdbc.get();
-                    HostInfo local_hostinfo = *node_threads_writer_host_info.get();
-                    if (OdbcHelper::CheckConnection(local_hdbc) && local_hostinfo.is_host_up()) {
-                        std::lock_guard<std::mutex> hdbc_lock(hdbc_mutex);
-                        if (main_hdbc) {
-                            SQLHDBC dbc_to_delete = *main_hdbc.get();
-                            SQLDisconnect(dbc_to_delete);
-                            SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-                            main_hdbc = nullptr;
-                        }
-                        main_hdbc = std::make_shared<SQLHDBC>(&local_hdbc);
-                        main_writer_host_info = std::make_shared<HostInfo>(local_hostinfo);
-                        is_writer_connection.store(true);
-                        high_refresh_end_time = std::chrono::high_resolution_clock::now() +
-                            high_refresh_rate_after_panic;
-
-                        // Writer verified at initial connection & failovers but want to ignore new topology requests after failover
-                        // The first writer will be able to set from epoch to a proper end time
-                        std::chrono::steady_clock::time_point expected = std::chrono::steady_clock::time_point{}; // Epoch
-                        std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now() +
-                            std::chrono::nanoseconds(ignore_topology_request_ns);
-                        ignore_topology_request_end_ns.compare_exchange_strong(expected, new_time);
-
-                        node_threads_stop.store(true);
-                        node_monitoring_threads.clear();
-                        continue;
-                    } else {
-                        std::lock_guard<std::mutex> topology_lock(node_threads_latest_topology_mutex);
-                        std::vector<HostInfo> local_topology = *node_threads_latest_topology.get();
-                        auto end = node_monitoring_threads.end();
-                        for (HostInfo hi : local_topology) {
-                            std::string host_id = hi.get_host();
-                            if (node_monitoring_threads.find(host_id) != end) {
-                                node_monitoring_threads[host_id] =
-                                    std::make_shared<NodeMonitoringThread>(this, std::make_shared<HostInfo>(hi), main_writer_host_info, conn_str);
-                            }
-                        }
-                    }
-                }
-                delay(true);
+                should_handle_topology_timing = handle_panic_mode();
             } else {
-                // Regular / Non-Panic Mode
-                node_monitoring_threads.clear();
-
-                std::vector<HostInfo> hosts = fetch_topology_update_cache(*main_hdbc.get());
-                // No hosts, switch to panic
-                if (hosts.empty()) {
-                    if (main_hdbc) {
-                        SQLHDBC dbc_to_delete = *main_hdbc.get();
-                        SQLDisconnect(dbc_to_delete);
-                        SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-                        main_hdbc = nullptr;
-                    }
-                    is_writer_connection.store(false);
-                    continue;
-                }
-
-                std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
-                std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
-                if (high_refresh_end_time != epoch && now > high_refresh_end_time) {
-                    high_refresh_end_time = epoch;
-                }
-                delay(false);
+                should_handle_topology_timing = handle_regular_mode();
             }
 
-            std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
-            std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
-            std::chrono::steady_clock::time_point ignore_topology = ignore_topology_request_end_ns.load();
-            if (ignore_topology != epoch && now > ignore_topology) {
-                ignore_topology_request_end_ns.store(epoch);
+            if (should_handle_topology_timing) {
+                handle_ignore_topology_timing();
             }
         }
     } catch (const std::exception& ex) {
@@ -244,16 +149,15 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(long time
     if (timeout_ms >= 0) {
         return curr_hosts;
     }
-    std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now() +
-        std::chrono::milliseconds(timeout_ms);
+    std::chrono::steady_clock::time_point curr_time = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point end = curr_time + std::chrono::milliseconds(timeout_ms);
 
     // Comparing vector's references
-    while (std::chrono::high_resolution_clock::now() < end && &curr_hosts == &(new_hosts = topology_map->get(cluster_id))) {
-        std::unique_lock<std::mutex> topology_lock(topology_updated_mutex, std::defer_lock);
-        while (std::chrono::high_resolution_clock::now() < end &&
-            &curr_hosts == &(new_hosts = topology_map->get(cluster_id))) {
-            topology_updated.wait_for(topology_lock, std::chrono::milliseconds(1000));
-        }
+    std::unique_lock<std::mutex> topology_lock(topology_updated_mutex);
+    while (curr_time < end && &curr_hosts == &new_hosts) {
+        topology_updated.wait_for(topology_lock, std::chrono::milliseconds(1000));
+        new_hosts = topology_map->get(cluster_id);
+        curr_time = std::chrono::high_resolution_clock::now();
     }
 
     if (std::chrono::high_resolution_clock::now() >= end) {
@@ -263,10 +167,10 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(long time
     return new_hosts;
 }
 
-void ClusterTopologyMonitor::delay(bool use_high_refresh_rate) {
-    std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
+void ClusterTopologyMonitor::delay_main_thread(bool use_high_refresh_rate) {
+    std::chrono::steady_clock::time_point curr_time = std::chrono::high_resolution_clock::now();
     if (high_refresh_end_time != std::chrono::steady_clock::time_point() &&
-            now < high_refresh_end_time) {
+            curr_time < high_refresh_end_time) {
         use_high_refresh_rate = true;
     }
 
@@ -274,20 +178,21 @@ void ClusterTopologyMonitor::delay(bool use_high_refresh_rate) {
         use_high_refresh_rate = true;
     }
 
-    std::chrono::steady_clock::time_point end = now + (use_high_refresh_rate ?
+    std::chrono::steady_clock::time_point end = curr_time + (use_high_refresh_rate ?
         std::chrono::nanoseconds(high_refresh_rate_ns) :
         std::chrono::nanoseconds(refresh_rate_ns));
-    std::unique_lock<std::mutex> request_lock(request_update_topology_mutex, std::defer_lock);
+    std::unique_lock<std::mutex> request_lock(request_update_topology_mutex);
     do {
         request_update_topology_cv.wait_for(request_lock, std::chrono::milliseconds(50));
+        curr_time = std::chrono::high_resolution_clock::now();
     } while (!request_update_topology.load() &&
-        std::chrono::high_resolution_clock::now() < end &&
-        !is_running.load());
+        curr_time < end && !is_running.load()
+    );
 }
 
 std::vector<HostInfo> ClusterTopologyMonitor::fetch_topology_update_cache(const SQLHDBC hdbc) {
     std::vector<HostInfo> hosts;
-    if (!OdbcHelper::CheckConnection(hdbc)) {
+    if (!odbc_helper->CheckConnection(hdbc)) {
         LOG(ERROR) << "Cluster Monitor invalid connection for querying for ClusterId: " << cluster_id;
         return hosts;
     }
@@ -300,42 +205,32 @@ std::vector<HostInfo> ClusterTopologyMonitor::fetch_topology_update_cache(const 
 }
 
 void ClusterTopologyMonitor::update_topology_cache(const std::vector<HostInfo>& hosts) {
-    std::unique_lock<std::mutex> request_lock(request_update_topology_mutex, std::defer_lock);
-    std::unique_lock<std::mutex> update_lock(topology_updated_mutex, std::defer_lock);
+    std::unique_lock<std::mutex> request_lock(request_update_topology_mutex);
+    std::unique_lock<std::mutex> update_lock(topology_updated_mutex);
 
-    // Try to get lock, if not wait under condition variable
-    while (true) {
-        if (request_lock.try_lock()) {
-            // Update topology and notify threads
-            topology_map->put(cluster_id, hosts);
-            std::lock_guard<std::mutex> update_lock(topology_updated_mutex);
-            request_update_topology.store(false);
-            topology_updated.notify_all();
-            break;
-        } else {
-            request_update_topology_cv.wait(request_lock);
-        }
-    }
-
-    // Release lock & notify next CV if other threads are waiting
-    request_lock.unlock();
+    // Update topology and notify threads
+    topology_map->put(cluster_id, hosts);
+    request_update_topology.store(false);
+    topology_updated.notify_all();
     request_update_topology_cv.notify_one();
 }
 
-std::string ClusterTopologyMonitor::conn_str_replace_host(std::string conn_in, std::string new_host) {
+std::string ClusterTopologyMonitor::conn_str_replace_host(const std::string& conn_in, const std::string& new_host) {
     std::map<std::string, std::string> conn_map;
     ConnectionStringHelper::ParseConnectionString(conn_in.c_str(), conn_map);
 
-    if (conn_map.find("SERVER") != conn_map.end()) {
-        conn_map["SERVER"] = new_host;
+    if (conn_map.find(SERVER_KEY) != conn_map.end()) {
+        conn_map[SERVER_KEY] = new_host;
     }
-    // TODO - Disable Failover
+    if (conn_map.find(FAILOVER_KEY) != conn_map.end()) {
+        conn_map[FAILOVER_KEY] = FAILOVER_DISABLE;
+    }
 
     return ConnectionStringHelper::BuildConnectionString(conn_map);
 }
 
 bool ClusterTopologyMonitor::in_panic_mode() {
-    return !main_hdbc || !OdbcHelper::CheckConnection(*main_hdbc.get()) ||
+    return !main_hdbc || !odbc_helper->CheckConnection(main_hdbc.get()) ||
         !is_writer_connection;
 }
 
@@ -346,10 +241,10 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         SQLHDBC local_hdbc;
         // open a new connection
         SQLAllocHandle(SQL_HANDLE_DBC, henv, &local_hdbc);
-        SQLTCHAR* conn_cstr = const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(conn_str.c_str()));
+        SQLCHAR* conn_cstr = AS_SQLCHAR(conn_str.c_str());
         rc = SQLDriverConnect(local_hdbc, nullptr, conn_cstr, SQL_NTS,
             nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-        if (!OdbcHelper::CheckResult(rc, std::string("ClusterTopologyMonitor failed to open connection for clusterId: ") + cluster_id, local_hdbc, SQL_HANDLE_DBC)) {
+        if (!odbc_helper->CheckResult(rc, std::string("ClusterTopologyMonitor failed to open connection for clusterId: ") + cluster_id, local_hdbc, SQL_HANDLE_DBC)) {
             SQLDisconnect(local_hdbc);
             SQLFreeHandle(SQL_HANDLE_DBC, local_hdbc);
             std::vector<HostInfo>();
@@ -363,10 +258,10 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
                 thread_writer_verified = true;
                 is_writer_connection.store(true);
                 std::lock_guard<std::mutex> host_info_lock(node_threads_writer_hdbc_mutex);
-                SQLTCHAR* writer_id_cstr = new SQLTCHAR[writer_id.size() + 1];
+                SQLCHAR* writer_id_cstr = new SQLCHAR[writer_id.size() + 1];
                 std::copy(writer_id.begin(), writer_id.end(), writer_id_cstr);
                 writer_id_cstr[writer_id.size()] = '\0';
-                SQL_TIMESTAMP_STRUCT last_update_timestamp;
+                SQL_TIMESTAMP_STRUCT last_update_timestamp{};
                 main_writer_host_info = std::make_shared<HostInfo>(
                     query_helper->create_host(writer_id_cstr, true, 0, 0, last_update_timestamp));
             }
@@ -377,7 +272,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         }
     }
 
-    std::vector<HostInfo> hosts = fetch_topology_update_cache(*main_hdbc.get());
+    std::vector<HostInfo> hosts = fetch_topology_update_cache(main_hdbc.get());
     if (thread_writer_verified) {
         // Writer verified at initial connection & failovers but want to ignore new topology requests after failover
         // The first writer will be able to set from epoch to a proper end time
@@ -389,23 +284,130 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
 
     if (hosts.empty()) {
         // No topology, close connection
-        if (main_hdbc) {
-            SQLHDBC dbc_to_delete = *main_hdbc.get();
-            SQLDisconnect(dbc_to_delete);
-            SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
-            main_hdbc = nullptr;
-        }
+        dbc_clean_up(main_hdbc);
         is_writer_connection.store(false);
     }
 
     return hosts;
 }
 
+void ClusterTopologyMonitor::dbc_clean_up(std::shared_ptr<SQLHDBC> dbc) {
+    if (dbc && *dbc) {
+        SQLHDBC dbc_to_delete = dbc.get();
+        SQLDisconnect(dbc_to_delete);
+        SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
+        dbc.reset(); // Release & set to null
+    }
+}
+
+bool ClusterTopologyMonitor::handle_panic_mode() {
+    bool should_handle_topology_timing = true;
+    if (node_monitoring_threads.empty()) {
+        init_node_monitors();
+    } else {
+        should_handle_topology_timing = get_possible_writer_conn();
+    }
+    delay_main_thread(true);
+    return should_handle_topology_timing;
+}
+
+bool ClusterTopologyMonitor::handle_regular_mode() {
+    node_monitoring_threads.clear();
+
+    std::vector<HostInfo> hosts = fetch_topology_update_cache(main_hdbc.get());
+    // No hosts, switch to panic
+    if (hosts.empty()) {
+        dbc_clean_up(main_hdbc);
+        is_writer_connection.store(false);
+        return false;
+    }
+
+    std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
+    if (high_refresh_end_time != epoch && now > high_refresh_end_time) {
+        high_refresh_end_time = epoch;
+    }
+    delay_main_thread(false);
+    return true;
+}
+
+void ClusterTopologyMonitor::handle_ignore_topology_timing() {
+    std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
+    std::chrono::steady_clock::time_point ignore_topology = ignore_topology_request_end_ns.load();
+    if (ignore_topology != epoch && now > ignore_topology) {
+        ignore_topology_request_end_ns.store(epoch);
+    }
+}
+
+void ClusterTopologyMonitor::init_node_monitors() {
+    node_threads_stop.store(false);
+    dbc_clean_up(node_threads_writer_hdbc);
+    dbc_clean_up(node_threads_reader_hdbc);
+    node_threads_writer_host_info = nullptr;
+    node_threads_latest_topology = nullptr;
+
+    std::vector<HostInfo> hosts = topology_map->get(cluster_id);
+    if (hosts.empty()) {
+        hosts = open_any_conn_get_hosts();
+    }
+
+    if (!hosts.empty() && !is_writer_connection.load()) {
+        for (HostInfo hi : hosts) {
+            node_monitoring_threads[hi.get_host()] =
+                std::make_shared<NodeMonitoringThread>(this, std::make_shared<HostInfo>(hi), main_writer_host_info, conn_str);
+        }
+    }
+}
+
+bool ClusterTopologyMonitor::get_possible_writer_conn() {
+    std::lock_guard<std::mutex> node_lock(node_threads_writer_hdbc_mutex);
+    std::lock_guard<std::mutex> hostinfo_lock(node_threads_writer_host_info_mutex);
+    SQLHDBC local_hdbc = node_threads_writer_hdbc.get();
+    HostInfo local_hostinfo = node_threads_writer_host_info ? *node_threads_writer_host_info.get() : HostInfo("", 0, DOWN, false, nullptr);
+    if (odbc_helper->CheckConnection(local_hdbc) && local_hostinfo.is_host_up()) {
+        std::lock_guard<std::mutex> hdbc_lock(hdbc_mutex);
+        dbc_clean_up(main_hdbc);
+        main_hdbc = std::make_shared<SQLHDBC>(&local_hdbc);
+        main_writer_host_info = std::make_shared<HostInfo>(local_hostinfo);
+        is_writer_connection.store(true);
+        high_refresh_end_time = std::chrono::high_resolution_clock::now() +
+            high_refresh_rate_after_panic;
+
+        // Writer verified at initial connection & failovers but want to ignore new topology requests after failover
+        // The first writer will be able to set from epoch to a proper end time
+        std::chrono::steady_clock::time_point expected = std::chrono::steady_clock::time_point{}; // Epoch
+        std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now() +
+            std::chrono::nanoseconds(ignore_topology_request_ns);
+        ignore_topology_request_end_ns.compare_exchange_strong(expected, new_time);
+
+        node_threads_stop.store(true);
+        node_monitoring_threads.clear();
+        return false;
+    } else {
+        std::vector<HostInfo> local_topology;
+        {
+            std::lock_guard<std::mutex> topology_lock(node_threads_latest_topology_mutex);
+            local_topology = node_threads_latest_topology ? *node_threads_latest_topology.get() : std::vector<HostInfo>();
+        }
+        auto end = node_monitoring_threads.end();
+        for (HostInfo hi : local_topology) {
+            std::string host_id = hi.get_host();
+            if (node_monitoring_threads.find(host_id) != end) {
+                node_monitoring_threads[host_id] =
+                    std::make_shared<NodeMonitoringThread>(this, std::make_shared<HostInfo>(hi), main_writer_host_info, conn_str);
+            }
+        }
+    }
+    return true;
+}
+
 ClusterTopologyMonitor::NodeMonitoringThread::NodeMonitoringThread(ClusterTopologyMonitor* monitor, std::shared_ptr<HostInfo> host_info, std::shared_ptr<HostInfo> writer_host_info, std::string conn_str) {
-    main_monitor = monitor;
+    this->main_monitor = monitor;
     this->host_info = host_info;
     this->writer_host_info = host_info;
     this->conn_str = conn_str;
+    SQLAllocHandle(SQL_HANDLE_DBC, main_monitor->henv, &hdbc);
     node_thread = std::make_shared<std::thread>(&NodeMonitoringThread::run, this);
 }
 
@@ -417,26 +419,22 @@ ClusterTopologyMonitor::NodeMonitoringThread::~NodeMonitoringThread() {
     }
     node_thread = nullptr;
 
-    if (hdbc) {
-        SQLDisconnect(hdbc);
-    }
-    OdbcHelper::Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
+    SQLDisconnect(hdbc);
+    main_monitor->odbc_helper->Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
 }
 
 void ClusterTopologyMonitor::NodeMonitoringThread::run() {
     bool thread_update_topology = false;
     std::string host_endpoint = host_info ? host_info->get_host() : "";
     conn_str = main_monitor->conn_str_replace_host(conn_str, host_endpoint);
-    SQLTCHAR* conn_cstr = const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(conn_str.c_str()));
+    SQLCHAR* conn_cstr = AS_SQLCHAR(conn_str.c_str());
     try {
         while (!main_monitor->node_threads_stop.load()) {
-            if (!OdbcHelper::CheckConnection(hdbc)) {
+            if (!main_monitor->odbc_helper->CheckConnection(hdbc)) {
                 // Disconnect
                 LOG(WARNING) << "Failover Monitor for: " << host_endpoint << " not connected. Trying to reconnect";
                 SQLDisconnect(hdbc);
-                OdbcHelper::Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
                 // Reconnect and try to query next interval
-                SQLAllocHandle(SQL_HANDLE_DBC, main_monitor->henv, &hdbc);
                 SQLDriverConnect(hdbc, nullptr, conn_cstr, SQL_NTS,
                     nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
             } else {
@@ -448,7 +446,7 @@ void ClusterTopologyMonitor::NodeMonitoringThread::run() {
                         // Writer connection already set
                         // Disconnect this thread's connection
                         SQLDisconnect(hdbc);
-                        OdbcHelper::Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
+                        main_monitor->odbc_helper->Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
                     } else {
                         // Main monitor now tracks this connection
                         main_monitor->node_threads_writer_hdbc = std::make_shared<SQLHDBC>(&hdbc);
@@ -489,15 +487,13 @@ void ClusterTopologyMonitor::NodeMonitoringThread::run() {
     }
 
     // Close any open connections / handles
-    if (hdbc) {
-        SQLDisconnect(hdbc);
-    }
-    OdbcHelper::Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
+    SQLDisconnect(hdbc);
+    main_monitor->odbc_helper->Cleanup(SQL_NULL_HANDLE, hdbc, SQL_NULL_HANDLE);
 }
 
 void ClusterTopologyMonitor::NodeMonitoringThread::reader_thread_fetch_topology() {
     // Check connection
-    if (!OdbcHelper::CheckConnection(hdbc)) {
+    if (!main_monitor->odbc_helper->CheckConnection(hdbc)) {
         return;
     };
     // Query for hosts

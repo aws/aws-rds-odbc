@@ -32,7 +32,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <chrono>
 #include <cmath>
 #include <condition_variable>
 #include <map>
@@ -58,37 +57,58 @@
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"
 
+
+// TODO, support unicode
+#ifdef UNICODE
+#define SERVER_KEY          "SERVER"
+#define FAILOVER_KEY        "ENABLECLUSTERFAILOVER"
+#define FAILOVER_DISABLE    "0"
+#else
+#define SERVER_KEY          "SERVER"
+#define FAILOVER_KEY        "ENABLECLUSTERFAILOVER"
+#define FAILOVER_DISABLE    "0"
+#endif
+
 class ClusterTopologyMonitor {
 public:
-    ClusterTopologyMonitor(const std::string& cluster_id,
-        const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-        const std::string& conn_str, std::shared_ptr<ClusterTopologyQueryHelper> query_helper,
-        const long ignore_topology_request_ns, const long high_refresh_rate_ns, const long refresh_rate_ns
-    );
+    ClusterTopologyMonitor(const std::string& cluster_id, const std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
+        const std::string& conn_str, std::shared_ptr<IOdbcHelper> odbc_helper,
+        std::shared_ptr<ClusterTopologyQueryHelper> query_helper, long ignore_topology_request_ns,
+        long high_refresh_rate_ns, long refresh_rate_ns);
     ~ClusterTopologyMonitor();
 
-    void set_cluster_id(std::string cluster_id);
+    void set_cluster_id(const std::string& cluster_id);
     std::vector<HostInfo> force_refresh(const bool verify_writer, const long timeout_ms);
     std::vector<HostInfo> force_refresh(SQLHDBC hdbc, const long timeout_ms);
 
-    void run();
+    void start_monitor();
 
 protected:
+    void run();
     std::vector<HostInfo> wait_for_topology_update(long timeout_ms);
-    void delay(bool use_high_refresh_rate);
+    void delay_main_thread(bool use_high_refresh_rate);
     std::vector<HostInfo> fetch_topology_update_cache(const SQLHDBC hdbc);
     void update_topology_cache(const std::vector<HostInfo>& hosts);
-    std::string conn_str_replace_host(std::string conn_in, std::string new_host);
+    std::string conn_str_replace_host(const std::string& conn_in, const std::string& new_host);
 
 private:
     class NodeMonitoringThread;
+    std::shared_ptr<IOdbcHelper> odbc_helper;
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper;
     bool in_panic_mode();
     std::vector<HostInfo> open_any_conn_get_hosts();
+    void dbc_clean_up(std::shared_ptr<SQLHDBC> dbc);
+
+    bool handle_panic_mode();
+    bool handle_regular_mode();
+    void handle_ignore_topology_timing();
+    void init_node_monitors();
+    bool get_possible_writer_conn();
 
     // Topology Tracking
     std::string cluster_id;
     std::string conn_str;
+    // SlidingCacheMap internally is thread safe
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map;
 
     // Track Update Request
@@ -154,7 +174,7 @@ private:
     std::string conn_str;
     bool writer_changed = false;    
     std::shared_ptr<std::thread> node_thread;
-    SQLHDBC hdbc;
+    SQLHDBC hdbc = SQL_NULL_HDBC;
 
     const int THREAD_SLEEP_MS = 100;
 };

@@ -55,4 +55,18 @@ private:
     static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
 };
 
+class IOdbcHelper {
+public:
+    virtual bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) = 0;
+    virtual bool CheckConnection(SQLHDBC conn) = 0;
+    virtual void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) = 0;
+};
+
+class OdbcHelperWrapper : public IOdbcHelper{
+public:
+    bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) { OdbcHelper::CheckResult(rc, log_message, handle, handle_type); };
+    bool CheckConnection(SQLHDBC conn) { OdbcHelper::CheckConnection(conn); };
+    void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) { OdbcHelper::Cleanup(henv, conn, hstmt); };
+};
+
 #endif // ODBCHELPER_H_

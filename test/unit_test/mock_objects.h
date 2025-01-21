@@ -46,6 +46,8 @@
 #include "federation.h"
 #include "limitless_monitor_service.h"
 
+#include "util/odbc_helper.h"
+
 class MOCK_SECRETS_MANAGER_CLIENT : public Aws::SecretsManager::SecretsManagerClient {
 public:
     MOCK_SECRETS_MANAGER_CLIENT() : SecretsManagerClient() {};
@@ -131,8 +133,16 @@ public:
     }
 };
 
+class MOCK_ODBC_HELPER : public IOdbcHelper {
+public:
+    MOCK_METHOD(bool, CheckResult, (SQLRETURN, const std::string&, SQLHANDLE, int32_t), ());
+    MOCK_METHOD(bool, CheckConnection, (SQLHDBC), ());
+    MOCK_METHOD(void, Cleanup, (SQLHENV, SQLHDBC, SQLHSTMT), ());
+};
+
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
 public:
+    MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", "", "", "") {}
     MOCK_METHOD(std::string, get_writer_id, (SQLHDBC hdbc), ());
     MOCK_METHOD(std::string, get_node_id, (SQLHDBC hdbc), ());
     MOCK_METHOD(std::vector<HostInfo>, query_topology, (SQLHDBC hdbc), ());

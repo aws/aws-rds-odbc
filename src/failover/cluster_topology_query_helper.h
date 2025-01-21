@@ -43,21 +43,33 @@
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 
-#define AS_SQLCHAR(str) const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
-#define AS_CHAR(str) reinterpret_cast<char*>(str)
 #define BUFFER_SIZE 1024
 #define REPLACE_CHAR "?"
 
-class ClusterTopologyQueryHelper {
-    ClusterTopologyQueryHelper(const int port, const std::string& endpoint_template, const std::string& topology_query, const std::string& writer_id_query, const std::string& node_id_query);
+#ifdef UNICODE
+// TODO, support unicode
+typedef std::string StringType;
+typedef char CharType;
+typedef SQLCHAR SqlCharType;
+#else
+typedef std::string StringType;
+typedef char CharType;
+typedef SQLCHAR SqlCharType;
+#endif
+
+#define AS_SQLCHAR(str) const_cast<SqlCharType*>(reinterpret_cast<const SqlCharType*>(str))
+#define AS_CHAR(str) reinterpret_cast<CharType*>(str)
+
+class ClusterTopologyQueryHelper {    
 public:
+    ClusterTopologyQueryHelper(int port, const std::string& endpoint_template, const std::string& topology_query, const std::string& writer_id_query, const std::string& node_id_query);
     virtual std::string get_writer_id(SQLHDBC hdbc);
     virtual std::string get_node_id(SQLHDBC hdbc);
     virtual std::vector<HostInfo> query_topology(SQLHDBC hdbc);
     virtual HostInfo create_host(SQLTCHAR* node_id, bool is_writer, SQLFLOAT cpu_usage, SQLFLOAT replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp);
-private:
     virtual std::string get_endpoint(SQLTCHAR* node_id);
 
+private:
     int port;
 
     // Query & Template to be passed in from caller, below are examples of APG
