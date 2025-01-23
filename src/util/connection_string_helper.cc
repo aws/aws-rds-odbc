@@ -68,7 +68,7 @@ void ConnectionStringHelper::ParseConnectionStringW(const wchar_t *connection_st
 
 std::string ConnectionStringHelper::BuildConnectionString(std::map<std::string, std::string> &input_map) {
     std::ostringstream conn_stream;
-    for (auto e : input_map) {
+    for (const auto& e : input_map) {
         if (conn_stream.tellp() > 0) {
             conn_stream << ";";
         }
@@ -79,7 +79,7 @@ std::string ConnectionStringHelper::BuildConnectionString(std::map<std::string, 
 
 std::wstring ConnectionStringHelper::BuildConnectionStringW(std::map<std::wstring, std::wstring> &input_map) {
     std::wostringstream conn_stream;
-    for (auto e : input_map) {
+    for (const auto& e : input_map) {
         if (conn_stream.tellp() > 0) {
             conn_stream << ";";
         }

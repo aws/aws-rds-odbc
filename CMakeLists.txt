@@ -148,9 +148,7 @@ endif()
 
 #-----------------------------------------------------
 
-if(ENABLE_INTEGRATION_TESTS AND NOT ENABLE_UNIT_TESTS)
-  add_subdirectory(test/integration_test)
-elseif(ENABLE_UNIT_TESTS AND NOT ENABLE_INTEGRATION_TESTS)
+if(ENABLE_UNIT_TESTS)
   add_subdirectory(test/unit_test)
 endif()
 

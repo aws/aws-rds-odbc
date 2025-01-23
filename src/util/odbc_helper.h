@@ -64,9 +64,9 @@ public:
 
 class OdbcHelperWrapper : public IOdbcHelper{
 public:
-    bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) { OdbcHelper::CheckResult(rc, log_message, handle, handle_type); };
-    bool CheckConnection(SQLHDBC conn) { OdbcHelper::CheckConnection(conn); };
-    void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) { OdbcHelper::Cleanup(henv, conn, hstmt); };
+    bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) override { return OdbcHelper::CheckResult(rc, log_message, handle, handle_type); };
+    bool CheckConnection(SQLHDBC conn) override { return OdbcHelper::CheckConnection(conn); };
+    void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) override { OdbcHelper::Cleanup(henv, conn, hstmt); };
 };
 
 #endif // ODBCHELPER_H_

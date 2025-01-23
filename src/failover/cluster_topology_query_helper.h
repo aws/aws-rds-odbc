@@ -43,22 +43,8 @@
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 
-#define BUFFER_SIZE 1024
-#define REPLACE_CHAR "?"
-
-#ifdef UNICODE
-// TODO, support unicode
-typedef std::string StringType;
-typedef char CharType;
-typedef SQLCHAR SqlCharType;
-#else
-typedef std::string StringType;
-typedef char CharType;
-typedef SQLCHAR SqlCharType;
-#endif
-
-#define AS_SQLCHAR(str) const_cast<SqlCharType*>(reinterpret_cast<const SqlCharType*>(str))
-#define AS_CHAR(str) reinterpret_cast<CharType*>(str)
+#define AS_SQLCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
+#define AS_CHAR(str) (reinterpret_cast<char*>(str))
 
 class ClusterTopologyQueryHelper {    
 public:
@@ -81,6 +67,17 @@ private:
     std::string writer_id_query;
     // SELECT aurora_db_instance_identifier()
     std::string node_id_query;
+
+    const static int BUFFER_SIZE = 1024;
+    const static char REPLACE_CHAR = '?';
+    const static uint64_t SCALE_TO_PERCENT = 100L;
+
+    // Topology Query
+    const static int NODE_ID_COL = 1;
+    const static int IS_WRITER_COL = 2;
+    const static int CPU_USAGE_COL = 3;
+    const static int REPLICA_LAG_COL = 4;
+    const static int UPDATE_TIMESTAMP_COL = 5;
 };
 
 #endif // CLUSTER_TOPOLOGY_QUERY_HELPER_H

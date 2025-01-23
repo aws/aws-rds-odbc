@@ -52,7 +52,7 @@ public:
         bool is_writer,
         std::shared_ptr<HostAvailabilityStrategy> host_availability_strategy,
         uint64_t weight = DEFAULT_WEIGHT,
-        SQL_TIMESTAMP_STRUCT last_update_timestamp = SQL_TIMESTAMP_STRUCT()
+        SQL_TIMESTAMP_STRUCT last_updated_timestamp = SQL_TIMESTAMP_STRUCT()
     );
 
     ~HostInfo() = default;

@@ -31,8 +31,8 @@
 #define CONNECTION_STRING_HELPER_H_
 
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
 
 class ConnectionStringHelper {
 public:
