@@ -57,6 +57,10 @@
 		73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */; };
 		73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */; };
 		73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */; };
+		73DDE0782D440725003614BF /* cluster_topology_query_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */; };
+		73DDE0792D440725003614BF /* cluster_topology_monitor_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */; };
+		73DDE07A2D440725003614BF /* cluster_topology_query_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */; };
+		73DDE07B2D440725003614BF /* cluster_topology_monitor_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +130,8 @@
 		73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
 		73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy_test.cc; sourceTree = "<group>"; };
 		73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper_test.cc; sourceTree = "<group>"; };
+		73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_monitor_test.cc; sourceTree = "<group>"; };
+		73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_query_helper_test.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,6 +280,8 @@
 		73D322F12CD3C3D1002268BF /* failover */ = {
 			isa = PBXGroup;
 			children = (
+				73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */,
+				73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */,
 				73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */,
 			);
 			path = failover;
@@ -395,6 +403,8 @@
 				733ED0CA2D28528D001BAC9D /* limitless_monitor_service_test.cc in Sources */,
 				733ED0CB2D28528D001BAC9D /* secrets_manager_helper_test.cc in Sources */,
 				733ED0CC2D28528D001BAC9D /* okta_test.cc in Sources */,
+				73DDE0782D440725003614BF /* cluster_topology_query_helper_test.cc in Sources */,
+				73DDE0792D440725003614BF /* cluster_topology_monitor_test.cc in Sources */,
 				733ED0CD2D28528D001BAC9D /* adfs_test.cc in Sources */,
 				733ED0CE2D28528D001BAC9D /* round_robin_host_selector_test.cc in Sources */,
 				733ED0CF2D28528D001BAC9D /* highest_weight_host_selector_test.cc in Sources */,
@@ -418,6 +428,8 @@
 				733C45F12D12ED6A0034BF7E /* limitless_monitor_service_test.cc in Sources */,
 				73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */,
 				7369B62D2CDE669D00C98EDF /* okta_test.cc in Sources */,
+				73DDE07A2D440725003614BF /* cluster_topology_query_helper_test.cc in Sources */,
+				73DDE07B2D440725003614BF /* cluster_topology_monitor_test.cc in Sources */,
 				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
 				738543EC2CEE0E050019F6C6 /* round_robin_host_selector_test.cc in Sources */,
 				73CB8C0E2D132764002671DA /* highest_weight_host_selector_test.cc in Sources */,
