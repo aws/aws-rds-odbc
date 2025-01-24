@@ -106,10 +106,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-build_ansi/
-build_debug/
-build_release/
-build_unicode/
+build_*/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -463,7 +460,7 @@ test/regression.diffs
 # Xcode
 .DS_Store
 build/
-xcode-build/
+xcode_build_*/
 DerivedData/
 *.pbxuser
 *.mode1v3
