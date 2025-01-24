@@ -31,12 +31,13 @@
 #include <cluster_topology_monitor.h>
 
 #include "../mock_objects.h"
+#include "text_helper.h"
 
 using ::testing::Return;
 
 namespace {
   const std::string cluster_id = "cluster_test_id";
-  const SQLTCHAR* conn_str = reinterpret_cast<SQLTCHAR*>(const_cast<char*>("DSN=Test_DSN;Server=cluster.server.com;"));
+  const SQLTCHAR* conn_str = (SQLTCHAR *)TEXT("DSN=Test_DSN;Server=cluster.server.com;");
   const long ignore_topology_request_ns = 1000;
   const long high_refresh_rate_ns = 50;
   const long refresh_rate_ns = 100;
