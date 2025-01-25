@@ -43,9 +43,6 @@
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 
-#define AS_SQLCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
-#define AS_CHAR(str) (reinterpret_cast<char*>(str))
-
 class ClusterTopologyQueryHelper {    
 public:
     ClusterTopologyQueryHelper(int port, const std::string& endpoint_template, const std::string& topology_query, const std::string& writer_id_query, const std::string& node_id_query);
@@ -56,20 +53,32 @@ public:
     virtual std::string get_endpoint(SQLTCHAR* node_id);
 
 private:
-    int port;
+    const int port;
 
     // Query & Template to be passed in from caller, below are examples of APG
     // ?.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
-    std::string endpoint_template;
+#ifdef UNICODE
+    std::wstring endpoint_template_;
     // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0), LAST_UPDATE_TIMESTAMP FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL
-    std::string topology_query;
+    std::wstring topology_query_;
     // SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' AND SERVER_ID = aurora_db_instance_identifier()
-    std::string writer_id_query;
+    std::wstring writer_id_query_;
     // SELECT aurora_db_instance_identifier()
-    std::string node_id_query;
+    std::wstring node_id_query_;
+#else
+    std::string endpoint_template_;
+    std::string topology_query_;
+    std::string writer_id_query_;
+    std::string node_id_query_;
+#endif
 
-    const static int BUFFER_SIZE = 1024;
+#ifdef UNICODE
+    const static wchar_t REPLACE_CHAR = L'?';
+#else 
     const static char REPLACE_CHAR = '?';
+#endif
+
+    const static int BUFFER_SIZE = 1024;;
     const static uint64_t SCALE_TO_PERCENT = 100L;
 
     // Topology Query

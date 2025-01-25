@@ -138,15 +138,19 @@ public:
     MOCK_METHOD(bool, CheckResult, (SQLRETURN, const std::string&, SQLHANDLE, int32_t), ());
     MOCK_METHOD(bool, CheckConnection, (SQLHDBC), ());
     MOCK_METHOD(void, Cleanup, (SQLHENV, SQLHDBC, SQLHSTMT), ());
+    MOCK_METHOD(bool, AllocateHandle, (SQLSMALLINT, SQLHANDLE, SQLHANDLE, const std::string&), ());
+    MOCK_METHOD(bool, ExecuteQuery, (SQLHSTMT, SQLTCHAR*, const std::string&), ());
+    MOCK_METHOD(bool, BindColumn, (SQLHSTMT, SQLUSMALLINT, SQLSMALLINT, SQLPOINTER, SQLLEN, const std::string&), ());
+    MOCK_METHOD(bool, FetchResults, (SQLHSTMT, const std::string&), ());
 };
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
 public:
     MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", "", "", "") {}
-    MOCK_METHOD(std::string, get_writer_id, (SQLHDBC hdbc), ());
-    MOCK_METHOD(std::string, get_node_id, (SQLHDBC hdbc), ());
-    MOCK_METHOD(std::vector<HostInfo>, query_topology, (SQLHDBC hdbc), ());
-    MOCK_METHOD(HostInfo, create_host, (SQLHDBC hdbc), ());
+    MOCK_METHOD(std::string, get_writer_id, (SQLHDBC), ());
+    MOCK_METHOD(std::string, get_node_id, (SQLHDBC), ());
+    MOCK_METHOD(std::vector<HostInfo>, query_topology, (SQLHDBC), ());
+    MOCK_METHOD(HostInfo, create_host, (SQLHDBC), ());
 };
 
 #endif /* __MOCKOBJECTS_H__ */

@@ -88,7 +88,7 @@ protected:
     void delay_main_thread(bool use_high_refresh_rate);
     std::vector<HostInfo> fetch_topology_update_cache(SQLHDBC hdbc);
     void update_topology_cache(const std::vector<HostInfo>& hosts);
-    #if UNICODE
+    #ifdef UNICODE
     std::wstring conn_for_host(const std::string& new_host);
     #else
     std::string conn_for_host(const std::string& new_host);
@@ -96,8 +96,8 @@ protected:
 
 private:
     class NodeMonitoringThread;
-    std::shared_ptr<IOdbcHelper> odbc_helper;
-    std::shared_ptr<ClusterTopologyQueryHelper> query_helper;
+    std::shared_ptr<IOdbcHelper> odbc_helper_;
+    std::shared_ptr<ClusterTopologyQueryHelper> query_helper_;
     bool in_panic_mode();
     std::vector<HostInfo> open_any_conn_get_hosts();
     static void dbc_clean_up(std::shared_ptr<SQLHDBC> dbc);
@@ -109,64 +109,61 @@ private:
     bool get_possible_writer_conn();
 
     // Topology Tracking
-    std::string cluster_id;
+    std::string cluster_id_;
     #ifdef UNICODE
-        std::wstring conn_str;
+        std::wstring conn_str_;
     #else
-        std::string conn_str;
+        std::string conn_str_;
     #endif
 
     // SlidingCacheMap internally is thread safe
-    std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map;
+    std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map_;
 
     // Track Update Request
-    std::atomic<bool> request_update_topology;
-    std::mutex request_update_topology_mutex;
-    std::condition_variable request_update_topology_cv;
+    std::atomic<bool> request_update_topology_;
+    std::mutex request_update_topology_mutex_;
+    std::condition_variable request_update_topology_cv_;
     const uint64_t TOPOLOGY_REQUEST_WAIT_MS = 50;
 
     // Track Topology Updated
-    std::mutex topology_updated_mutex;
-    std::condition_variable topology_updated;
+    std::mutex topology_updated_mutex_;
+    std::condition_variable topology_updated_;
     const uint64_t TOPOLOGY_UPDATE_WAIT_MS = 1000;
 
-    std::atomic<std::chrono::steady_clock::time_point> ignore_topology_request_end_ns;
-    uint64_t ignore_topology_request_ns;
-    std::chrono::steady_clock::time_point high_refresh_end_time;
-    uint64_t high_refresh_rate_ns;
-    const std::chrono::seconds high_refresh_rate_after_panic = std::chrono::seconds(30);
-    uint64_t refresh_rate_ns;
+    std::atomic<std::chrono::steady_clock::time_point> ignore_topology_request_end_ns_;
+    uint64_t ignore_topology_request_ns_;
+    std::chrono::steady_clock::time_point high_refresh_end_time_;
+    uint64_t high_refresh_rate_ns_;
+    const std::chrono::seconds high_refresh_rate_after_panic_ = std::chrono::seconds(30);
+    uint64_t refresh_rate_ns_;
 
     // Main Thread
-    std::shared_ptr<std::thread> monitoring_thread; 
-    std::atomic<bool> is_running;
+    std::shared_ptr<std::thread> monitoring_thread_; 
+    std::atomic<bool> is_running_;
     // Children / Node Threads
-    std::map<std::string, std::shared_ptr<NodeMonitoringThread>> node_monitoring_threads;
-    std::atomic<bool> node_threads_stop;
+    std::map<std::string, std::shared_ptr<NodeMonitoringThread>> node_monitoring_threads_;
+    std::atomic<bool> node_threads_stop_;
 
     // Children Thread Connections & Host Info
-    std::shared_ptr<SQLHDBC> node_threads_writer_hdbc;
-    std::shared_ptr<HostInfo> node_threads_writer_host_info;
-    std::shared_ptr<SQLHDBC> node_threads_reader_hdbc;
-    std::shared_ptr<std::vector<HostInfo>> node_threads_latest_topology;
+    std::shared_ptr<SQLHDBC> node_threads_writer_hdbc_;
+    std::shared_ptr<HostInfo> node_threads_writer_host_info_;
+    std::shared_ptr<SQLHDBC> node_threads_reader_hdbc_;
+    std::shared_ptr<std::vector<HostInfo>> node_threads_latest_topology_;
 
-    std::mutex node_threads_writer_hdbc_mutex;
-    std::mutex node_threads_writer_host_info_mutex;
-    std::mutex node_threads_reader_hdbc_mutex;
-    std::mutex node_threads_latest_topology_mutex;
+    std::mutex node_threads_writer_hdbc_mutex_;
+    std::mutex node_threads_writer_host_info_mutex_;
+    std::mutex node_threads_reader_hdbc_mutex_;
+    std::mutex node_threads_latest_topology_mutex_;
 
     // TODO(yuenhcol), review if these can be done without mutex/atomics
     // There should be only at most 1 thread interacting with these
     // Connection Information for main thread
-    std::atomic<bool> is_writer_connection;
-    SQLHENV henv;
-    std::mutex hdbc_mutex;
-    std::shared_ptr<SQLHDBC> main_hdbc;
-    std::shared_ptr<HostInfo> main_writer_host_info;
+    std::atomic<bool> is_writer_connection_;
+    SQLHENV henv_;
+    std::mutex hdbc_mutex_;
+    std::shared_ptr<SQLHDBC> main_hdbc_;
+    std::shared_ptr<HostInfo> main_writer_host_info_;
 };
-
-#ifndef NODE_MONITORING_THREAD_H
-#define NODE_MONITORING_THREAD_H
 
 class ClusterTopologyMonitor::NodeMonitoringThread {
 public:
@@ -181,16 +178,14 @@ private:
     void handle_reader_conn(bool& thread_update_topology);
     void reader_thread_fetch_topology();
 
-    ClusterTopologyMonitor* main_monitor;
-    std::shared_ptr<HostInfo> host_info;
-    std::shared_ptr<HostInfo> writer_host_info;
-    bool writer_changed = false;    
-    std::shared_ptr<std::thread> node_thread;
-    SQLHDBC hdbc = SQL_NULL_HDBC;
+    ClusterTopologyMonitor* main_monitor_;
+    std::shared_ptr<HostInfo> host_info_;
+    std::shared_ptr<HostInfo> writer_host_info_;
+    bool writer_changed_ = false;    
+    std::shared_ptr<std::thread> node_thread_;
+    SQLHDBC hdbc_ = SQL_NULL_HDBC;
 
-    const uint64_t THREAD_SLEEP_MS = 100;
+    const uint64_t THREAD_SLEEP_MS_ = 100;
 };
-
-#endif // NODE_MONITORING_THREAD_H
 
 #endif // CLUSTER_TOPOLOGY_MONITOR_H

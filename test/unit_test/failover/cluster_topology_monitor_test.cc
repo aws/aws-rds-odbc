@@ -81,125 +81,125 @@ TEST_F(ClusterTopologyMonitorTest, henv_create_fail) {
 }
 
 TEST_F(ClusterTopologyMonitorTest, run_panic_no_cached_topology_writer_conn) {
- EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
-     .Times(testing::AtLeast(0));
- EXPECT_CALL(*mock_odbc_helper, CheckConnection(testing::_))
-     .WillRepeatedly(Return(true));
- EXPECT_CALL(*mock_odbc_helper, CheckResult(testing::_, testing::_, testing::_, testing::_))
-     .WillRepeatedly(Return(true));
- // First connection (open_any_conn_get_hosts) is the writer
- // Note, this query should only return a string if the connected one is the writer
- EXPECT_CALL(*mock_query_helper, get_writer_id(testing::_))
-     .WillOnce(Return("writer"))
-     .WillRepeatedly(Return(""));
+    EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
+        .Times(testing::AtLeast(0));
+    EXPECT_CALL(*mock_odbc_helper, CheckConnection(testing::_))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_odbc_helper, CheckResult(testing::_, testing::_, testing::_, testing::_))
+        .WillRepeatedly(Return(true));
+    // First connection (open_any_conn_get_hosts) is the writer
+    // Note, this query should only return a string if the connected one is the writer
+    EXPECT_CALL(*mock_query_helper, get_writer_id(testing::_))
+        .WillOnce(Return("writer"))
+        .WillRepeatedly(Return(""));
 
- std::vector<HostInfo> topology;
- topology.push_back(HostInfo("writer.server.com", 1234, UP, true, nullptr));
- topology.push_back(HostInfo("reader_a.server.com", 1234, UP, false, nullptr));
- topology.push_back(HostInfo("reader_b.server.com", 1234, UP, false, nullptr));
+    std::vector<HostInfo> topology;
+    topology.push_back(HostInfo("writer.server.com", 1234, UP, true, nullptr));
+    topology.push_back(HostInfo("reader_a.server.com", 1234, UP, false, nullptr));
+    topology.push_back(HostInfo("reader_b.server.com", 1234, UP, false, nullptr));
 
- EXPECT_CALL(*mock_query_helper, query_topology(testing::_))
-     .WillRepeatedly(Return(topology));
+    EXPECT_CALL(*mock_query_helper, query_topology(testing::_))
+        .WillRepeatedly(Return(topology));
 
- // Create monitor, starts main thread
- monitor = std::make_shared<ClusterTopologyMonitor>(
-   cluster_id,
-   topology_map,
-   conn_str,
-   mock_odbc_helper,
-   mock_query_helper,
-   ignore_topology_request_ns,
-   high_refresh_rate_ns,
-   refresh_rate_ns
- );
- monitor->start_monitor();
+    // Create monitor, starts main thread
+    monitor = std::make_shared<ClusterTopologyMonitor>(
+    cluster_id,
+    topology_map,
+    conn_str,
+    mock_odbc_helper,
+    mock_query_helper,
+    ignore_topology_request_ns,
+    high_refresh_rate_ns,
+    refresh_rate_ns
+    );
+    monitor->start_monitor();
 
- // Sleep to give time for topology to update
- std::this_thread::sleep_for(std::chrono::seconds(sleep_duration_sec));
+    // Sleep to give time for topology to update
+    std::this_thread::sleep_for(std::chrono::seconds(sleep_duration_sec));
 
- // Check if topology is updated by main thread / open_any_conn_get_hosts
- EXPECT_EQ(1, topology_map->size());
+    // Check if topology is updated by main thread / open_any_conn_get_hosts
+    EXPECT_EQ(1, topology_map->size());
 }
 
 // Should do the same as above, except internally will not mark conn as writer
 // or create the writer host info
 TEST_F(ClusterTopologyMonitorTest, run_panic_no_cached_topology_init_reader_conn) {
- EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
-     .Times(testing::AtLeast(0));
- EXPECT_CALL(*mock_odbc_helper, CheckConnection(testing::_))
-     .WillRepeatedly(Return(true));
- EXPECT_CALL(*mock_odbc_helper, CheckResult(testing::_, testing::_, testing::_, testing::_))
-     .WillRepeatedly(Return(true));
- // First connection (open_any_conn_get_hosts) is a reader
- // Empty string represents that query did not return result, meaning the connection is not the writer
- EXPECT_CALL(*mock_query_helper, get_writer_id(testing::_))
-     .WillOnce(Return("")) // First connection by main thread, open_any_conn_get_hosts
-     .WillOnce(Return("writer")) // Node thread connects to writer
-     .WillRepeatedly(Return(""));;
+    EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
+        .Times(testing::AtLeast(0));
+    EXPECT_CALL(*mock_odbc_helper, CheckConnection(testing::_))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_odbc_helper, CheckResult(testing::_, testing::_, testing::_, testing::_))
+        .WillRepeatedly(Return(true));
+    // First connection (open_any_conn_get_hosts) is a reader
+    // Empty string represents that query did not return result, meaning the connection is not the writer
+    EXPECT_CALL(*mock_query_helper, get_writer_id(testing::_))
+        .WillOnce(Return("")) // First connection by main thread, open_any_conn_get_hosts
+        .WillOnce(Return("writer")) // Node thread connects to writer
+        .WillRepeatedly(Return(""));;
 
- std::vector<HostInfo> topology;
- topology.push_back(HostInfo("writer.server.com", 1234, UP, true, nullptr));
- topology.push_back(HostInfo("reader_a.server.com", 1234, UP, false, nullptr));
- topology.push_back(HostInfo("reader_b.server.com", 1234, UP, false, nullptr));
+    std::vector<HostInfo> topology;
+    topology.push_back(HostInfo("writer.server.com", 1234, UP, true, nullptr));
+    topology.push_back(HostInfo("reader_a.server.com", 1234, UP, false, nullptr));
+    topology.push_back(HostInfo("reader_b.server.com", 1234, UP, false, nullptr));
 
- EXPECT_CALL(*mock_query_helper, query_topology(testing::_))
-     .WillRepeatedly(Return(topology));
+    EXPECT_CALL(*mock_query_helper, query_topology(testing::_))
+        .WillRepeatedly(Return(topology));
 
- // Create monitor, starts main thread
- monitor = std::make_shared<ClusterTopologyMonitor>(
-   cluster_id,
-   topology_map,
-   conn_str,
-   mock_odbc_helper,
-   mock_query_helper,
-   ignore_topology_request_ns,
-   high_refresh_rate_ns,
-   refresh_rate_ns
- );
- monitor->start_monitor();
+    // Create monitor, starts main thread
+    monitor = std::make_shared<ClusterTopologyMonitor>(
+    cluster_id,
+    topology_map,
+    conn_str,
+    mock_odbc_helper,
+    mock_query_helper,
+    ignore_topology_request_ns,
+    high_refresh_rate_ns,
+    refresh_rate_ns
+    );
+    monitor->start_monitor();
 
- // Sleep to give time for topology to update
- std::this_thread::sleep_for(std::chrono::seconds(sleep_duration_sec));
+    // Sleep to give time for topology to update
+    std::this_thread::sleep_for(std::chrono::seconds(sleep_duration_sec));
 
- // Check if topology is updated by main thread / open_any_conn_get_hosts
- EXPECT_EQ(1, topology_map->size());
+    // Check if topology is updated by main thread / open_any_conn_get_hosts
+    EXPECT_EQ(1, topology_map->size());
 }
 
 TEST_F(ClusterTopologyMonitorTest, run_panic_with_cached_hosts) {
- std::vector<HostInfo> topology;
- topology.push_back(HostInfo("writer.server.com", 1234, UP, true, nullptr));
- topology.push_back(HostInfo("reader_a.server.com", 1234, UP, false, nullptr));
- topology.push_back(HostInfo("reader_b.server.com", 1234, UP, false, nullptr));
- topology_map->put(cluster_id, topology);
+    std::vector<HostInfo> topology;
+    topology.push_back(HostInfo("writer.server.com", 1234, UP, true, nullptr));
+    topology.push_back(HostInfo("reader_a.server.com", 1234, UP, false, nullptr));
+    topology.push_back(HostInfo("reader_b.server.com", 1234, UP, false, nullptr));
+    topology_map->put(cluster_id, topology);
 
- EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
-     .Times(testing::AtLeast(0));
- EXPECT_CALL(*mock_odbc_helper, CheckConnection(testing::_))
-     .WillRepeatedly(Return(true));
- EXPECT_CALL(*mock_odbc_helper, CheckResult(testing::_, testing::_, testing::_, testing::_))
-     .WillRepeatedly(Return(true));
- EXPECT_CALL(*mock_query_helper, query_topology(testing::_))
-     .WillRepeatedly(Return(topology));
- EXPECT_CALL(*mock_query_helper, get_writer_id(testing::_))
-     .WillOnce(Return("writer"))
-     .WillRepeatedly(Return(""));
+    EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
+        .Times(testing::AtLeast(0));
+    EXPECT_CALL(*mock_odbc_helper, CheckConnection(testing::_))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_odbc_helper, CheckResult(testing::_, testing::_, testing::_, testing::_))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_query_helper, query_topology(testing::_))
+        .WillRepeatedly(Return(topology));
+    EXPECT_CALL(*mock_query_helper, get_writer_id(testing::_))
+        .WillOnce(Return("writer"))
+        .WillRepeatedly(Return(""));
 
- // Create monitor, starts main thread
- monitor = std::make_shared<ClusterTopologyMonitor>(
-     cluster_id,
-     topology_map,
-     conn_str,
-     mock_odbc_helper,
-     mock_query_helper,
-     ignore_topology_request_ns,
-     high_refresh_rate_ns,
-     refresh_rate_ns
- );
- monitor->start_monitor();
+    // Create monitor, starts main thread
+    monitor = std::make_shared<ClusterTopologyMonitor>(
+        cluster_id,
+        topology_map,
+        conn_str,
+        mock_odbc_helper,
+        mock_query_helper,
+        ignore_topology_request_ns,
+        high_refresh_rate_ns,
+        refresh_rate_ns
+    );
+    monitor->start_monitor();
 
- // Sleep to give time for topology to update
- std::this_thread::sleep_for(std::chrono::seconds(sleep_duration_sec));
+    // Sleep to give time for topology to update
+    std::this_thread::sleep_for(std::chrono::seconds(sleep_duration_sec));
 
- // Check that topology did not increase in size or decrease
- EXPECT_EQ(1, topology_map->size());
+    // Check that topology did not increase in size or decrease
+    EXPECT_EQ(1, topology_map->size());
 }

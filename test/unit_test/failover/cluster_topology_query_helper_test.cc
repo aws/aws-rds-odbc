@@ -34,6 +34,7 @@
 
 #include <cluster_topology_query_helper.h>
 
+#include "text_helper.h"
 #include "../mock_objects.h"
 
 using ::testing::Return;
@@ -49,7 +50,7 @@ protected:
 };
 
 TEST_F(ClusterTopologyQueryHelperTest, create_host) {
-    SQLTCHAR* node_id = AS_SQLCHAR("node_id");
+    SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node_id"));
     int port = 1;
     bool is_writer = false;
     float cpu_usage = 2;
@@ -61,7 +62,14 @@ TEST_F(ClusterTopologyQueryHelperTest, create_host) {
         std::make_shared<ClusterTopologyQueryHelper>(port, "?", "", "", "");
 
     HostInfo host = query_helper->create_host(node_id, false, cpu_usage, replica_lag, timestamp);
-    EXPECT_EQ(std::string(AS_CHAR(node_id)), host.get_host());
+    std::string expected;
+#ifdef UNICODE
+    std::wstring node_id_wstr(node_id);
+    expected = std::string(node_id_wstr.begin(), node_id_wstr.end());
+#else
+    expected = std::string(AS_CHAR(node_id));
+#endif
+    EXPECT_EQ(expected, host.get_host());
     EXPECT_EQ(port, host.get_port());
     EXPECT_EQ(weight, host.get_weight());
     EXPECT_EQ(is_writer, host.is_host_writer());
@@ -70,16 +78,29 @@ TEST_F(ClusterTopologyQueryHelperTest, create_host) {
 TEST_F(ClusterTopologyQueryHelperTest, get_endpoint) {
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
         std::make_shared<ClusterTopologyQueryHelper>(1234, "?", "", "", "");
-    SQLTCHAR* input = AS_SQLCHAR("node-id");
-    std::string expected = AS_CHAR(input);
-    EXPECT_EQ(expected, query_helper->get_endpoint(input));
+    SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node-id"));
+    std::string expected;
+#ifdef UNICODE
+    std::wstring node_id_wstr(node_id);
+    expected = std::string(node_id_wstr.begin(), node_id_wstr.end());
+#else
+    expected = std::string(AS_CHAR(node_id));
+#endif
+    EXPECT_EQ(expected, query_helper->get_endpoint(node_id));
 }
 
 TEST_F(ClusterTopologyQueryHelperTest, get_endpoint_extra_values) {
     std::string endpoint_template = "?.other-values";
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
         std::make_shared<ClusterTopologyQueryHelper>(1234, endpoint_template, "", "", "");
-    SQLTCHAR* input = AS_SQLCHAR("node-id");
-    std::string expected = std::string(endpoint_template).replace(endpoint_template.find("?"), 1, AS_CHAR(input));
-    EXPECT_EQ(expected, query_helper->get_endpoint(input));
+    SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node-id"));
+    std::string expected;
+#ifdef UNICODE
+    std::wstring node_id_wstr(node_id);
+    std::string narrow_id = std::string(node_id_wstr.begin(), node_id_wstr.end());
+    expected = std::string(endpoint_template).replace(endpoint_template.find("?"), 1, narrow_id.c_str());
+#else
+    expected = std::string(endpoint_template).replace(endpoint_template.find("?"), 1, AS_CHAR(node_id));
+#endif
+    EXPECT_EQ(expected, query_helper->get_endpoint(node_id));
 }
