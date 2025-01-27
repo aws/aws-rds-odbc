@@ -88,16 +88,19 @@ endif()
 #-----------------------------------------------------
 
 target_link_libraries(
-  # Name
   ${PROJECT_NAME}
 
   # External Libaries
   gtest_main
   gmock_main
-
-  # Source Libaries
-  aws-rds-odbc
 )
+
+if (UNICODE_BUILD)
+  target_link_libraries(${PROJECT_NAME} aws-rds-odbc-w)
+else()
+  target_link_libraries(${PROJECT_NAME} aws-rds-odbc-a)
+endif()
+
 
 #-----------------------------------------------------
 

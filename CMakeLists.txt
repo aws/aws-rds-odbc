@@ -45,6 +45,24 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 #-----------------------------------------------------
 
+# Create an option for selecting the Unicode build type
+option(UNICODE_BUILD "Enable Unicode build" OFF)
+
+# Set output directory suffix based on the build type
+if (UNICODE_BUILD)
+  set(BUILD_DIR_SUFFIX "unicode")
+  set(LIBRARY_NAME "${PROJECT_NAME}-w")
+  add_definitions(-DUNICODE)
+else()
+  set(BUILD_DIR_SUFFIX "ansi")
+  set(LIBRARY_NAME "${PROJECT_NAME}-a")
+endif()
+
+# Output a message indicating the build type
+message(STATUS "Building ${BUILD_DIR_SUFFIX} version of ${PROJECT_NAME}")
+
+#-----------------------------------------------------
+
 set(SRC
   src/host_info.cc
 
@@ -101,26 +119,10 @@ set(INC
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  add_library(${PROJECT_NAME} SHARED ${SRC} ${INC})
+  add_library(${LIBRARY_NAME} SHARED ${SRC} ${INC})
 else()
-  add_library(${PROJECT_NAME} STATIC ${SRC} ${INC})
+  add_library(${LIBRARY_NAME} STATIC ${SRC} ${INC})
 endif()
-
-#-----------------------------------------------------
-
-# Create an option for selecting the Unicode build type
-option(UNICODE_BUILD "Enable Unicode build" OFF)
-
-# Set output directory suffix based on the build type
-if (UNICODE_BUILD)
-  set(BUILD_DIR_SUFFIX "unicode")
-  add_definitions(-DUNICODE)
-else()
-  set(BUILD_DIR_SUFFIX "ansi")
-endif()
-
-# Output a message indicating the build type
-message(STATUS "Building ${BUILD_DIR_SUFFIX} version of ${PROJECT_NAME}")
 
 #-----------------------------------------------------
 
@@ -186,7 +188,7 @@ list(APPEND CMAKE_PREFIX_PATH ${SYSTEM_MODULE_PATH})
 
 find_package(AWSSDK REQUIRED COMPONENTS core rds secretsmanager sts)
 include_directories(${AWSSDK_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${AWSSDK_LINK_LIBRARIES})
+target_link_libraries(${LIBRARY_NAME} ${AWSSDK_LINK_LIBRARIES})
 
 set(
   AWS_SDK_LIBS
@@ -230,7 +232,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glog)
 include_directories(${glog_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} glog::glog)
+target_link_libraries(${LIBRARY_NAME} glog::glog)
 
 #-----------------------------------------------------
 # Find and add ODBC
@@ -245,25 +247,25 @@ find_package(ODBC REQUIRED)
 message(STATUS "ODBC_INCLUDE_DIRS: ${ODBC_INCLUDE_DIRS}")
 message(STATUS "ODBC_LIBRARIES: ${ODBC_LIBRARIES}")
 include_directories(${ODBC_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${ODBC_LIBRARIES})
+target_link_libraries(${LIBRARY_NAME} ${ODBC_LIBRARIES})
 
 #-----------------------------------------------------
 # Combine static libraries into the target static library
 
 if(APPLE)
   add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "Combining static libraries into $<TARGET_FILE:${PROJECT_NAME}>"
-    COMMAND libtool -static -o $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:glog::glog> ${AWS_SDK_LIBRARIES_EXPANDED}
+    TARGET ${LIBRARY_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Combining static libraries into $<TARGET_FILE:${LIBRARY_NAME}>"
+    COMMAND libtool -static -o $<TARGET_FILE:${LIBRARY_NAME}> $<TARGET_FILE:${LIBRARY_NAME}> $<TARGET_FILE:glog::glog> ${AWS_SDK_LIBRARIES_EXPANDED}
   )
 endif()
 
 if(WIN32)
   add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND lib /OUT:$<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:glog::glog> ${AWS_SDK_LIBRARIES_EXPANDED}
-    COMMENT "Packaging additional .lib files into $<TARGET_FILE:${PROJECT_NAME}>"
+    TARGET ${LIBRARY_NAME} POST_BUILD
+    COMMAND lib /OUT:$<TARGET_FILE:${LIBRARY_NAME}> $<TARGET_FILE:${LIBRARY_NAME}> $<TARGET_FILE:glog::glog> ${AWS_SDK_LIBRARIES_EXPANDED}
+    COMMENT "Packaging additional .lib files into $<TARGET_FILE:${LIBRARY_NAME}>"
 )
 endif()
 
-set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(${LIBRARY_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
