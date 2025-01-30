@@ -95,11 +95,7 @@ bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle,
 
 bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) {
     SQLRETURN rc;
-    #ifdef UNICODE
-    rc = SQLExecDirectW(stmt, query, SQL_NTS);
-    #else
     rc = SQLExecDirect(stmt, query, SQL_NTS);
-    #endif
 
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
         OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
