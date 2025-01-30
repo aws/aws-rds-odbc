@@ -11,7 +11,6 @@
     - [Debugging with Xcode](#debugging-with-xcode)
 
 ## Windows
-
 ### Prerequisites
 1. Download the CMake Windows x64 Installer from https://cmake.org/download/ and install CMake using the installer. When going through the install, ensure that adding CMake to the PATH is selected.
 1. Refer to [Install Microsoft Visual Studio](./InstallMicrosoftVisualStudio.md) to install Microsoft Visual Studio.
@@ -63,7 +62,6 @@
 1. After the build completes, the debugger will start.
 
 ## macOS
-
 ### Prerequisites
 1. Install [Homebrew](https://brew.sh/). If Homebrew is already installed, run the following command to install the latest updates.
    ```bash
@@ -117,3 +115,64 @@
 1. Open the project, `<root repository folder>/test/unit_test/aws-rds-odbc-unit-tests.xcodeproj`.
 1. Set breakpoints in any of the source files listed in the project tree.
 1. Press ⌘+R or select Run from the Product menu. This will build the library, the tests and start the debug execution of the tests.
+
+## Amazon Linux using Graviton
+### Prerequisites
+1. Run the following commands to install the required development tools and libraries.
+   ```bash
+   sudo dnf update -y
+   sudo dnf groupinstall "Development Tools" -y
+   sudo dnf install -y \
+     autoconf \
+     automake \
+     cmake \
+     gcc-c++ \
+     git \
+     libcurl-devel \
+     libpq-devel \
+     openssl-devel \
+     unixODBC \
+     unixODBC-devel
+   ```
+1. Configure git to connect to your GitHub account and clone this repository
+1. Run the following to download, build and install [iODBC Driver Manager](https://github.com/openlink/iODBC).
+   ```bash
+   wget https://github.com/openlink/iODBC/releases/download/v3.52.16/libiodbc-3.52.16.tar.gz
+   tar xzf libiodbc-3.52.16.tar.gz
+   cd libiodbc-3.52.16
+   ./configure
+   make
+   sudo make install
+   ```
+
+### Build the library and run tests in a terminal
+1. In a bash shell, change to the root repository folder.
+1. Run the following to build the AWS SDK.
+   ```bash
+   scripts/build_aws_sdk_unix.sh Release
+   ```
+1. Run the following to build the ANSI and Unicode versions of the library and the unit tests
+
+   **ANSI**
+   ```bash
+   cmake -S . -B build_ansi -DENABLE_UNIT_TESTS=TRUE
+   cmake --build build_ansi
+   ```
+
+   **Unicode**
+   ```bash
+   cmake -S . -B build_unicode -DUNICODE_BUILD=ON -DENABLE_UNIT_TESTS=TRUE
+   cmake --build build_unicode
+   ```
+
+1. Run the following to run the unit tests.
+
+   **ANSI**
+   ```bash
+   build_ansi/test/unit_test/bin/unit_test
+   ```
+
+   **Unicode**
+   ```bash
+   build_unicode/test/unit_test/bin/unit_test
+   ```
