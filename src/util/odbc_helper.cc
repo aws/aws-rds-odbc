@@ -71,7 +71,7 @@ void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
     }
 }
 
-bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle, SQLHANDLE output_handle, const std::string& log_message) {
+bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle, SQLHANDLE& output_handle, const std::string& log_message) {
     SQLRETURN rc;
     rc = SQLAllocHandle(handle_type, input_handle, &output_handle);
     if (!OdbcHelper::CheckResult(rc, log_message, output_handle, handle_type)) {
