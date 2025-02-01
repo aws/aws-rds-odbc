@@ -151,7 +151,8 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(uint64_t 
     }
     request_update_topology_cv_.notify_all();
 
-    if (timeout_ms >= 0) {
+    if (timeout_ms == 0) {
+        LOG(INFO) << "Cluster Monitor topology skipping wait period for topology update";
         return curr_hosts;
     }
     std::chrono::steady_clock::time_point curr_time = std::chrono::high_resolution_clock::now();
