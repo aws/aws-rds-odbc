@@ -49,7 +49,7 @@ public:
     virtual std::string get_writer_id(SQLHDBC hdbc);
     virtual std::string get_node_id(SQLHDBC hdbc);
     virtual std::vector<HostInfo> query_topology(SQLHDBC hdbc);
-    virtual HostInfo create_host(SQLTCHAR* node_id, bool is_writer, SQLFLOAT cpu_usage, SQLFLOAT replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp);
+    virtual HostInfo create_host(SQLTCHAR* node_id, bool is_writer, SQLREAL cpu_usage, SQLREAL replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp);
     virtual std::string get_endpoint(SQLTCHAR* node_id);
 
 private:

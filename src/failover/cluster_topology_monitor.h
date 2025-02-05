@@ -100,7 +100,7 @@ private:
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper_;
     bool in_panic_mode();
     std::vector<HostInfo> open_any_conn_get_hosts();
-    static void dbc_clean_up(std::shared_ptr<SQLHDBC> dbc);
+    static void dbc_clean_up(std::shared_ptr<SQLHDBC>& dbc);
 
     bool handle_panic_mode();
     bool handle_regular_mode();

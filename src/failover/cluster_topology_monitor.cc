@@ -252,7 +252,7 @@ std::string ClusterTopologyMonitor::conn_for_host(const std::string& new_host) {
 #endif
 
 bool ClusterTopologyMonitor::in_panic_mode() {
-    return !main_hdbc_ || !odbc_helper_->CheckConnection(reinterpret_cast<SQLHDBC>(main_hdbc_.get())) ||
+    return !main_hdbc_ || !odbc_helper_->CheckConnection(reinterpret_cast<SQLHDBC>(*(main_hdbc_.get()))) ||
         !is_writer_connection_;
 }
 
@@ -279,7 +279,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         // Check if another thread already set HDBC
         std::lock_guard<std::mutex> hdbc_lock(hdbc_mutex_);
         if (!main_hdbc_) {
-            main_hdbc_ = std::make_shared<SQLHDBC>(&local_hdbc);
+            main_hdbc_ = std::make_shared<SQLHDBC>(local_hdbc);
             std::string writer_id = query_helper_->get_writer_id(local_hdbc);
             if (!writer_id.empty()) {
                 thread_writer_verified = true;
@@ -296,7 +296,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         }
     }
 
-    std::vector<HostInfo> hosts = fetch_topology_update_cache(reinterpret_cast<SQLHDBC>(main_hdbc_.get()));
+    std::vector<HostInfo> hosts = fetch_topology_update_cache(reinterpret_cast<SQLHDBC>(*(main_hdbc_.get())));
     if (thread_writer_verified) {
         // Writer verified at initial connection & failovers but want to ignore new topology requests after failover
         // The first writer will be able to set from epoch to a proper end time
@@ -315,9 +315,9 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
     return hosts;
 }
 
-void ClusterTopologyMonitor::dbc_clean_up(std::shared_ptr<SQLHDBC> dbc) {
-    if (dbc && *dbc) {
-        auto* dbc_to_delete = reinterpret_cast<SQLHDBC>(dbc.get());
+void ClusterTopologyMonitor::dbc_clean_up(std::shared_ptr<SQLHDBC>& dbc) {
+    if (dbc && dbc.get()) {
+        auto* dbc_to_delete = reinterpret_cast<SQLHDBC>(*(dbc.get()));
         SQLDisconnect(dbc_to_delete);
         SQLFreeHandle(SQL_HANDLE_DBC, dbc_to_delete);
         dbc.reset(); // Release & set to null
@@ -338,7 +338,7 @@ bool ClusterTopologyMonitor::handle_panic_mode() {
 bool ClusterTopologyMonitor::handle_regular_mode() {
     node_monitoring_threads_.clear();
 
-    std::vector<HostInfo> hosts = fetch_topology_update_cache(reinterpret_cast<SQLHDBC>(main_hdbc_.get()));
+    std::vector<HostInfo> hosts = fetch_topology_update_cache(reinterpret_cast<SQLHDBC>(*main_hdbc_.get()));
     // No hosts, switch to panic
     if (hosts.empty()) {
         dbc_clean_up(main_hdbc_);
@@ -391,12 +391,12 @@ void ClusterTopologyMonitor::init_node_monitors() {
 bool ClusterTopologyMonitor::get_possible_writer_conn() {
     std::lock_guard<std::mutex> node_lock(node_threads_writer_hdbc_mutex_);
     std::lock_guard<std::mutex> hostinfo_lock(node_threads_writer_host_info_mutex_);
-    auto* local_hdbc = reinterpret_cast<SQLHDBC>(node_threads_writer_hdbc_.get());
+    auto* local_hdbc = reinterpret_cast<SQLHDBC>(*node_threads_writer_hdbc_.get());
     HostInfo local_hostinfo = node_threads_writer_host_info_ ? *node_threads_writer_host_info_ : HostInfo("", 0, DOWN, false, nullptr);
     if (odbc_helper_->CheckConnection(local_hdbc) && local_hostinfo.is_host_up()) {
         std::lock_guard<std::mutex> hdbc_lock(hdbc_mutex_);
         dbc_clean_up(main_hdbc_);
-        main_hdbc_ = std::make_shared<SQLHDBC>(&local_hdbc);
+        main_hdbc_ = std::make_shared<SQLHDBC>(local_hdbc);
         main_writer_host_info_ = std::make_shared<HostInfo>(local_hostinfo);
         is_writer_connection_.store(true);
         high_refresh_end_time_ = std::chrono::high_resolution_clock::now() +
