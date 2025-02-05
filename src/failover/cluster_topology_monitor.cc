@@ -284,6 +284,7 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
             if (!writer_id.empty()) {
                 thread_writer_verified = true;
                 is_writer_connection_.store(true);
+                // TODO(yuenhcol), double lock makes this complicated & complex, need to come back to refactor
                 std::lock_guard<std::mutex> host_info_lock(node_threads_writer_hdbc_mutex_);
                 SQL_TIMESTAMP_STRUCT last_update_timestamp{};
                 main_writer_host_info_ = std::make_shared<HostInfo>(
