@@ -163,7 +163,7 @@ endif()
 #-----------------------------------------------------
 # macOS specific configuration
 
-if(APPLE)
+if(APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # ZLIB needs to be explicity required
   find_package(ZLIB REQUIRED)
 endif()
@@ -189,6 +189,8 @@ string(REPLACE ";" "/aws-cpp-sdk-all;" SYSTEM_MODULE_PATH "${CMAKE_SYSTEM_PREFIX
 list(APPEND CMAKE_PREFIX_PATH ${SYSTEM_MODULE_PATH})
 
 find_package(AWSSDK REQUIRED COMPONENTS core rds secretsmanager sts)
+message(STATUS "AWSSDK_INCLUDE_DIRS: ${AWSSDK_INCLUDE_DIRS}")
+message(STATUS "AWSSDK_LINK_LIBRARIES: ${AWSSDK_LINK_LIBRARIES}")
 include_directories(${AWSSDK_INCLUDE_DIRS})
 target_link_libraries(${LIBRARY_NAME} ${AWSSDK_LINK_LIBRARIES})
 
@@ -214,7 +216,7 @@ set(
 
 set(AWS_SDK_LIBRARIES_EXPANDED "")
 foreach(lib ${AWS_SDK_LIBS})
-  if(APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  if(APPLE)
     list(APPEND AWS_SDK_LIBRARIES_EXPANDED ${AWS_SDK_DIR}/lib/lib${lib}.a)
   endif()
   if(WIN32)
