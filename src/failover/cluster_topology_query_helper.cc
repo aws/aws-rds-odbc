@@ -29,6 +29,8 @@
 
 #include "cluster_topology_query_helper.h"
 
+#include <cmath>
+
 ClusterTopologyQueryHelper::ClusterTopologyQueryHelper(
     int port,
     const std::string& endpoint_template,
