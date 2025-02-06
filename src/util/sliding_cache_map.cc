@@ -28,6 +28,7 @@
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
 #include "sliding_cache_map.h"
+#include "host_info.h"
 #include "host_selector/round_robin_property.h"
 
 template <typename K, typename V>
@@ -100,3 +101,4 @@ void SlidingCacheMap<K, V>::clear() {
 // Explicit Template Instantiations
 template class SlidingCacheMap<std::string, std::string>;
 template class SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>>;
+template class SlidingCacheMap<std::string, std::vector<HostInfo>>;

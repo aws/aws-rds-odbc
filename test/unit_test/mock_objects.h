@@ -42,8 +42,11 @@
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
 
 #include "authentication_provider.h"
+#include "cluster_topology_query_helper.h"
 #include "federation.h"
 #include "limitless_monitor_service.h"
+
+#include "util/odbc_helper.h"
 
 class MOCK_SECRETS_MANAGER_CLIENT : public Aws::SecretsManager::SecretsManagerClient {
 public:
@@ -128,6 +131,26 @@ public:
             this->monitor_thread = std::make_shared<std::thread>(&MOCK_LIMITLESS_ROUTER_MONITOR::mock_run, this, limitless_routers, limitless_routers_mutex);
         }
     }
+};
+
+class MOCK_ODBC_HELPER : public IOdbcHelper {
+public:
+    MOCK_METHOD(bool, CheckResult, (SQLRETURN, const std::string&, SQLHANDLE, int32_t), ());
+    MOCK_METHOD(bool, CheckConnection, (SQLHDBC), ());
+    MOCK_METHOD(void, Cleanup, (SQLHENV, SQLHDBC, SQLHSTMT), ());
+    MOCK_METHOD(bool, AllocateHandle, (SQLSMALLINT, SQLHANDLE, SQLHANDLE&, const std::string&), ());
+    MOCK_METHOD(bool, ExecuteQuery, (SQLHSTMT, SQLTCHAR*, const std::string&), ());
+    MOCK_METHOD(bool, BindColumn, (SQLHSTMT, SQLUSMALLINT, SQLSMALLINT, SQLPOINTER, SQLLEN, const std::string&), ());
+    MOCK_METHOD(bool, FetchResults, (SQLHSTMT, const std::string&), ());
+};
+
+class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
+public:
+    MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", "", "", "") {}
+    MOCK_METHOD(std::string, get_writer_id, (SQLHDBC), ());
+    MOCK_METHOD(std::string, get_node_id, (SQLHDBC), ());
+    MOCK_METHOD(std::vector<HostInfo>, query_topology, (SQLHDBC), ());
+    MOCK_METHOD(HostInfo, create_host, (SQLHDBC), ());
 };
 
 #endif /* __MOCKOBJECTS_H__ */

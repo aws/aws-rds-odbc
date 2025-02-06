@@ -55,19 +55,21 @@ add_executable(
   authentication/secrets_manager_helper_test.cc
 
   failover/cluster_topology_info_test.cc
+  failover/cluster_topology_monitor_test.cc
+  failover/cluster_topology_query_helper_test.cc
 
   host_availability/simple_host_availability_strategy_test.cc
 
   host_selector/random_host_selector_test.cc
   host_selector/round_robin_host_selector_test.cc
+  host_selector/highest_weight_host_selector_test.cc
 
   limitless/limitless_monitor_service_test.cc
 
   util/connection_string_helper_test.cc
   util/sliding_cache_map_test.cc
   util/odbc_helper_test.cc
-        host_selector/highest_weight_host_selector_test.cc
-        util/logger_wrapper_test.cc
+  util/logger_wrapper_test.cc
 )
 
 #-----------------------------------------------------

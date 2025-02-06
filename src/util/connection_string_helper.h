@@ -31,6 +31,7 @@
 #define CONNECTION_STRING_HELPER_H_
 
 #include <map>
+#include <sstream>
 #include <string>
 
 class ConnectionStringHelper {
@@ -41,6 +42,12 @@ public:
      */
     static void ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map);
     static void ParseConnectionStringW(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map);
+
+    /**
+     * Builds a connection string with the given map
+     */
+    static std::string BuildConnectionString(std::map<std::string, std::string> &input_map);
+    static std::wstring BuildConnectionStringW(std::map<std::wstring, std::wstring> &input_map);
 };
 
 #endif

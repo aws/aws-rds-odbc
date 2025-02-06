@@ -74,6 +74,8 @@ set(SRC
   src/authentication/secrets_manager_helper.cc
 
   src/failover/cluster_topology_info.cc
+  src/failover/cluster_topology_monitor.cc
+  src/failover/cluster_topology_query_helper.cc
 
   src/host_availability/simple_host_availability_strategy.cc
   src/host_selector/highest_weight_host_selector.cc
@@ -101,6 +103,8 @@ set(INC
   src/authentication/secrets_manager_helper.h
 
   src/failover/cluster_topology_info.h
+  src/failover/cluster_topology_monitor.h
+  src/failover/cluster_topology_query_helper.h
 
   src/host_availability/simple_host_availability_strategy.h
   src/host_selector/highest_weight_host_selector.h
@@ -144,9 +148,7 @@ endif()
 
 #-----------------------------------------------------
 
-if(ENABLE_INTEGRATION_TESTS AND NOT ENABLE_UNIT_TESTS)
-  add_subdirectory(test/integration_test)
-elseif(ENABLE_UNIT_TESTS AND NOT ENABLE_INTEGRATION_TESTS)
+if(ENABLE_UNIT_TESTS)
   add_subdirectory(test/unit_test)
 endif()
 
