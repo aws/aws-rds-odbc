@@ -149,7 +149,7 @@
 1. In a bash shell, change to the root repository folder.
 1. Run the following to build the AWS SDK.
    ```bash
-   scripts/build_aws_sdk_unix.sh Release
+   scripts/build_aws_sdk_linux.sh Release
    ```
 1. Run the following to build the ANSI and Unicode versions of the library and the unit tests
 
