@@ -234,6 +234,10 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/google/glog.git
     GIT_TAG        v0.7.1
 )
+set(GLOG_BUILD_TESTS OFF) # Don't build tests
+set(GLOG_BUILD_BENCHMARKS OFF) # Don't build benchmarks
+set(GLOG_USE_CMAKE_INSTALL OFF) # Don't install glog
+set(BUILD_SHARED_LIBS OFF) # Force static linking.  Crucial for static glog
 FetchContent_MakeAvailable(glog)
 include_directories(${glog_SOURCE_DIR})
 target_link_libraries(${LIBRARY_NAME} glog::glog)
