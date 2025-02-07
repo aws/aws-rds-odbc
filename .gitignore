@@ -444,6 +444,8 @@ aws_sdk*/
 # Build output directory
 build
 build-debug
+build_debug_*
+build_release_*
 
 # CodeChecker static analysis reports directory
 reports

@@ -30,19 +30,29 @@
 
 CONFIGURATION=$1
 
-# Build AWS SDK
+export ROOT_REPO_PATH=$(cd "$(dirname "$0")/.."; pwd -P)
 
-# one liner to get script directory no matter where it being called from
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-AWS_SRC_DIR=$SCRIPT_DIR/../aws_sdk/aws_sdk_cpp
-AWS_BUILD_DIR=$AWS_SRC_DIR/../build
-AWS_INSTALL_DIR=$AWS_SRC_DIR/../install
+export AWS_SDK_CPP_TAG="1.11.481"
+export AWS_SDK_PATH="${ROOT_REPO_PATH}/aws_sdk"
+export SRC_DIR="${AWS_SDK_PATH}/aws_sdk_cpp"
+export BUILD_DIR="${AWS_SDK_PATH}/build"
+export INSTALL_DIR="${AWS_SDK_PATH}/install"
 
-mkdir -p $AWS_SRC_DIR $AWS_BUILD_DIR $AWS_INSTALL_DIR
+mkdir -p ${SRC_DIR} ${BUILD_DIR} ${INSTALL_DIR}
+pushd $BUILD_DIR
 
-git clone --recurse-submodules -b "1.11.481" "https://github.com/aws/aws-sdk-cpp.git" $AWS_SRC_DIR
+git clone --recurse-submodules -b "$AWS_SDK_CPP_TAG" "https://github.com/aws/aws-sdk-cpp.git" ${SRC_DIR}
 
-cmake -S $AWS_SRC_DIR -B $AWS_BUILD_DIR -DCMAKE_INSTALL_PREFIX="${AWS_INSTALL_DIR}" -DCMAKE_BUILD_TYPE="${CONFIGURATION}" -DBUILD_ONLY="rds;secretsmanager;sts" -DENABLE_TESTING="OFF" -DBUILD_SHARED_LIBS="ON" -DCPP_STANDARD="14"
-cd $AWS_BUILD_DIR
-make -j 4
-make install
+cmake -S ${SRC_DIR} \
+  -B $BUILD_DIR \
+  -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"\
+  -DCMAKE_BUILD_TYPE="${CONFIGURATION}" \
+  -DBUILD_ONLY="rds;secretsmanager;sts" \
+  -DENABLE_TESTING="OFF" \
+  -DBUILD_SHARED_LIBS="OFF" \
+  -DCPP_STANDARD="20"
+
+cmake --build . --config=${CONFIGURATION}
+cmake --install . --config=${CONFIGURATION}
+
+popd

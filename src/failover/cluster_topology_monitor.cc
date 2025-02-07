@@ -86,7 +86,8 @@ void ClusterTopologyMonitor::set_cluster_id(const std::string& cluster_id) {
 }
 
 std::vector<HostInfo> ClusterTopologyMonitor::force_refresh(const bool verify_writer, const uint64_t timeout_ms) {
-    std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point now =
+        std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
     std::chrono::steady_clock::time_point ignore_topology = ignore_topology_request_end_ns_.load();
     if (ignore_topology != epoch && now > ignore_topology) {
@@ -155,7 +156,8 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(uint64_t 
         LOG(INFO) << "Cluster Monitor topology skipping wait period for topology update";
         return curr_hosts;
     }
-    std::chrono::steady_clock::time_point curr_time = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point curr_time =
+        std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     std::chrono::steady_clock::time_point end = curr_time + std::chrono::milliseconds(timeout_ms);
 
     // Comparing vector's references
@@ -163,10 +165,10 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(uint64_t 
     while (curr_time < end && &curr_hosts == &new_hosts) {
         topology_updated_.wait_for(topology_lock, std::chrono::milliseconds(TOPOLOGY_UPDATE_WAIT_MS));
         new_hosts = topology_map_->get(cluster_id_);
-        curr_time = std::chrono::high_resolution_clock::now();
+        curr_time = std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     }
 
-    if (std::chrono::high_resolution_clock::now() >= end) {
+    if (std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch()) >= end) {
         LOG(ERROR) << "Cluster Monitor topology did not update for cluster ID: " << cluster_id_;
     }
 
@@ -174,7 +176,8 @@ std::vector<HostInfo> ClusterTopologyMonitor::wait_for_topology_update(uint64_t 
 }
 
 void ClusterTopologyMonitor::delay_main_thread(bool use_high_refresh_rate) {
-    std::chrono::steady_clock::time_point curr_time = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point curr_time =
+        std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     if ((high_refresh_end_time_ != std::chrono::steady_clock::time_point() &&
             curr_time < high_refresh_end_time_) || request_update_topology_.load()) {
         use_high_refresh_rate = true;
@@ -186,7 +189,7 @@ void ClusterTopologyMonitor::delay_main_thread(bool use_high_refresh_rate) {
     std::unique_lock<std::mutex> request_lock(request_update_topology_mutex_);
     do {
         request_update_topology_cv_.wait_for(request_lock, std::chrono::milliseconds(TOPOLOGY_REQUEST_WAIT_MS));
-        curr_time = std::chrono::high_resolution_clock::now();
+        curr_time = std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     } while (!request_update_topology_.load() &&
         curr_time < end && !is_running_.load()
     );
@@ -302,7 +305,8 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         // Writer verified at initial connection & failovers but want to ignore new topology requests after failover
         // The first writer will be able to set from epoch to a proper end time
         std::chrono::steady_clock::time_point expected = std::chrono::steady_clock::time_point{}; // Epoch
-        std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now() +
+        std::chrono::steady_clock::time_point new_time =
+            std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch()) +
             std::chrono::nanoseconds(ignore_topology_request_ns_);
         ignore_topology_request_end_ns_.compare_exchange_strong(expected, new_time);
     }
@@ -347,7 +351,8 @@ bool ClusterTopologyMonitor::handle_regular_mode() {
         return false;
     }
 
-    std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point now =
+        std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
     if (high_refresh_end_time_ != epoch && now > high_refresh_end_time_) {
         high_refresh_end_time_ = epoch;
@@ -357,7 +362,8 @@ bool ClusterTopologyMonitor::handle_regular_mode() {
 }
 
 void ClusterTopologyMonitor::handle_ignore_topology_timing() {
-    std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
+    std::chrono::steady_clock::time_point now =
+        std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     std::chrono::steady_clock::time_point epoch = std::chrono::steady_clock::time_point{};
     std::chrono::steady_clock::time_point ignore_topology = ignore_topology_request_end_ns_.load();
     if (ignore_topology != epoch && now > ignore_topology) {
@@ -400,13 +406,15 @@ bool ClusterTopologyMonitor::get_possible_writer_conn() {
         main_hdbc_ = std::make_shared<SQLHDBC>(local_hdbc);
         main_writer_host_info_ = std::make_shared<HostInfo>(local_hostinfo);
         is_writer_connection_.store(true);
-        high_refresh_end_time_ = std::chrono::high_resolution_clock::now() +
+        high_refresh_end_time_ =
+            std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch()) +
             high_refresh_rate_after_panic_;
 
         // Writer verified at initial connection & failovers but want to ignore new topology requests after failover
         // The first writer will be able to set from epoch to a proper end time
         std::chrono::steady_clock::time_point expected = std::chrono::steady_clock::time_point{}; // Epoch
-        std::chrono::steady_clock::time_point new_time = std::chrono::high_resolution_clock::now() +
+        std::chrono::steady_clock::time_point new_time =
+            std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch()) +
             std::chrono::nanoseconds(ignore_topology_request_ns_);
         ignore_topology_request_end_ns_.compare_exchange_strong(expected, new_time);
 
