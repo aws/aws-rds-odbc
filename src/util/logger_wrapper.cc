@@ -36,13 +36,18 @@
 
 #include "logger_wrapper.h"
 
-void LoggerWrapper::initialize() {
+void LoggerWrapper::initialize() { initialize(logger_config::LOG_LOCATION); }
+
+void LoggerWrapper::initialize(std::string log_location) {
 #ifndef XCODE_BUILD
     static LoggerWrapper instance;
     if (!instance.init) {
-        FLAGS_stderrthreshold = 4; // Disable console output
+        FLAGS_stderrthreshold = 4;  // Disable console output
         FLAGS_timestamp_in_logfile_name = false;
-        set_log_directory(logger_config::LOG_LOCATION);
+        if (log_location.empty()) {
+            log_location = logger_config::LOG_LOCATION;
+        }
+        set_log_directory(log_location);
         google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
         instance.init = true;
     }

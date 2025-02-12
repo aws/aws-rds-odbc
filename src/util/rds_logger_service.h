@@ -24,53 +24,25 @@
 // See the GNU General Public License, version 2.0, for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program. If not, see 
+// along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef LOGGERWRAPPER_H_
-#define LOGGERWRAPPER_H_
+#ifndef RDS_LOGGER_SERVICE_H
+#define RDS_LOGGER_SERVICE_H
 
-#ifdef XCODE_BUILD
-// Setting this to a value greater than 3 strips out all of the
-// Google logging functionality
-#define GOOGLE_STRIP_LOG 4
-#endif /* XCODE_BUILD */
+#ifdef __cplusplus
+extern "C" {
+#endif
+/**
+ * Initialize the logger for the AWS RDS ODBC library.
+ *
+ * @param log_dir Directory to contain the AWS RDS ODBC library logs.
+ */
+void initialize_rds_logger(const char* log_dir);
 
-#include <filesystem>
-#include <glog/logging.h>
+#ifdef __cplusplus
+}
 
-#ifdef WIN32
-    #include <windows.h>
 #endif
 
-#include <sqltypes.h>
-
-namespace logger_config {
-    const std::string PROGRAM_NAME = "aws-rds-odbc";
-    const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append("aws-rds-odbc").string();
-}  // namespace logger_config
-
-// Initializes glog once
-class LoggerWrapper {
-public:
-    static void initialize();
-    static void initialize(std::string log_location);
-
-    static std::string convert_wchar_to_char (const wchar_t* wstr);
-    static std::string sqlwchar_to_string(const SQLWCHAR* sqlwchar);
-
-    // Prevent copy constructors
-    LoggerWrapper(const LoggerWrapper&) = delete;
-    LoggerWrapper(LoggerWrapper&&) = delete;
-    LoggerWrapper& operator=(const LoggerWrapper&) = delete;
-    LoggerWrapper& operator=(LoggerWrapper&&) = delete;
-
-protected:
-    LoggerWrapper() = default;
-
-private:
-    static void set_log_directory(const std::string& directory_path);
-    bool init = false;
-};
-
-#endif // LOGGERWRAPPER_H_
+#endif
