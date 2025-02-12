@@ -27,51 +27,9 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-
-#ifdef WIN32
-    #include <windows.h>
-#else
-    #include <iconv.h>
-#endif
-
+#include "rds_logger_service.h"
 #include "logger_wrapper.h"
 
-void LoggerWrapper::initialize() { initialize(logger_config::LOG_LOCATION); }
-
-void LoggerWrapper::initialize(std::string log_location) {
-#ifndef XCODE_BUILD
-    static LoggerWrapper instance;
-    if (!instance.init) {
-        FLAGS_stderrthreshold = 4; // Disable console output
-        FLAGS_timestamp_in_logfile_name = false;
-        if (log_location.empty()) {
-            log_location = logger_config::LOG_LOCATION;
-        }
-        set_log_directory(log_location);
-        google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
-        instance.init = true;
-    }
-#endif
-}
-
-std::string LoggerWrapper::sqlwchar_to_string(const SQLWCHAR* sqlwchar) {
-    if (!sqlwchar) {
-        return "";
-    }
-
-    std::u16string u16_str(reinterpret_cast<const char16_t*>(sqlwchar));
-    std::ostringstream oss;
-    for (auto ch : u16_str) {
-        oss << static_cast<char>(ch);
-    }
-    return oss.str();
-}
-
-void LoggerWrapper::set_log_directory(const std::string& directory_path) {
-#ifndef XCODE_BUILD
-    if (!std::filesystem::exists(directory_path)) {
-        std::filesystem::create_directory(directory_path);
-    }
-    FLAGS_log_dir = directory_path;
-#endif
+void initialize_rds_logger(const char* log_dir) {
+    LoggerWrapper::initialize(log_dir);
 }

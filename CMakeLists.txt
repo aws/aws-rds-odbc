@@ -89,6 +89,7 @@ set(SRC
   src/util/connection_string_helper.cc
   src/util/sliding_cache_map.cc
   src/util/logger_wrapper.cc
+  src/util/rds_logger_service.cc
   src/util/odbc_helper.cc
 )
 
@@ -119,6 +120,7 @@ set(INC
   src/util/connection_string_helper.h
   src/util/sliding_cache_map.h
   src/util/logger_wrapper.h
+  src/util/rds_logger_service.h
   src/util/odbc_helper.h
 )
 

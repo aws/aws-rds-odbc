@@ -42,7 +42,6 @@ static int get_random_number() {
 }
 
 ClusterTopologyInfo::ClusterTopologyInfo() {
-    LoggerWrapper::initialize();
     DLOG(INFO) << "Constructor";
     update_time();
 }

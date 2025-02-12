@@ -54,6 +54,7 @@ namespace logger_config {
 class LoggerWrapper {
 public:
     static void initialize();
+    static void initialize(std::string log_location);
 
     static std::string convert_wchar_to_char (const wchar_t* wstr);
     static std::string sqlwchar_to_string(const SQLWCHAR* sqlwchar);
