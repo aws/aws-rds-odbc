@@ -42,7 +42,7 @@ void LoggerWrapper::initialize(std::string log_location) {
 #ifndef XCODE_BUILD
     static LoggerWrapper instance;
     if (!instance.init) {
-        FLAGS_stderrthreshold = 4;  // Disable console output
+        FLAGS_stderrthreshold = 4; // Disable console output
         FLAGS_timestamp_in_logfile_name = false;
         if (log_location.empty()) {
             log_location = logger_config::LOG_LOCATION;
