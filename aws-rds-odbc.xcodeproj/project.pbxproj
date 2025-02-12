@@ -108,6 +108,10 @@
 		73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E42CD3BC08002268BF /* host_availability_strategy.h */; };
 		73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */; };
 		73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */; };
+		73D3A2CF2D5D45910059158A /* rds_logger_service.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D3A2CE2D5D45910059158A /* rds_logger_service.cc */; };
+		73D3A2D02D5D45910059158A /* rds_logger_service.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D3A2CD2D5D45910059158A /* rds_logger_service.h */; };
+		73D3A2D12D5D45910059158A /* rds_logger_service.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D3A2CE2D5D45910059158A /* rds_logger_service.cc */; };
+		73D3A2D22D5D45910059158A /* rds_logger_service.h in Headers */ = {isa = PBXBuildFile; fileRef = 73D3A2CD2D5D45910059158A /* rds_logger_service.h */; };
 		73D7882D2CC919070028B42F /* adfs.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D7881D2CC919070028B42F /* adfs.cc */; };
 		73D7882E2CC919070028B42F /* authentication_provider.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D788202CC919070028B42F /* authentication_provider.cc */; };
 		73D7882F2CC919070028B42F /* host_info.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D788272CC919070028B42F /* host_info.cc */; };
@@ -188,6 +192,8 @@
 		73D322E42CD3BC08002268BF /* host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = host_availability_strategy.h; sourceTree = "<group>"; };
 		73D322E52CD3BC08002268BF /* simple_host_availability_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = simple_host_availability_strategy.h; sourceTree = "<group>"; };
 		73D322E92CD3BF74002268BF /* simple_host_availability_strategy.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy.cc; sourceTree = "<group>"; };
+		73D3A2CD2D5D45910059158A /* rds_logger_service.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rds_logger_service.h; sourceTree = "<group>"; };
+		73D3A2CE2D5D45910059158A /* rds_logger_service.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rds_logger_service.cc; sourceTree = "<group>"; };
 		73D7880E2CC915A60028B42F /* libaws-rds-odbc-ansi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libaws-rds-odbc-ansi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		73D7881C2CC919070028B42F /* adfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = adfs.h; sourceTree = "<group>"; };
 		73D7881D2CC919070028B42F /* adfs.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs.cc; sourceTree = "<group>"; };
@@ -399,6 +405,8 @@
 		73D7882B2CC919070028B42F /* util */ = {
 			isa = PBXGroup;
 			children = (
+				73D3A2CD2D5D45910059158A /* rds_logger_service.h */,
+				73D3A2CE2D5D45910059158A /* rds_logger_service.cc */,
 				73ABBC412D304A7400E34238 /* connection_string_helper.h */,
 				73ABBC422D304A7400E34238 /* connection_string_helper.cc */,
 				733B9FE32D1DBEA100F2D918 /* text_helper.h */,
@@ -465,6 +473,7 @@
 				733ED0902D285155001BAC9D /* limitless_query_helper.h in Headers */,
 				733ED0912D285155001BAC9D /* logger_wrapper.h in Headers */,
 				733ED0922D285155001BAC9D /* host_availability_strategy.h in Headers */,
+				73D3A2D22D5D45910059158A /* rds_logger_service.h in Headers */,
 				733ED0932D285155001BAC9D /* simple_host_availability_strategy.h in Headers */,
 				733ED0942D285155001BAC9D /* highest_weight_host_selector.h in Headers */,
 				733ED0952D285155001BAC9D /* host_info.h in Headers */,
@@ -497,6 +506,7 @@
 				73DAE0222CDA71DD00225BE1 /* limitless_query_helper.h in Headers */,
 				73D788352CC919070028B42F /* logger_wrapper.h in Headers */,
 				73D322E72CD3BC08002268BF /* host_availability_strategy.h in Headers */,
+				73D3A2D02D5D45910059158A /* rds_logger_service.h in Headers */,
 				73D322E82CD3BC08002268BF /* simple_host_availability_strategy.h in Headers */,
 				73CB8C132D132772002671DA /* highest_weight_host_selector.h in Headers */,
 				73D788362CC919070028B42F /* host_info.h in Headers */,
@@ -594,6 +604,7 @@
 				733ED09C2D285155001BAC9D /* adfs.cc in Sources */,
 				733ED09D2D285155001BAC9D /* highest_weight_host_selector.cc in Sources */,
 				733ED09E2D285155001BAC9D /* authentication_provider.cc in Sources */,
+				73D3A2D12D5D45910059158A /* rds_logger_service.cc in Sources */,
 				733ED09F2D285155001BAC9D /* host_info.cc in Sources */,
 				733ED0A02D285155001BAC9D /* odbc_helper.cc in Sources */,
 				733ED0A12D285155001BAC9D /* simple_host_availability_strategy.cc in Sources */,
@@ -622,6 +633,7 @@
 				73D7882D2CC919070028B42F /* adfs.cc in Sources */,
 				73CB8C122D132772002671DA /* highest_weight_host_selector.cc in Sources */,
 				73D7882E2CC919070028B42F /* authentication_provider.cc in Sources */,
+				73D3A2CF2D5D45910059158A /* rds_logger_service.cc in Sources */,
 				73D7882F2CC919070028B42F /* host_info.cc in Sources */,
 				7369B6102CDE5C9E00C98EDF /* odbc_helper.cc in Sources */,
 				73D322EA2CD3BF74002268BF /* simple_host_availability_strategy.cc in Sources */,
