@@ -54,19 +54,6 @@ void LoggerWrapper::initialize(std::string log_location) {
 #endif
 }
 
-std::string LoggerWrapper::sqlwchar_to_string(const SQLWCHAR* sqlwchar) {
-    if (!sqlwchar) {
-        return "";
-    }
-
-    std::u16string u16_str(reinterpret_cast<const char16_t*>(sqlwchar));
-    std::ostringstream oss;
-    for (auto ch : u16_str) {
-        oss << static_cast<char>(ch);
-    }
-    return oss.str();
-}
-
 void LoggerWrapper::set_log_directory(const std::string& directory_path) {
 #ifndef XCODE_BUILD
     if (!std::filesystem::exists(directory_path)) {

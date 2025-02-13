@@ -39,10 +39,10 @@ ClusterTopologyQueryHelper::ClusterTopologyQueryHelper(
     const std::string& node_id_query):
     port{port} {
     #ifdef UNICODE
-        endpoint_template_ = std::wstring(endpoint_template.begin(), endpoint_template.end());
-        topology_query_ = std::wstring(topology_query.begin(), topology_query.end());
-        writer_id_query_ = std::wstring(writer_id_query.begin(), writer_id_query.end());
-        node_id_query_ = std::wstring(node_id_query.begin(), node_id_query.end());
+    endpoint_template_ = StringHelper::to_wstring(endpoint_template);
+    topology_query_ = StringHelper::to_wstring(topology_query);
+    writer_id_query_ = StringHelper::to_wstring(writer_id_query);
+    node_id_query_ = StringHelper::to_wstring(node_id_query);
     #else
         endpoint_template_ = endpoint_template;
         topology_query_ = topology_query;
@@ -141,41 +141,28 @@ std::vector<HostInfo> ClusterTopologyQueryHelper::query_topology(SQLHDBC hdbc) {
         fetch_success = OdbcHelper::FetchResults(stmt, "ClusterTopologyQueryHelper failed to fetch topology from results");
     }
 
-    if (fetch_success) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-    }
+    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
     return hosts;
 }
 
 HostInfo ClusterTopologyQueryHelper::create_host(SQLTCHAR* node_id, bool is_writer, SQLREAL cpu_usage, SQLREAL replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp) {
     uint64_t weight = (std::round(replica_lag_ms) * SCALE_TO_PERCENT) + std::round(cpu_usage);
     std::string endpoint_url = get_endpoint(node_id);
-    HostInfo hi = HostInfo(endpoint_url, port, HOST_STATE::UP, is_writer, nullptr, weight, update_timestamp);
+    HostInfo hi = HostInfo(endpoint_url, port, UP, is_writer, nullptr, weight, update_timestamp);
     return hi;
 }
 
+std::string ClusterTopologyQueryHelper::get_endpoint(SQLTCHAR* node_id) {
 #ifdef UNICODE
-std::string ClusterTopologyQueryHelper::get_endpoint(SQLTCHAR* node_id) {
-    std::wstring w_res(endpoint_template_); // Create a copy
-    int pos = w_res.find(REPLACE_CHAR);
-    if (pos != std::wstring::npos) {
-        w_res.replace(pos, 1, AS_WCHAR(node_id));
-    }
-    std::string res(w_res.length(), 0);
-    // Simple transform is fine for node IDs
-    // Instance names are restricted to alphanumberic characters
-    std::transform(w_res.begin(), w_res.end(), res.begin(), [] (wchar_t c) {
-        return static_cast<char>(c);
-    });
-    return res;
-}
+    std::string res = StringHelper::to_string(endpoint_template_);
+    std::string node_id_str = StringHelper::to_string(AS_WCHAR(node_id));
 #else
-std::string ClusterTopologyQueryHelper::get_endpoint(SQLTCHAR* node_id) {
-    std::string res(endpoint_template_); // Create a copy
+    std::string res(endpoint_template_);
+    std::string node_id_str = AS_CHAR(node_id);
+#endif
     int pos = res.find(REPLACE_CHAR);
     if (pos != std::string::npos) {
-        res.replace(pos, 1, AS_CHAR(node_id));
+        res.replace(pos, 1, node_id_str);
     }
     return res;
 }
-#endif

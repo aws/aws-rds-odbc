@@ -27,26 +27,28 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#include <gtest/gtest.h>
-#include "logger_wrapper.h"
+#ifndef RDS_UTILS_H_
+#define RDS_UTILS_H_
 
-class LoggerWrapperHelperTest : public testing::Test {
-protected:
-    // Runs once per suite
-    static void SetUpTestSuite() {}
-    static void TearDownTestSuite() {}
-    // Runs per test case
-    void SetUp() override {}
-    void TearDown() override {}
+#include <regex>
+
+class RdsUtils {
+   public:
+    static bool is_dns_pattern_valid(const std::string& host);
+    static bool is_rds_dns(const std::string& host);
+    static bool is_rds_cluster_dns(const std::string& host);
+    static bool is_rds_proxy_dns(const std::string& host);
+    static bool is_rds_writer_cluster_dns(const std::string& host);
+    static bool is_rds_reader_cluster_dns(const std::string& host);
+    static bool is_rds_custom_cluster_dns(const std::string& host);
+    static bool is_ipv4(const std::string& host);
+    static bool is_ipv6(const std::string& host);
+
+    static std::string get_rds_cluster_host_url(const std::string& host);
+    static std::string get_rds_cluster_id(const std::string& host);
+    static std::string get_rds_instance_host_pattern(const std::string& host);
+    static std::string get_rds_instance_id(const std::string& host);
+    static std::string get_rds_region(const std::string& host);
 };
 
-TEST_F(LoggerWrapperHelperTest, sqlwchar_to_string_nullptr_returns_empty_string) {
-    EXPECT_EQ("", LoggerWrapper::sqlwchar_to_string(nullptr));
-}
-
-#ifdef WIN32
-TEST_F(LoggerWrapperHelperTest, sqlwchar_to_string_converted) {
-    EXPECT_EQ("Wide character string", LoggerWrapper::sqlwchar_to_string(L"Wide character string"));
-}
 #endif
-

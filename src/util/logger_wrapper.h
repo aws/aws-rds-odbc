@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef LOGGERWRAPPER_H_
-#define LOGGERWRAPPER_H_
+#ifndef LOGGER_WRAPPER_H_
+#define LOGGER_WRAPPER_H_
 
 #ifdef XCODE_BUILD
 // Setting this to a value greater than 3 strips out all of the
@@ -56,9 +56,6 @@ public:
     static void initialize();
     static void initialize(std::string log_location);
 
-    static std::string convert_wchar_to_char (const wchar_t* wstr);
-    static std::string sqlwchar_to_string(const SQLWCHAR* sqlwchar);
-
     // Prevent copy constructors
     LoggerWrapper(const LoggerWrapper&) = delete;
     LoggerWrapper(LoggerWrapper&&) = delete;
@@ -73,4 +70,4 @@ private:
     bool init = false;
 };
 
-#endif // LOGGERWRAPPER_H_
+#endif // LOGGER_WRAPPER_H_

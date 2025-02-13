@@ -73,20 +73,20 @@ private:
 #endif
 
 #ifdef UNICODE
-    const static wchar_t REPLACE_CHAR = L'?';
+    static constexpr wchar_t REPLACE_CHAR = L'?';
 #else 
-    const static char REPLACE_CHAR = '?';
+    static constexpr char REPLACE_CHAR = '?';
 #endif
 
-    const static int BUFFER_SIZE = 1024;;
-    const static uint64_t SCALE_TO_PERCENT = 100L;
+    static constexpr int BUFFER_SIZE = 1024;;
+    static constexpr uint64_t SCALE_TO_PERCENT = 100L;
 
     // Topology Query
-    const static int NODE_ID_COL = 1;
-    const static int IS_WRITER_COL = 2;
-    const static int CPU_USAGE_COL = 3;
-    const static int REPLICA_LAG_COL = 4;
-    const static int UPDATE_TIMESTAMP_COL = 5;
+    static constexpr int NODE_ID_COL = 1;
+    static constexpr int IS_WRITER_COL = 2;
+    static constexpr int CPU_USAGE_COL = 3;
+    static constexpr int REPLICA_LAG_COL = 4;
+    static constexpr int UPDATE_TIMESTAMP_COL = 5;
 };
 
 #endif // CLUSTER_TOPOLOGY_QUERY_HELPER_H
