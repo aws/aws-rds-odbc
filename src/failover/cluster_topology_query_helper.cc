@@ -140,8 +140,6 @@ std::vector<HostInfo> ClusterTopologyQueryHelper::query_topology(SQLHDBC hdbc) {
         hosts.push_back(create_host(node_id, is_writer, cpu_usage, replica_lag_ms, last_update_timestamp));
         fetch_success = OdbcHelper::FetchResults(stmt, "ClusterTopologyQueryHelper failed to fetch topology from results");
     }
-
-    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
     return hosts;
 }
 
