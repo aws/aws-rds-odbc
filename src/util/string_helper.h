@@ -27,22 +27,46 @@
 // along with this program. If not, see
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef RDS_LOGGER_SERVICE_H_
-#define RDS_LOGGER_SERVICE_H_
+#ifndef STRING_HELPER_H_
+#define STRING_HELPER_H_
 
-#ifdef __cplusplus
-extern "C" {
+#include <codecvt>
+#include <locale>
+
+#define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
+#define AS_CHAR(str) (reinterpret_cast<char*>(str))
+#define AS_CONST_CHAR(str) (reinterpret_cast<const char*>(str))
+#define AS_WCHAR(str) (reinterpret_cast<wchar_t*>(str))
+#define AS_CONST_WCHAR(str) (reinterpret_cast<const wchar_t*>(str))
+
+#if defined(__APPLE__) || defined(__linux__)
+#define strcmp_case_insensitive(str1, str2) strcasecmp(str1, str2)
+#else
+#define strcmp_case_insensitive(str1, str2) strcmpi(str1, str2)
 #endif
-/**
- * Initialize the logger for the AWS RDS ODBC library.
- *
- * @param log_dir Directory to contain the AWS RDS ODBC library logs.
- */
-void initialize_rds_logger(const char* log_dir);
 
-#ifdef __cplusplus
-}
-
+#ifdef __linux__
+typedef std::wstring_convert<std::codecvt_utf8_utf16<char16_t>> converter;
+#elifdef __APPLE__
+typedef std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+#else
+typedef std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 #endif
 
-#endif
+class StringHelper {
+   public:
+    static std::wstring to_wstring(const std::string& src) {
+        if (src.empty()) {
+            return std::wstring();
+        }
+        return converter{}.from_bytes(src);
+    }
+    static std::string to_string(const std::wstring& src) {
+        if (src.empty()) {
+            return std::string();
+        }
+        return converter{}.to_bytes(src);
+    }
+};
+
+#endif  // STRING_HELPER_H_

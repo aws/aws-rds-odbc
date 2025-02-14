@@ -27,8 +27,8 @@
 // along with this program. If not, see 
 // http://www.gnu.org/licenses/gpl-2.0.html.
 
-#ifndef CLUSTERTOPOLOGYINFO_H_
-#define CLUSTERTOPOLOGYINFO_H_
+#ifndef CLUSTER_TOPOLOGY_INFO_H_
+#define CLUSTER_TOPOLOGY_INFO_H_
 
 #include "host_info.h"
 

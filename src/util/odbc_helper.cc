@@ -142,7 +142,7 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
             LOG(ERROR) << "Invalid handle";
         } else if (SQL_SUCCEEDED(ret)) {
             #ifdef UNICODE
-            LOG(ERROR) << LoggerWrapper::sqlwchar_to_string(sqlstate) << ": " << LoggerWrapper::sqlwchar_to_string(message);
+            LOG(ERROR) << StringHelper::to_string(sqlstate) << ": " << StringHelper::to_string(message);
             #else
             LOG(ERROR) << sqlstate << ": " << message;
             #endif            

@@ -69,7 +69,7 @@ add_executable(
   util/connection_string_helper_test.cc
   util/sliding_cache_map_test.cc
   util/odbc_helper_test.cc
-  util/logger_wrapper_test.cc
+  util/rds_utils_test.cc
 )
 
 #-----------------------------------------------------

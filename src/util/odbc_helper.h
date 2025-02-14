@@ -39,11 +39,8 @@
 #include <sqltypes.h>
 #include <string>
 
+#include "string_helper.h"
 #include "text_helper.h"
-
-#define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
-#define AS_CHAR(str) (reinterpret_cast<char*>(str))
-#define AS_WCHAR(str) (reinterpret_cast<wchar_t*>(str))
 
 class OdbcHelper {
 public:

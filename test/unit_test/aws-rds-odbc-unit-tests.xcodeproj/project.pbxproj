@@ -45,7 +45,6 @@
 		7369B6212CDE64AD00C98EDF /* random_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B61F2CDE64AD00C98EDF /* random_host_selector_test.cc */; };
 		7369B62D2CDE669D00C98EDF /* okta_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B62B2CDE669D00C98EDF /* okta_test.cc */; };
 		7369B62F2CDE677300C98EDF /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7369B62E2CDE677300C98EDF /* libiconv.tbd */; };
-		73778D292D26E8B6006859EE /* logger_wrapper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73778D282D26E8B6006859EE /* logger_wrapper_test.cc */; };
 		738543EC2CEE0E050019F6C6 /* round_robin_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543EB2CEE0E050019F6C6 /* round_robin_host_selector_test.cc */; };
 		73ABBC482D304A8000E34238 /* connection_string_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */; };
 		73ABBC492D304A8000E34238 /* connection_string_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */; };
@@ -61,6 +60,8 @@
 		73DDE0792D440725003614BF /* cluster_topology_monitor_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */; };
 		73DDE07A2D440725003614BF /* cluster_topology_query_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */; };
 		73DDE07B2D440725003614BF /* cluster_topology_monitor_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */; };
+		98CF443F2D5E92D80079DD79 /* rds_utils_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 98CF443E2D5E92D80079DD79 /* rds_utils_test.cc */; };
+		98CF44402D5E92D80079DD79 /* rds_utils_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 98CF443E2D5E92D80079DD79 /* rds_utils_test.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,6 +133,7 @@
 		73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper_test.cc; sourceTree = "<group>"; };
 		73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_monitor_test.cc; sourceTree = "<group>"; };
 		73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_query_helper_test.cc; sourceTree = "<group>"; };
+		98CF443E2D5E92D80079DD79 /* rds_utils_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rds_utils_test.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 		7369B6132CDE5CBC00C98EDF /* util */ = {
 			isa = PBXGroup;
 			children = (
+				98CF443E2D5E92D80079DD79 /* rds_utils_test.cc */,
 				73ABBC472D304A8000E34238 /* connection_string_helper_test.cc */,
 				73778D282D26E8B6006859EE /* logger_wrapper_test.cc */,
 				731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */,
@@ -413,6 +416,7 @@
 				733ED0D22D28528D001BAC9D /* simple_host_availability_strategy_test.cc in Sources */,
 				733ED0D32D28528D001BAC9D /* odbc_helper_test.cc in Sources */,
 				733ED0D42D28528D001BAC9D /* authentication_provider_test.cc in Sources */,
+				98CF443F2D5E92D80079DD79 /* rds_utils_test.cc in Sources */,
 				733ED0D52D28528D001BAC9D /* logger_wrapper_test.cc in Sources */,
 				733ED0D62D28528D001BAC9D /* random_host_selector_test.cc in Sources */,
 				733ED0D72D28528D001BAC9D /* main.cc in Sources */,
@@ -438,6 +442,7 @@
 				73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */,
 				7369B6142CDE5CBC00C98EDF /* odbc_helper_test.cc in Sources */,
 				73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */,
+				98CF44402D5E92D80079DD79 /* rds_utils_test.cc in Sources */,
 				73778D292D26E8B6006859EE /* logger_wrapper_test.cc in Sources */,
 				7369B6212CDE64AD00C98EDF /* random_host_selector_test.cc in Sources */,
 				734B1D442CC97FA800FB6683 /* main.cc in Sources */,
