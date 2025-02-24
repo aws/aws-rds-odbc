@@ -15,6 +15,6 @@
 #include "rds_logger_service.h"
 #include "logger_wrapper.h"
 
-void initialize_rds_logger(const char* log_dir) {
-    LoggerWrapper::initialize(log_dir);
+void initialize_rds_logger(const char* log_dir, int threshold) {
+    LoggerWrapper::initialize(log_dir, threshold);
 }
