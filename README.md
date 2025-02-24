@@ -23,4 +23,4 @@ advantage of AWS RDS functionality inside an Amazon Aurora database (DB) cluster
 Please refer to the [documentation](docs/Documentation.md) for details on how to build and test the library.
 
 ## License
-This software is released under version 2 of the GNU Lesser General Public License (LGPLv2).
+This software is released under the Apache 2.0 license.
