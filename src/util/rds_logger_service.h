@@ -23,7 +23,7 @@ extern "C" {
  *
  * @param log_dir Directory to contain the AWS RDS ODBC library logs.
  */
-void initialize_rds_logger(const char* log_dir);
+void initialize_rds_logger(const char* log_dir, int threshold);
 
 #ifdef __cplusplus
 }

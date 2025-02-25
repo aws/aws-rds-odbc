@@ -32,14 +32,14 @@
 
 namespace logger_config {
     const std::string PROGRAM_NAME = "aws-rds-odbc";
-    const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append("aws-rds-odbc").string();
+    const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append(PROGRAM_NAME).string();
 }  // namespace logger_config
 
 // Initializes glog once
 class LoggerWrapper {
 public:
     static void initialize();
-    static void initialize(std::string log_location);
+    static void initialize(std::string log_location, int threshold);
 
     // Prevent copy constructors
     LoggerWrapper(const LoggerWrapper&) = delete;
