@@ -30,9 +30,7 @@
 #define strcmp_case_insensitive(str1, str2) strcmpi(str1, str2)
 #endif
 
-#ifdef __linux__
-typedef std::wstring_convert<std::codecvt_utf8_utf16<char16_t>> converter;
-#elifdef __APPLE__
+#if defined(__APPLE__) || defined(__linux__)
 typedef std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 #else
 typedef std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
