@@ -478,3 +478,4 @@ contents.xcworkspacedata
 # IntelliJ IDEA / CLion
 .clang-tidy
 .idea
+/cmake-build-debug
