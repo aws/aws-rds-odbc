@@ -74,6 +74,7 @@ void LimitlessRouterMonitor::Open(
         return; // fatal error; don't open thread
     }
 
+    SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
     rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
     if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
         return; // fatal error; don't open thread
