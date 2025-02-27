@@ -28,14 +28,19 @@ using testing::Return;
 using testing::StrEq;
 using testing::Invoke;
 
-static const SQLTCHAR *test_connection_string_lazy_c_str = (SQLTCHAR *)TEXT("LIMITLESSMODE=lazy;");
-static const SQLTCHAR *test_connection_string_immediate_c_str = (SQLTCHAR *)TEXT("LIMITLESSMODE=immediate;");
+static const SQLTCHAR *test_connection_string_lazy_c_str;
+static const SQLTCHAR *test_connection_string_immediate_c_str;
 const static int test_host_port = 5432;
 
 class LimitlessMonitorServiceTest : public testing::Test {
   protected:
     // Runs once per suite
-    static void SetUpTestSuite() {}
+    static void SetUpTestSuite() {
+        std::string conn_str = "LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
+        test_connection_string_lazy_c_str = (SQLTCHAR *)TEXT(conn_str.c_str());
+        conn_str = "LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
+        test_connection_string_immediate_c_str = (SQLTCHAR *)TEXT(conn_str.c_str());
+    }
     static void TearDownTestSuite() {}
 
     // Runs per test case
@@ -48,7 +53,7 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host1", 5432, UP, true, nullptr, 101)); // round robin should choose this one
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host2", 5432, UP, true, nullptr, 100));
 
-    EXPECT_CALL(*mock_monitor, Open(false, test_connection_string_lazy_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor, Open(false, test_connection_string_lazy_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
@@ -84,11 +89,11 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor3 = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     // mock_monitor3 will have an empty set of limitless routers -- couldn't fetch in time, essentially
 
-    EXPECT_CALL(*mock_monitor1, Open(false, test_connection_string_lazy_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor1, Open(false, test_connection_string_lazy_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor1.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
-    EXPECT_CALL(*mock_monitor2, Open(false, test_connection_string_lazy_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor2, Open(false, test_connection_string_lazy_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor2.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
-    EXPECT_CALL(*mock_monitor3, Open(false, test_connection_string_lazy_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor3, Open(false, test_connection_string_lazy_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor3.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
     LimitlessMonitorService limitless_monitor_service;
@@ -151,7 +156,7 @@ TEST_F(LimitlessMonitorServiceTest, ImmediateMonitorTest) {
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host1", 5432, UP, true, nullptr, 101)); // round robin should choose this one
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host2", 5432, UP, true, nullptr, 100));
 
-    EXPECT_CALL(*mock_monitor, Open(true, test_connection_string_immediate_c_str, test_host_port, DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
+    EXPECT_CALL(*mock_monitor, Open(true, test_connection_string_immediate_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
