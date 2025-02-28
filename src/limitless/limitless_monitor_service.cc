@@ -14,7 +14,6 @@
 
 #include <cstdio>
 #include <cstring>
-#include <cwchar>
 
 #include "../util/logger_wrapper.h"
 #include "connection_string_helper.h"
@@ -76,13 +75,7 @@ bool LimitlessMonitorService::NewService(
     unsigned int limitless_monitor_interval_ms = DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS; // incase the field is unset
 
     if (connection_string_map.contains(LIMITLESS_MONITOR_INTERVAL_MS_KEY)) {
-        #ifdef UNICODE
-        const wchar_t *str = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY].c_str();
-        limitless_monitor_interval_ms = wcstol(str, nullptr, 10);
-        #else
-        const char *str = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY].c_str();
-        limitless_monitor_interval_ms = atoi(str);
-        #endif
+        limitless_monitor_interval_ms = std::stoi(connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY]);
     }
 
     // ensure that the owning scope of the shared pointer is inside the map

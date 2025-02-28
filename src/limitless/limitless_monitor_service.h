@@ -80,7 +80,7 @@ private:
 extern "C" {
 #endif
 
-#define DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS 15000
+#define DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS 7500
 
 typedef struct {
     char *server;
