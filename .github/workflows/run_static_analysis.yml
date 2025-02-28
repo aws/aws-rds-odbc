@@ -50,19 +50,20 @@ jobs:
         run: cmake -E make_directory ./build
 
       - name: Configure CMake
-        run: cmake -S . -B build
+        run: cmake -S . -B build_unicode
           -G "$CMAKE_GENERATOR"
+          -DUNICODE_BUILD=ON
           -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 
       - name: Create skip file
-        run: echo "-*/build/_deps/*" > ./skipfile
+        run: echo "-*/build_unicode/_deps/*" > ./skipfile
 
       - name: Run static analysis
         run: |
           export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
           whereis clang-tidy
           source ./venv/bin/activate
-          CodeChecker analyze ./build/compile_commands.json -i ./skipfile --config codechecker.json -o ./reports
+          CodeChecker analyze ./build_unicode/compile_commands.json -i ./skipfile --config codechecker.json -o ./reports
 
       - name: Print static analysis
         if: always()
