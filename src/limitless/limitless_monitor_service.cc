@@ -61,21 +61,28 @@ bool LimitlessMonitorService::NewService(
 
     bool block_and_query_immediately = true;
 
-    if (connection_string_map.contains(LIMITLESS_MODE_KEY)) {
+    auto it = connection_string_map.find(LIMITLESS_MODE_KEY);
+    if (it != connection_string_map.end()) {
         #ifdef UNICODE
-        std::wstring limitless_mode = connection_string_map[LIMITLESS_MODE_KEY];
+        std::wstring value = connection_string_map[LIMITLESS_MODE_KEY];
         #else
-        std::string limitless_mode = connection_string_map[LIMITLESS_MODE_KEY];
+        std::string value = connection_string_map[LIMITLESS_MODE_KEY];
         #endif
-        if (limitless_mode == LIMITLESS_MODE_VALUE_LAZY) {
+        if (value == LIMITLESS_MODE_VALUE_LAZY) {
             block_and_query_immediately = false;
         }
     }
 
     unsigned int limitless_monitor_interval_ms = DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS; // incase the field is unset
 
-    if (connection_string_map.contains(LIMITLESS_MONITOR_INTERVAL_MS_KEY)) {
-        limitless_monitor_interval_ms = std::stoi(connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY]);
+    it = connection_string_map.find(LIMITLESS_MONITOR_INTERVAL_MS_KEY);
+    if (it != connection_string_map.end()) {
+        #ifdef UNICODE
+        std::wstring value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
+        #else
+        std::string value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
+        #endif
+        limitless_monitor_interval_ms = std::stoi(value);
     }
 
     // ensure that the owning scope of the shared pointer is inside the map

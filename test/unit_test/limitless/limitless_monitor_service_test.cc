@@ -31,16 +31,27 @@ using testing::Invoke;
 static const SQLTCHAR *test_connection_string_lazy_c_str;
 static const SQLTCHAR *test_connection_string_immediate_c_str;
 const static int test_host_port = 5432;
+#ifdef UNICODE
+std::wstring conn_str_lazy, conn_str_immediate;
+#else
 std::string conn_str_lazy, conn_str_immediate;
+#endif
 
 class LimitlessMonitorServiceTest : public testing::Test {
   protected:
     // Runs once per suite
     static void SetUpTestSuite() {
+        #ifdef UNICODE
+        conn_str_lazy = L"LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
+        test_connection_string_lazy_c_str = (SQLTCHAR *)conn_str_lazy.c_str();
+        conn_str_immediate = L"LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
+        test_connection_string_immediate_c_str = (SQLTCHAR *)conn_str_immediate.c_str();
+        #else
         conn_str_lazy = "LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
-        test_connection_string_lazy_c_str = (SQLTCHAR *)TEXT(conn_str_lazy.c_str());
+        test_connection_string_lazy_c_str = (SQLTCHAR *)conn_str_lazy.c_str();
         conn_str_immediate = "LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
-        test_connection_string_immediate_c_str = (SQLTCHAR *)TEXT(conn_str_immediate.c_str());
+        test_connection_string_immediate_c_str = (SQLTCHAR *)conn_str_immediate.c_str();
+        #endif
     }
     static void TearDownTestSuite() {}
 
