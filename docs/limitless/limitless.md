@@ -9,12 +9,13 @@ Aurora Limitless Database introduces a new endpoint for the databases - the DB s
 The Limitless Monitoring Feature achieves this by periodically polling for available transaction routers and their load metrics, and then caching them. When a new connection is made, the library allows calls to select a transaction router from the cache using a weighted round-robin strategy. Routers with a higher load are assigned a lower weight, and routers with a lower load are assigned a higher weight.
 
 ## Use with Other Features
-The Limitless Connection Feature is compatible with authentication type features such as the IAM and AWS Secrets Manager.
+The Limitless Connection Feature is compatible with AWS authentication methods. See more about the supported AWS authentication methods [here](../authentication/authentication.md).
 
 > [!WARNING]\
-> The Failover feature is also compatible with the Limitless Connection Feature.  
-However, we don't recommend using them with the Limitless Connection Feature because they're not designed to be used with Aurora Limitless Database. 
-They don't provide any extra value, and add unnecessary computation and memory overhead.
+> We don't recommend enabling both the Failover and Limitless Connection feature at the same time.
+> While it won't result in issues, the Failover feature was not designed to be used with Aurora Limitless Database.
+> Enabling both features will introduce unnecessary computation and memory overhead with no added benefits.
+
 
 ## Sample Code
 [Limitless Example](./limitless_example.cpp)
