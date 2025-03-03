@@ -33,6 +33,8 @@
 
 #include "util/odbc_helper.h"
 
+#define TEST_LIMITLESS_MONITOR_INTERVAL_MS 250
+
 class MOCK_SECRETS_MANAGER_CLIENT : public Aws::SecretsManager::SecretsManagerClient {
 public:
     MOCK_SECRETS_MANAGER_CLIENT() : SecretsManagerClient() {};
