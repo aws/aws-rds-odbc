@@ -30,20 +30,11 @@ namespace {
 
 class AuthenticationProviderTest : public testing::Test {
 protected:
-    char* token;
+    char token[max_token_size] = "";
 
     // Runs once per suite
     static void SetUpTestSuite() {}
     static void TearDownTestSuite() {}
-
-    // Runs per test case
-    void SetUp() override {
-        token = (char*) malloc(max_token_size * sizeof(char));
-        strcpy(token, empty_token);
-    }
-    void TearDown() override {
-        free(token);
-    }
 };
 
 TEST_F(AuthenticationProviderTest, GetFedAuthTypeEnum_Test) {
@@ -89,6 +80,21 @@ TEST_F(AuthenticationProviderTest, GetCachedToken_TooLarge) {
     bool result = GetCachedToken(token, max_token_size - 1, hostname, region, port, username);
     EXPECT_FALSE(result);
     ASSERT_EQ(strlen(empty_token), strlen(token));
+}
+
+TEST_F(AuthenticationProviderTest, GetCachedToken_DifferentUsers) {
+    char token1[max_token_size] = "";
+    char token2[max_token_size] = "";
+    const char* username1 = "user1";
+    const char* username2 = "user2";
+    UpdateCachedToken(hostname, region, port, username1, "1", "10");
+    UpdateCachedToken(hostname, region, port, username2, "2", "10");
+    bool user1_result = GetCachedToken(token1, max_token_size, hostname, region, port, username1);
+    bool user2_result = GetCachedToken(token2, max_token_size, hostname, region, port, username2);
+    EXPECT_TRUE(user1_result);
+    EXPECT_TRUE(user2_result);
+    ASSERT_EQ(strlen(token1), strlen(token2));
+    EXPECT_TRUE(token1[0] != token2[0]);
 }
 
 TEST_F(AuthenticationProviderTest, GenerateConnectAuthToken_EmptyAdfsConf) {
