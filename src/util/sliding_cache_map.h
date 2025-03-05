@@ -26,12 +26,12 @@ class SlidingCacheMap {
 public:
     SlidingCacheMap() = default;
 
-    void put(const K& key, const V& value);
-    void put(const K& key, const V& value, int sec_ttl);
-    V get(const K& key);
-    bool find(const K& key);
-    unsigned int size();
-    void clear();
+    void Put(const K& key, const V& value);
+    void Put(const K& key, const V& value, int sec_ttl);
+    V Get(const K& key);
+    bool Find(const K& key);
+    unsigned int Size();
+    void Clear();
 
 private:
     struct CacheEntry {

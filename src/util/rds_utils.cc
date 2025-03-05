@@ -48,35 +48,35 @@ namespace {
     const std::regex IPV6_COMPRESSED_PATTERN(R"#(^(([0-9A-Fa-f]{1,4}(:[0-9A-Fa-f]{1,4}){0,5})?)::(([0-9A-Fa-f]{1,4}(:[0-9A-Fa-f]{1,4}){0,5})?)$)#");
 }
 
-bool RdsUtils::is_dns_pattern_valid(const std::string& host) {
+bool RdsUtils::IsDnsPatternValid(const std::string& host) {
     return ( host.find('?') != std::string::npos);
 }
 
-bool RdsUtils::is_rds_dns(const std::string& host) {
+bool RdsUtils::IsRdsDns(const std::string& host) {
     return std::regex_match(host, AURORA_DNS_PATTERN) || std::regex_match(host, AURORA_CHINA_DNS_PATTERN);
 }
 
-bool RdsUtils::is_rds_cluster_dns(const std::string& host) {
+bool RdsUtils::IsRdsClusterDns(const std::string& host) {
     return std::regex_match(host, AURORA_CLUSTER_PATTERN) || std::regex_match(host, AURORA_CHINA_CLUSTER_PATTERN);
 }
 
-bool RdsUtils::is_rds_proxy_dns(const std::string& host) {
+bool RdsUtils::IsRdsProxyDns(const std::string& host) {
     return std::regex_match(host, AURORA_PROXY_DNS_PATTERN) || std::regex_match(host, AURORA_CHINA_PROXY_DNS_PATTERN);
 }
 
-bool RdsUtils::is_rds_writer_cluster_dns(const std::string& host) {
+bool RdsUtils::IsRdsWriterClusterDns(const std::string& host) {
     return std::regex_match(host, AURORA_WRITER_CLUSTER_PATTERN) || std::regex_match(host, AURORA_CHINA_WRITER_CLUSTER_PATTERN);
 }
 
-bool RdsUtils::is_rds_reader_cluster_dns(const std::string& host) {
+bool RdsUtils::IsRdsReaderClusterDns(const std::string& host) {
     return std::regex_match(host, AURORA_READER_CLUSTER_PATTERN) || std::regex_match(host, AURORA_CHINA_READER_CLUSTER_PATTERN);
 }
 
-bool RdsUtils::is_rds_custom_cluster_dns(const std::string& host) {
+bool RdsUtils::IsRdsCustomClusterDns(const std::string& host) {
     return std::regex_match(host, AURORA_CUSTOM_CLUSTER_PATTERN) || std::regex_match(host, AURORA_CHINA_CUSTOM_CLUSTER_PATTERN);
 }
 
-std::string RdsUtils::get_rds_cluster_host_url(const std::string& host) {
+std::string RdsUtils::GetRdsClusterHostUrl(const std::string& host) {
     auto f = [ host ](const std::regex& pattern) {
         std::smatch m;
         if (std::regex_search(host, m, pattern) && m.size() > 1) {
@@ -104,7 +104,7 @@ std::string RdsUtils::get_rds_cluster_host_url(const std::string& host) {
     return f(AURORA_CHINA_CLUSTER_PATTERN);
 }
 
-std::string RdsUtils::get_rds_cluster_id(const std::string& host) {
+std::string RdsUtils::GetRdsClusterId(const std::string& host) {
     auto f = [ host ](const std::regex& pattern) {
         std::smatch m;
         if (std::regex_search(host, m, pattern) && m.size() > 1 && !m.str(2).empty()) {
@@ -121,7 +121,7 @@ std::string RdsUtils::get_rds_cluster_id(const std::string& host) {
     return f(AURORA_CHINA_DNS_PATTERN);
 }
 
-std::string RdsUtils::get_rds_instance_id(const std::string& host) {
+std::string RdsUtils::GetRdsInstanceId(const std::string& host) {
     auto f = [ host ](const std::regex& pattern) {
         std::smatch m;
         if (std::regex_search(host, m, pattern) && m.size() > 1 && m.str(2).empty()) {
@@ -138,7 +138,7 @@ std::string RdsUtils::get_rds_instance_id(const std::string& host) {
     return f(AURORA_CHINA_DNS_PATTERN);
 }
 
-std::string RdsUtils::get_rds_instance_host_pattern(const std::string& host) {
+std::string RdsUtils::GetRdsInstanceHostPattern(const std::string& host) {
     auto f = [ host ](const std::regex& pattern) {
         std::smatch m;
         if (std::regex_search(host, m, pattern) && m.size() > 4 && !m.str(3).empty()) {
@@ -158,7 +158,7 @@ std::string RdsUtils::get_rds_instance_host_pattern(const std::string& host) {
     return f(AURORA_CHINA_DNS_PATTERN);
 }
 
-std::string RdsUtils::get_rds_region(const std::string& host) {
+std::string RdsUtils::GetRdsRegion(const std::string& host) {
     auto f = [ host ](const std::regex& pattern) {
         std::smatch m;
         if (std::regex_search(host, m, pattern) && m.size() > 4 && !m.str(4).empty()) {
@@ -175,10 +175,10 @@ std::string RdsUtils::get_rds_region(const std::string& host) {
     return f(AURORA_CHINA_DNS_PATTERN);
 }
 
-bool RdsUtils::is_ipv4(const std::string& host) {
+bool RdsUtils::IsIpv4(const std::string& host) {
     return std::regex_match(host, IPV4_PATTERN);
 }
 
-bool RdsUtils::is_ipv6(const std::string& host) {
+bool RdsUtils::IsIpv6(const std::string& host) {
     return std::regex_match(host, IPV6_PATTERN) || std::regex_match(host, IPV6_COMPRESSED_PATTERN);
 }

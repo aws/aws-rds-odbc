@@ -44,114 +44,114 @@ class RdsUtilsTest : public testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(RdsUtilsTest, is_rds_dns) {
-    EXPECT_TRUE(RdsUtils::is_rds_dns(US_EAST_REGION_CLUSTER));
-    EXPECT_TRUE(RdsUtils::is_rds_dns(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_TRUE(RdsUtils::is_rds_dns(US_EAST_REGION_PROXY));
-    EXPECT_TRUE(RdsUtils::is_rds_dns(US_EAST_REGION_CUSTON_DOMAIN));
+TEST_F(RdsUtilsTest, IsRdsDns) {
+    EXPECT_TRUE(RdsUtils::IsRdsDns(US_EAST_REGION_CLUSTER));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(US_EAST_REGION_PROXY));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_TRUE(RdsUtils::is_rds_dns(CHINA_REGION_CLUSTER));
-    EXPECT_TRUE(RdsUtils::is_rds_dns(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_TRUE(RdsUtils::is_rds_dns(CHINA_REGION_PROXY));
-    EXPECT_TRUE(RdsUtils::is_rds_dns(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(CHINA_REGION_CLUSTER));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(CHINA_REGION_PROXY));
+    EXPECT_TRUE(RdsUtils::IsRdsDns(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, is_rds_cluster_dns) {
-    EXPECT_TRUE(RdsUtils::is_rds_cluster_dns(US_EAST_REGION_CLUSTER));
-    EXPECT_TRUE(RdsUtils::is_rds_cluster_dns(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_FALSE(RdsUtils::is_rds_cluster_dns(US_EAST_REGION_PROXY));
-    EXPECT_FALSE(RdsUtils::is_rds_cluster_dns(US_EAST_REGION_CUSTON_DOMAIN));
+TEST_F(RdsUtilsTest, IsRdsClusterDns) {
+    EXPECT_TRUE(RdsUtils::IsRdsClusterDns(US_EAST_REGION_CLUSTER));
+    EXPECT_TRUE(RdsUtils::IsRdsClusterDns(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_FALSE(RdsUtils::IsRdsClusterDns(US_EAST_REGION_PROXY));
+    EXPECT_FALSE(RdsUtils::IsRdsClusterDns(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_TRUE(RdsUtils::is_rds_cluster_dns(CHINA_REGION_CLUSTER));
-    EXPECT_TRUE(RdsUtils::is_rds_cluster_dns(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_FALSE(RdsUtils::is_rds_cluster_dns(CHINA_REGION_PROXY));
-    EXPECT_FALSE(RdsUtils::is_rds_cluster_dns(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_TRUE(RdsUtils::IsRdsClusterDns(CHINA_REGION_CLUSTER));
+    EXPECT_TRUE(RdsUtils::IsRdsClusterDns(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_FALSE(RdsUtils::IsRdsClusterDns(CHINA_REGION_PROXY));
+    EXPECT_FALSE(RdsUtils::IsRdsClusterDns(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, is_rds_proxy_dns) {
-    EXPECT_FALSE(RdsUtils::is_rds_proxy_dns(US_EAST_REGION_CLUSTER));
-    EXPECT_FALSE(RdsUtils::is_rds_proxy_dns(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_TRUE(RdsUtils::is_rds_proxy_dns(US_EAST_REGION_PROXY));
-    EXPECT_FALSE(RdsUtils::is_rds_proxy_dns(US_EAST_REGION_CUSTON_DOMAIN));
+TEST_F(RdsUtilsTest, IsRdsProxyDns) {
+    EXPECT_FALSE(RdsUtils::IsRdsProxyDns(US_EAST_REGION_CLUSTER));
+    EXPECT_FALSE(RdsUtils::IsRdsProxyDns(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_TRUE(RdsUtils::IsRdsProxyDns(US_EAST_REGION_PROXY));
+    EXPECT_FALSE(RdsUtils::IsRdsProxyDns(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_FALSE(RdsUtils::is_rds_proxy_dns(CHINA_REGION_CLUSTER));
-    EXPECT_FALSE(RdsUtils::is_rds_proxy_dns(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_TRUE(RdsUtils::is_rds_proxy_dns(CHINA_REGION_PROXY));
-    EXPECT_FALSE(RdsUtils::is_rds_proxy_dns(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_FALSE(RdsUtils::IsRdsProxyDns(CHINA_REGION_CLUSTER));
+    EXPECT_FALSE(RdsUtils::IsRdsProxyDns(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_TRUE(RdsUtils::IsRdsProxyDns(CHINA_REGION_PROXY));
+    EXPECT_FALSE(RdsUtils::IsRdsProxyDns(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, is_rds_writer_cluster_dns) {
-    EXPECT_TRUE(RdsUtils::is_rds_writer_cluster_dns(US_EAST_REGION_CLUSTER));
-    EXPECT_FALSE(RdsUtils::is_rds_writer_cluster_dns(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_FALSE(RdsUtils::is_rds_writer_cluster_dns(US_EAST_REGION_PROXY));
-    EXPECT_FALSE(RdsUtils::is_rds_writer_cluster_dns(US_EAST_REGION_CUSTON_DOMAIN));
+TEST_F(RdsUtilsTest, IsRdsWriterClusterDns) {
+    EXPECT_TRUE(RdsUtils::IsRdsWriterClusterDns(US_EAST_REGION_CLUSTER));
+    EXPECT_FALSE(RdsUtils::IsRdsWriterClusterDns(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_FALSE(RdsUtils::IsRdsWriterClusterDns(US_EAST_REGION_PROXY));
+    EXPECT_FALSE(RdsUtils::IsRdsWriterClusterDns(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_TRUE(RdsUtils::is_rds_writer_cluster_dns(CHINA_REGION_CLUSTER));
-    EXPECT_FALSE(RdsUtils::is_rds_writer_cluster_dns(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_FALSE(RdsUtils::is_rds_writer_cluster_dns(CHINA_REGION_PROXY));
-    EXPECT_FALSE(RdsUtils::is_rds_writer_cluster_dns(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_TRUE(RdsUtils::IsRdsWriterClusterDns(CHINA_REGION_CLUSTER));
+    EXPECT_FALSE(RdsUtils::IsRdsWriterClusterDns(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_FALSE(RdsUtils::IsRdsWriterClusterDns(CHINA_REGION_PROXY));
+    EXPECT_FALSE(RdsUtils::IsRdsWriterClusterDns(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, id_rds_custom_cluster) {
-    EXPECT_FALSE(RdsUtils::is_rds_custom_cluster_dns(US_EAST_REGION_CLUSTER));
-    EXPECT_FALSE(RdsUtils::is_rds_custom_cluster_dns(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_FALSE(RdsUtils::is_rds_custom_cluster_dns(US_EAST_REGION_PROXY));
-    EXPECT_TRUE(RdsUtils::is_rds_custom_cluster_dns(US_EAST_REGION_CUSTON_DOMAIN));
+TEST_F(RdsUtilsTest, IsRdsCustomClusterDns) {
+    EXPECT_FALSE(RdsUtils::IsRdsCustomClusterDns(US_EAST_REGION_CLUSTER));
+    EXPECT_FALSE(RdsUtils::IsRdsCustomClusterDns(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_FALSE(RdsUtils::IsRdsCustomClusterDns(US_EAST_REGION_PROXY));
+    EXPECT_TRUE(RdsUtils::IsRdsCustomClusterDns(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_FALSE(RdsUtils::is_rds_custom_cluster_dns(CHINA_REGION_CLUSTER));
-    EXPECT_FALSE(RdsUtils::is_rds_custom_cluster_dns(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_FALSE(RdsUtils::is_rds_custom_cluster_dns(CHINA_REGION_PROXY));
-    EXPECT_TRUE(RdsUtils::is_rds_custom_cluster_dns(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_FALSE(RdsUtils::IsRdsCustomClusterDns(CHINA_REGION_CLUSTER));
+    EXPECT_FALSE(RdsUtils::IsRdsCustomClusterDns(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_FALSE(RdsUtils::IsRdsCustomClusterDns(CHINA_REGION_PROXY));
+    EXPECT_TRUE(RdsUtils::IsRdsCustomClusterDns(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, get_rds_instance_host_pattern) {
+TEST_F(RdsUtilsTest, GetRdsInstanceHostPattern) {
     const std::string expected_pattern = "?.XYZ.us-east-2.rds.amazonaws.com";
-    EXPECT_EQ(expected_pattern, RdsUtils::get_rds_instance_host_pattern(US_EAST_REGION_CLUSTER));
-    EXPECT_EQ(expected_pattern, RdsUtils::get_rds_instance_host_pattern(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ(expected_pattern, RdsUtils::get_rds_instance_host_pattern(US_EAST_REGION_PROXY));
-    EXPECT_EQ(expected_pattern, RdsUtils::get_rds_instance_host_pattern(US_EAST_REGION_CUSTON_DOMAIN));
+    EXPECT_EQ(expected_pattern, RdsUtils::GetRdsInstanceHostPattern(US_EAST_REGION_CLUSTER));
+    EXPECT_EQ(expected_pattern, RdsUtils::GetRdsInstanceHostPattern(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ(expected_pattern, RdsUtils::GetRdsInstanceHostPattern(US_EAST_REGION_PROXY));
+    EXPECT_EQ(expected_pattern, RdsUtils::GetRdsInstanceHostPattern(US_EAST_REGION_CUSTON_DOMAIN));
 
     const std::string expected_china_pattern = "?.XYZ.rds.cn-northwest-1.amazonaws.com.cn";
-    EXPECT_EQ(expected_china_pattern, RdsUtils::get_rds_instance_host_pattern(CHINA_REGION_CLUSTER));
-    EXPECT_EQ(expected_china_pattern, RdsUtils::get_rds_instance_host_pattern(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ(expected_china_pattern, RdsUtils::get_rds_instance_host_pattern(CHINA_REGION_PROXY));
-    EXPECT_EQ(expected_china_pattern, RdsUtils::get_rds_instance_host_pattern(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_EQ(expected_china_pattern, RdsUtils::GetRdsInstanceHostPattern(CHINA_REGION_CLUSTER));
+    EXPECT_EQ(expected_china_pattern, RdsUtils::GetRdsInstanceHostPattern(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ(expected_china_pattern, RdsUtils::GetRdsInstanceHostPattern(CHINA_REGION_PROXY));
+    EXPECT_EQ(expected_china_pattern, RdsUtils::GetRdsInstanceHostPattern(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, get_rds_cluster_host_url) {
-    EXPECT_EQ(US_EAST_REGION_CLUSTER, RdsUtils::get_rds_cluster_host_url(US_EAST_REGION_CLUSTER));
-    EXPECT_EQ(US_EAST_REGION_CLUSTER, RdsUtils::get_rds_cluster_host_url(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_cluster_host_url(US_EAST_REGION_PROXY));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_cluster_host_url(US_EAST_REGION_CUSTON_DOMAIN));
+TEST_F(RdsUtilsTest, GetRdsClusterHostUrl) {
+    EXPECT_EQ(US_EAST_REGION_CLUSTER, RdsUtils::GetRdsClusterHostUrl(US_EAST_REGION_CLUSTER));
+    EXPECT_EQ(US_EAST_REGION_CLUSTER, RdsUtils::GetRdsClusterHostUrl(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsClusterHostUrl(US_EAST_REGION_PROXY));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsClusterHostUrl(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_EQ(CHINA_REGION_CLUSTER, RdsUtils::get_rds_cluster_host_url(CHINA_REGION_CLUSTER));
-    EXPECT_EQ(CHINA_REGION_CLUSTER, RdsUtils::get_rds_cluster_host_url(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_cluster_host_url(CHINA_REGION_PROXY));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_cluster_host_url(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_EQ(CHINA_REGION_CLUSTER, RdsUtils::GetRdsClusterHostUrl(CHINA_REGION_CLUSTER));
+    EXPECT_EQ(CHINA_REGION_CLUSTER, RdsUtils::GetRdsClusterHostUrl(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsClusterHostUrl(CHINA_REGION_PROXY));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsClusterHostUrl(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, get_rds_cluster_id) {
-    EXPECT_EQ("database-test-name", RdsUtils::get_rds_cluster_id(US_EAST_REGION_CLUSTER));
-    EXPECT_EQ("database-test-name", RdsUtils::get_rds_cluster_id(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_cluster_id(US_EAST_REGION_INSTANCE));
+TEST_F(RdsUtilsTest, GetRdsClusterId) {
+    EXPECT_EQ("database-test-name", RdsUtils::GetRdsClusterId(US_EAST_REGION_CLUSTER));
+    EXPECT_EQ("database-test-name", RdsUtils::GetRdsClusterId(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsClusterId(US_EAST_REGION_INSTANCE));
 
-    EXPECT_EQ("proxy-test-name", RdsUtils::get_rds_cluster_id(US_EAST_REGION_PROXY));
-    EXPECT_EQ("custom-test-name", RdsUtils::get_rds_cluster_id(US_EAST_REGION_CUSTON_DOMAIN));
+    EXPECT_EQ("proxy-test-name", RdsUtils::GetRdsClusterId(US_EAST_REGION_PROXY));
+    EXPECT_EQ("custom-test-name", RdsUtils::GetRdsClusterId(US_EAST_REGION_CUSTON_DOMAIN));
 
-    EXPECT_EQ("database-test-name", RdsUtils::get_rds_cluster_id(CHINA_REGION_CLUSTER));
-    EXPECT_EQ("database-test-name", RdsUtils::get_rds_cluster_id(CHINA_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ("proxy-test-name", RdsUtils::get_rds_cluster_id(CHINA_REGION_PROXY));
-    EXPECT_EQ("custom-test-name", RdsUtils::get_rds_cluster_id(CHINA_REGION_CUSTON_DOMAIN));
+    EXPECT_EQ("database-test-name", RdsUtils::GetRdsClusterId(CHINA_REGION_CLUSTER));
+    EXPECT_EQ("database-test-name", RdsUtils::GetRdsClusterId(CHINA_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ("proxy-test-name", RdsUtils::GetRdsClusterId(CHINA_REGION_PROXY));
+    EXPECT_EQ("custom-test-name", RdsUtils::GetRdsClusterId(CHINA_REGION_CUSTON_DOMAIN));
 }
 
-TEST_F(RdsUtilsTest, get_rds_instance_id) {
-    EXPECT_EQ("instance-test-name", RdsUtils::get_rds_instance_id(US_EAST_REGION_INSTANCE));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_instance_id(US_EAST_REGION_CLUSTER_READ_ONLY));
-    EXPECT_EQ(std::string(), RdsUtils::get_rds_instance_id(US_EAST_REGION_CLUSTER));
+TEST_F(RdsUtilsTest, GetRdsInstanceId) {
+    EXPECT_EQ("instance-test-name", RdsUtils::GetRdsInstanceId(US_EAST_REGION_INSTANCE));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsInstanceId(US_EAST_REGION_CLUSTER_READ_ONLY));
+    EXPECT_EQ(std::string(), RdsUtils::GetRdsInstanceId(US_EAST_REGION_CLUSTER));
 }
 
 #ifdef WIN32
 TEST_F(RdsUtilsTest, sqlwchar_to_string_converted) {
-    EXPECT_EQ("Wide character string", StringHelper::to_string(L"Wide character string"));
+    EXPECT_EQ("Wide character string", StringHelper::ToString(L"Wide character string"));
 }
 #endif

@@ -40,7 +40,7 @@ public:
     static std::vector<HostInfo> QueryForLimitlessRouters(SQLHDBC conn, int host_port_to_map);
 
 private:
-    static HostInfo CreateHost(const SQLCHAR* load, const SQLCHAR* router_endpoint, int host_port_to_map);
+    static HostInfo create_host(const SQLCHAR* load, const SQLCHAR* router_endpoint, int host_port_to_map);
 };
 
 #endif // LIMITLESSQUERYHELPER_H_

@@ -51,7 +51,7 @@ std::string AdfsCredentialsProvider::GetSAMLAssertion(std::string& err_info) {
     std::smatch matches;
     std::string action;
     if (std::regex_search(body, matches, std::regex(FORM_ACTION_PATTERN))) {
-        action = HtmlUtil::escape_html_entity(matches.str(1));
+        action = HtmlUtil::EscapeHtmlEntity(matches.str(1));
     } else {
         err_info = "Could not extract action from the response body";
         return retval;
@@ -131,7 +131,7 @@ std::string AdfsCredentialsProvider::get_value_by_key(const std::string& input, 
 
     std::smatch matches;
     if (std::regex_search(input, matches, std::regex(pattern))) {
-        return HtmlUtil::escape_html_entity(matches.str(2));
+        return HtmlUtil::EscapeHtmlEntity(matches.str(2));
     }
     return "";
 }

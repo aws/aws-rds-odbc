@@ -82,7 +82,7 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
     std::shared_ptr<HostInfo> host_info = limitless_monitor_service.GetHostInfo(test_service_id);
     EXPECT_TRUE(host_info != nullptr);
     if (host_info != nullptr) {
-        EXPECT_EQ(host_info->get_host(), "test_host1");
+        EXPECT_EQ(host_info->GetHost(), "test_host1");
     }
 
     limitless_monitor_service.DecrementReferenceCounter(test_service_id);
@@ -134,13 +134,13 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
     std::shared_ptr<HostInfo> host_info = limitless_monitor_service.GetHostInfo(mock_monitor1_id);
     EXPECT_TRUE(host_info != nullptr);
     if (host_info != nullptr) {
-        EXPECT_EQ(host_info->get_host(), "correct1");
+        EXPECT_EQ(host_info->GetHost(), "correct1");
         host_info = nullptr; // free it
     }
     host_info = limitless_monitor_service.GetHostInfo(mock_monitor2_id);
     EXPECT_TRUE(host_info != nullptr);
     if (host_info != nullptr) {
-        EXPECT_EQ(host_info->get_host(), "correct2");
+        EXPECT_EQ(host_info->GetHost(), "correct2");
         host_info = nullptr; // free it
     }
     host_info = limitless_monitor_service.GetHostInfo(mock_monitor3_id);
@@ -185,7 +185,7 @@ TEST_F(LimitlessMonitorServiceTest, ImmediateMonitorTest) {
     std::shared_ptr<HostInfo> host_info = limitless_monitor_service.GetHostInfo(test_service_id);
     EXPECT_TRUE(host_info != nullptr);
     if (host_info != nullptr) {
-        EXPECT_EQ(host_info->get_host(), "test_host1");
+        EXPECT_EQ(host_info->GetHost(), "test_host1");
     }
 
     limitless_monitor_service.DecrementReferenceCounter(test_service_id);

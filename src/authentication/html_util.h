@@ -20,7 +20,7 @@
 
 class HtmlUtil {
 public:
-    static std::string escape_html_entity(const std::string& html);
+    static std::string EscapeHtmlEntity(const std::string& html);
 private:
     static const std::unordered_map<std::string, char> HTML_DECODE_MAP;
 };

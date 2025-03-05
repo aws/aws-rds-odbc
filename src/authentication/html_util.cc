@@ -26,7 +26,7 @@ const std::unordered_map<std::string, char> HtmlUtil::HTML_DECODE_MAP = {
     {"&quot;", '"'}
 };
 
-std::string HtmlUtil::escape_html_entity(const std::string& html) {
+std::string HtmlUtil::EscapeHtmlEntity(const std::string& html) {
     std::string retval;
     DLOG(INFO) << "Before HTML escape modification: " << html;
     int i = 0;

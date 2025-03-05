@@ -64,7 +64,7 @@ protected:
 
     std::shared_ptr<std::thread> monitor_thread = nullptr;
 
-    void run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
+    void Run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
 };
 
 #ifdef UNICODE

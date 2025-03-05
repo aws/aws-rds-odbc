@@ -16,14 +16,14 @@
 
 #include <random>
 
-HostInfo RandomHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer,
+HostInfo RandomHostSelector::GetHost(std::vector<HostInfo> hosts, bool is_writer,
     std::unordered_map<std::string, std::string>) {
 
     std::vector<HostInfo> selection;
     selection.reserve(hosts.size());
 
     std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(selection), [&is_writer](const HostInfo& host) {
-        return host.is_host_up() && (is_writer ? host.is_host_writer() : true);
+        return host.IsHostUp() && (is_writer ? host.IsHostWriter() : true);
     });
 
     if (selection.empty()) {

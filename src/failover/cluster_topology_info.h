@@ -32,24 +32,24 @@ public:
     ClusterTopologyInfo(const ClusterTopologyInfo& src_info); //copy constructor
     virtual ~ClusterTopologyInfo();
 
-    void add_host(const std::shared_ptr<HostInfo>& host_info);
-    size_t total_hosts();
-    size_t num_readers(); // return number of readers in the cluster
-    std::time_t time_last_updated() const;
+    void AddHost(const std::shared_ptr<HostInfo>& host_info);
+    size_t TotalHosts();
+    size_t NumReaders(); // return number of readers in the cluster
+    std::time_t TimeLastUpdated() const;
 
-    std::shared_ptr<HostInfo> get_writer();
-    std::shared_ptr<HostInfo> get_next_reader();
-    // TODO(yuenhcol) - Ponder if the get_reader below is needed. In general user of this should not need to deal with indexes.
+    std::shared_ptr<HostInfo> GetWriter();
+    std::shared_ptr<HostInfo> GetNextReader();
+    // TODO(yuenhcol) - Ponder if the GetReader below is needed. In general user of this should not need to deal with indexes.
     // One case that comes to mind, if we were to try to do a random shuffle of readers or hosts in general like JDBC driver
-    // we could do random shuffle of host indices and call the get_reader for specific index in order we wanted.
-    std::shared_ptr<HostInfo> get_reader(int i);
-    std::vector<std::shared_ptr<HostInfo>> get_writers();
-    std::vector<std::shared_ptr<HostInfo>> get_readers();
+    // we could do random shuffle of host indices and call the GetReader for specific index in order we wanted.
+    std::shared_ptr<HostInfo> GetReader(int i);
+    std::vector<std::shared_ptr<HostInfo>> GetWriters();
+    std::vector<std::shared_ptr<HostInfo>> GetReaders();
 
 private:
     int current_reader = -1;
     std::time_t last_updated;
-    std::set<std::string> down_hosts; // maybe not needed, HostInfo has is_host_down() method
+    std::set<std::string> down_hosts; // maybe not needed, HostInfo has IsHostDown() method
     //std::vector<HostInfo*> hosts;
     std::shared_ptr<HostInfo> last_used_reader;  // TODO(yuenhcol) perhaps this overlaps with current_reader and is not needed
 

@@ -19,21 +19,21 @@
 
 class RdsUtils {
    public:
-    static bool is_dns_pattern_valid(const std::string& host);
-    static bool is_rds_dns(const std::string& host);
-    static bool is_rds_cluster_dns(const std::string& host);
-    static bool is_rds_proxy_dns(const std::string& host);
-    static bool is_rds_writer_cluster_dns(const std::string& host);
-    static bool is_rds_reader_cluster_dns(const std::string& host);
-    static bool is_rds_custom_cluster_dns(const std::string& host);
-    static bool is_ipv4(const std::string& host);
-    static bool is_ipv6(const std::string& host);
+    static bool IsDnsPatternValid(const std::string& host);
+    static bool IsRdsDns(const std::string& host);
+    static bool IsRdsClusterDns(const std::string& host);
+    static bool IsRdsProxyDns(const std::string& host);
+    static bool IsRdsWriterClusterDns(const std::string& host);
+    static bool IsRdsReaderClusterDns(const std::string& host);
+    static bool IsRdsCustomClusterDns(const std::string& host);
+    static bool IsIpv4(const std::string& host);
+    static bool IsIpv6(const std::string& host);
 
-    static std::string get_rds_cluster_host_url(const std::string& host);
-    static std::string get_rds_cluster_id(const std::string& host);
-    static std::string get_rds_instance_host_pattern(const std::string& host);
-    static std::string get_rds_instance_id(const std::string& host);
-    static std::string get_rds_region(const std::string& host);
+    static std::string GetRdsClusterHostUrl(const std::string& host);
+    static std::string GetRdsClusterId(const std::string& host);
+    static std::string GetRdsInstanceHostPattern(const std::string& host);
+    static std::string GetRdsInstanceId(const std::string& host);
+    static std::string GetRdsRegion(const std::string& host);
 };
 
 #endif

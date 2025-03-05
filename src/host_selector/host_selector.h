@@ -24,7 +24,7 @@
 class HostSelector {
 public:
     virtual ~HostSelector() = default;
-    virtual HostInfo get_host(std::vector<HostInfo> hosts, bool is_writer,
+    virtual HostInfo GetHost(std::vector<HostInfo> hosts, bool is_writer,
         std::unordered_map<std::string, std::string> properties) = 0;
 };
 

@@ -31,11 +31,11 @@
 class ClusterTopologyQueryHelper {    
 public:
     ClusterTopologyQueryHelper(int port, const std::string& endpoint_template, const std::string& topology_query, const std::string& writer_id_query, const std::string& node_id_query);
-    virtual std::string get_writer_id(SQLHDBC hdbc);
-    virtual std::string get_node_id(SQLHDBC hdbc);
-    virtual std::vector<HostInfo> query_topology(SQLHDBC hdbc);
-    virtual HostInfo create_host(SQLTCHAR* node_id, bool is_writer, SQLREAL cpu_usage, SQLREAL replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp);
-    virtual std::string get_endpoint(SQLTCHAR* node_id);
+    virtual std::string GetWriterId(SQLHDBC hdbc);
+    virtual std::string GetNodeId(SQLHDBC hdbc);
+    virtual std::vector<HostInfo> QueryTopology(SQLHDBC hdbc);
+    virtual HostInfo CreateHost(SQLTCHAR* node_id, bool is_writer, SQLREAL cpu_usage, SQLREAL replica_lag_ms, SQL_TIMESTAMP_STRUCT update_timestamp);
+    virtual std::string GetEndpoint(SQLTCHAR* node_id);
 
 private:
     const int port;

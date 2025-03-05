@@ -19,8 +19,8 @@
 
 class SimpleHostAvailabilityStrategy: public HostAvailabilityStrategy {
 public:    
-    void set_host_availability(HostAvailability hostAvailability) override;
-    HostAvailability get_host_availability(HostAvailability rawHostAvailability) override;
+    void SetHostAvailability(HostAvailability hostAvailability) override;
+    HostAvailability GetHostAvailability(HostAvailability rawHostAvailability) override;
 };
 
 #endif // SIMPLEHOSTAVAILABILITYSTRATEGY_H_

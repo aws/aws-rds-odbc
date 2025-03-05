@@ -159,8 +159,8 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     }
 
     std::unordered_map<std::string, std::string> properties;
-    RoundRobinHostSelector::set_round_robin_weight(hosts, properties);
-    std::shared_ptr<HostInfo> host = std::make_shared<HostInfo>(round_robin.get_host(hosts, true, properties));
+    RoundRobinHostSelector::SetRoundRobinWeight(hosts, properties);
+    std::shared_ptr<HostInfo> host = std::make_shared<HostInfo>(round_robin.GetHost(hosts, true, properties));
     return host;
 }
 
@@ -185,7 +185,7 @@ bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port
         return false;
     }
 
-    strncpy(db_instance->server, host->get_host().c_str(), db_instance->server_size);
+    strncpy(db_instance->server, host->GetHost().c_str(), db_instance->server_size);
     return true;
 }
 
