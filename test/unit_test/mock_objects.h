@@ -134,10 +134,10 @@ public:
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
 public:
     MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", "", "", "") {}
-    MOCK_METHOD(std::string, get_writer_id, (SQLHDBC), ());
-    MOCK_METHOD(std::string, get_node_id, (SQLHDBC), ());
-    MOCK_METHOD(std::vector<HostInfo>, query_topology, (SQLHDBC), ());
-    MOCK_METHOD(HostInfo, create_host, (SQLHDBC), ());
+    MOCK_METHOD(std::string, GetWriterId, (SQLHDBC), ());
+    MOCK_METHOD(std::string, GetNodeId, (SQLHDBC), ());
+    MOCK_METHOD(std::vector<HostInfo>, QueryTopology, (SQLHDBC), ());
+    MOCK_METHOD(HostInfo, CreateHost, (SQLHDBC), ());
 };
 
 #endif /* __MOCKOBJECTS_H__ */

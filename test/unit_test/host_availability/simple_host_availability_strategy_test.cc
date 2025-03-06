@@ -27,19 +27,19 @@ class SimpleHostAvailabilityStrategyTest : public testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(SimpleHostAvailabilityStrategyTest, set_host_availability) {
+TEST_F(SimpleHostAvailabilityStrategyTest, SetHostAvailability) {
     std::shared_ptr<SimpleHostAvailabilityStrategy> simple_host_availability_strategy = 
         std::make_shared<SimpleHostAvailabilityStrategy>();
 
-    simple_host_availability_strategy->set_host_availability(AVAILABLE);
-    // set_host_availability does nothing so ensure it can be called
+    simple_host_availability_strategy->SetHostAvailability(AVAILABLE);
+    // SetHostAvailability does nothing so ensure it can be called
     // without throwing an exception
     SUCCEED();
 }
 
-TEST_F(SimpleHostAvailabilityStrategyTest, get_host_availability) {
+TEST_F(SimpleHostAvailabilityStrategyTest, GetHostAvailability) {
     std::shared_ptr<SimpleHostAvailabilityStrategy> simple_host_availability_strategy = 
         std::make_shared<SimpleHostAvailabilityStrategy>();
-    EXPECT_EQ(AVAILABLE, simple_host_availability_strategy->get_host_availability(AVAILABLE));
-    EXPECT_EQ(NOT_AVAILABLE, simple_host_availability_strategy->get_host_availability(NOT_AVAILABLE));
+    EXPECT_EQ(AVAILABLE, simple_host_availability_strategy->GetHostAvailability(AVAILABLE));
+    EXPECT_EQ(NOT_AVAILABLE, simple_host_availability_strategy->GetHostAvailability(NOT_AVAILABLE));
 }

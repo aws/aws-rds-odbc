@@ -16,7 +16,7 @@
 #include <logger_wrapper.h>
 
 int main(int argc, char** argv) {
-  LoggerWrapper::initialize();
+  LoggerWrapper::Initialize();
 
 #ifdef WIN32
 #ifdef _DEBUG

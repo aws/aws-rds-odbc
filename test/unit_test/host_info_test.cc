@@ -40,71 +40,71 @@ class HostInfoTest : public testing::Test {
     std::shared_ptr<HostInfo> hostInfo;
 };
 
-TEST_F(HostInfoTest, get_host) {
-  EXPECT_EQ(host, hostInfo->get_host());
+TEST_F(HostInfoTest, GetHost) {
+  EXPECT_EQ(host, hostInfo->GetHost());
 }
 
-TEST_F(HostInfoTest, get_port) {
-  EXPECT_EQ(port, hostInfo->get_port());
+TEST_F(HostInfoTest, GetPort) {
+  EXPECT_EQ(port, hostInfo->GetPort());
 }
 
-TEST_F(HostInfoTest, get_host_port_pair) {
-  EXPECT_EQ(hostPortPair, hostInfo->get_host_port_pair());
+TEST_F(HostInfoTest, GetHostPortPair) {
+  EXPECT_EQ(hostPortPair, hostInfo->GetHostPortPair());
 }
 
-TEST_F(HostInfoTest, equal_host_port_pair) {
+TEST_F(HostInfoTest, EqualHostPortPair) {
   HostInfo hostInfoHostPortMatches(host, port, UP, false, simple_host_availability_strategy);
-  EXPECT_TRUE(hostInfo->equal_host_port_pair(hostInfoHostPortMatches));
+  EXPECT_TRUE(hostInfo->EqualHostPortPair(hostInfoHostPortMatches));
 
   HostInfo hostInfoHostDoesNotMatch(host + "DoesNotMatch", port, UP, false, simple_host_availability_strategy);
-  EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoHostDoesNotMatch));
+  EXPECT_FALSE(hostInfo->EqualHostPortPair(hostInfoHostDoesNotMatch));
 
   HostInfo hostInfoPortDoesNotMatch(host, port + 1, UP, false, simple_host_availability_strategy);
-  EXPECT_FALSE(hostInfo->equal_host_port_pair(hostInfoPortDoesNotMatch));
+  EXPECT_FALSE(hostInfo->EqualHostPortPair(hostInfoPortDoesNotMatch));
 }
 
-TEST_F(HostInfoTest, get_host_state) {
-  EXPECT_EQ(UP, hostInfo->get_host_state());
+TEST_F(HostInfoTest, GetHostState) {
+  EXPECT_EQ(UP, hostInfo->GetHostState());
 }
 
-TEST_F(HostInfoTest, get_weight) {
-  EXPECT_EQ(HostInfo::DEFAULT_WEIGHT, hostInfo->get_weight());
+TEST_F(HostInfoTest, GetWeight) {
+  EXPECT_EQ(HostInfo::DEFAULT_WEIGHT, hostInfo->GetWeight());
 }
 
 TEST_F(HostInfoTest, set_host_state) {
-  EXPECT_EQ(UP, hostInfo->get_host_state());
-  hostInfo->set_host_state(DOWN);
-  EXPECT_EQ(DOWN, hostInfo->get_host_state());
+  EXPECT_EQ(UP, hostInfo->GetHostState());
+  hostInfo->SetHostState(DOWN);
+  EXPECT_EQ(DOWN, hostInfo->GetHostState());
 }
 
-TEST_F(HostInfoTest, is_host_up) {
-  EXPECT_TRUE(hostInfo->is_host_up());
+TEST_F(HostInfoTest, IsHostUp) {
+  EXPECT_TRUE(hostInfo->IsHostUp());
 }
 
-TEST_F(HostInfoTest, is_host_down) {
-  EXPECT_FALSE(hostInfo->is_host_down());
+TEST_F(HostInfoTest, IsHostDown) {
+  EXPECT_FALSE(hostInfo->IsHostDown());
 }
 
-TEST_F(HostInfoTest, is_host_writer) {
-  EXPECT_FALSE(hostInfo->is_host_writer());
+TEST_F(HostInfoTest, IsHostWriter) {
+  EXPECT_FALSE(hostInfo->IsHostWriter());
 }
 
-TEST_F(HostInfoTest, mark_as_writer) {
-  EXPECT_FALSE(hostInfo->is_host_writer());
-  hostInfo->mark_as_writer(true);
-  EXPECT_TRUE(hostInfo->is_host_writer());
-  hostInfo->mark_as_writer(false);
-  EXPECT_FALSE(hostInfo->is_host_writer());
+TEST_F(HostInfoTest, MarkAsWriter) {
+  EXPECT_FALSE(hostInfo->IsHostWriter());
+  hostInfo->MarkAsWriter(true);
+  EXPECT_TRUE(hostInfo->IsHostWriter());
+  hostInfo->MarkAsWriter(false);
+  EXPECT_FALSE(hostInfo->IsHostWriter());
 }
 
-TEST_F(HostInfoTest, get_host_availability_strategy) {
-  EXPECT_EQ(simple_host_availability_strategy, hostInfo->get_host_availability_strategy());
+TEST_F(HostInfoTest, GetHostAvailabilityStrategy) {
+  EXPECT_EQ(simple_host_availability_strategy, hostInfo->GetHostAvailabilityStrategy());
 }
 
-TEST_F(HostInfoTest, set_host_availability_strategy) {
-  hostInfo->set_host_availability_strategy(nullptr);
-  EXPECT_EQ(nullptr, hostInfo->get_host_availability_strategy());
+TEST_F(HostInfoTest, SetHostAvailabilityStrategy) {
+  hostInfo->SetHostAvailabilityStrategy(nullptr);
+  EXPECT_EQ(nullptr, hostInfo->GetHostAvailabilityStrategy());
 
-  hostInfo->set_host_availability_strategy(simple_host_availability_strategy);
-  EXPECT_EQ(simple_host_availability_strategy, hostInfo->get_host_availability_strategy());
+  hostInfo->SetHostAvailabilityStrategy(simple_host_availability_strategy);
+  EXPECT_EQ(simple_host_availability_strategy, hostInfo->GetHostAvailabilityStrategy());
 }

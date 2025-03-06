@@ -30,7 +30,7 @@ HostInfo::HostInfo(std::string host, int port, HOST_STATE state, bool is_writer,
  *
  * @return the host
  */
-std::string HostInfo::get_host() const {
+std::string HostInfo::GetHost() const {
     return host;
 }
 
@@ -39,7 +39,7 @@ std::string HostInfo::get_host() const {
  *
  * @return the port
  */
-int HostInfo::get_port() const {
+int HostInfo::GetPort() const {
     return port;
 }
 
@@ -48,11 +48,11 @@ int HostInfo::get_port() const {
  *
  * @return the weight
  */
-uint64_t HostInfo::get_weight() const {
+uint64_t HostInfo::GetWeight() const {
     return weight;
 }
 
-SQL_TIMESTAMP_STRUCT HostInfo::get_last_updated_time() const {
+SQL_TIMESTAMP_STRUCT HostInfo::GetLastUpdatedTime() const {
     return last_updated_timestamp;
 }
 
@@ -61,42 +61,42 @@ SQL_TIMESTAMP_STRUCT HostInfo::get_last_updated_time() const {
  *
  * @return the host:port representation of this host
  */
-std::string HostInfo::get_host_port_pair() const {
-    return get_host() + host_port_separator + std::to_string(get_port());
+std::string HostInfo::GetHostPortPair() const {
+    return GetHost() + host_port_separator + std::to_string(GetPort());
 }
 
-bool HostInfo::equal_host_port_pair(const HostInfo& hi) const {
-    return get_host_port_pair() == hi.get_host_port_pair();
+bool HostInfo::EqualHostPortPair(const HostInfo& hi) const {
+    return GetHostPortPair() == hi.GetHostPortPair();
 }
 
-HOST_STATE HostInfo::get_host_state() const {
+HOST_STATE HostInfo::GetHostState() const {
     return host_state;
 }
 
-void HostInfo::set_host_state(HOST_STATE state) {
+void HostInfo::SetHostState(HOST_STATE state) {
     host_state = state;
 }
 
-bool HostInfo::is_host_up() const {
+bool HostInfo::IsHostUp() const {
     return host_state == UP;
 }
 
-bool HostInfo::is_host_down() const {
+bool HostInfo::IsHostDown() const {
     return host_state == DOWN;
 }
 
-bool HostInfo::is_host_writer() const {
+bool HostInfo::IsHostWriter() const {
     return is_writer;
 }
 
-void HostInfo::mark_as_writer(bool writer) {
+void HostInfo::MarkAsWriter(bool writer) {
     is_writer = writer;
 }
 
-std::shared_ptr<HostAvailabilityStrategy> HostInfo::get_host_availability_strategy() const {
+std::shared_ptr<HostAvailabilityStrategy> HostInfo::GetHostAvailabilityStrategy() const {
     return host_availability_strategy;
 }
 
-void HostInfo::set_host_availability_strategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy) {
+void HostInfo::SetHostAvailabilityStrategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy) {
     host_availability_strategy = std::move(new_host_availability_strategy);
 }

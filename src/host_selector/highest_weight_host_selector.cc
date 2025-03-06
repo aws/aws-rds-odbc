@@ -14,12 +14,12 @@
 
 #include "highest_weight_host_selector.h"
 
-HostInfo HighestWeightHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer, std::unordered_map<std::string, std::string>) {
+HostInfo HighestWeightHostSelector::GetHost(std::vector<HostInfo> hosts, bool is_writer, std::unordered_map<std::string, std::string>) {
     std::vector<HostInfo> eligible_hosts;
     eligible_hosts.reserve(hosts.size());
 
     std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(eligible_hosts), [&is_writer](const HostInfo& host) {
-        return host.is_host_up() && is_writer == host.is_host_writer();
+        return host.IsHostUp() && is_writer == host.IsHostWriter();
     });
 
     if (eligible_hosts.empty()) {
@@ -30,7 +30,7 @@ HostInfo HighestWeightHostSelector::get_host(std::vector<HostInfo> hosts, bool i
         eligible_hosts.begin(),
         eligible_hosts.end(),
         [](const HostInfo& a, const HostInfo& b) {
-            return a.get_weight() < b.get_weight();
+            return a.GetWeight() < b.GetWeight();
         }
     );
 

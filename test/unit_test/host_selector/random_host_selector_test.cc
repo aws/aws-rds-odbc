@@ -38,44 +38,44 @@ class RandomHostSelectorTest : public testing::Test {
     void TearDown() override {}
 };
 
-TEST_F(RandomHostSelectorTest, get_writer) {
+TEST_F(RandomHostSelectorTest, GetWriter) {
     RandomHostSelector host_selector;
     std::vector<HostInfo> hosts = {writer_host_info_a, reader_host_info_a, reader_host_info_b};
-    HostInfo host_info = host_selector.get_host(hosts, true, empty_map);
-    EXPECT_EQ(writer_host_info_a.get_host(), host_info.get_host());
+    HostInfo host_info = host_selector.GetHost(hosts, true, empty_map);
+    EXPECT_EQ(writer_host_info_a.GetHost(), host_info.GetHost());
 }
 
 TEST_F(RandomHostSelectorTest, get_live_writer) {
     RandomHostSelector host_selector;
     std::vector<HostInfo> hosts = {writer_host_info_a, writer_host_info_down};
-    HostInfo host_info = host_selector.get_host(hosts, true, empty_map);
-    EXPECT_EQ(writer_host_info_a.get_host(), host_info.get_host());
+    HostInfo host_info = host_selector.GetHost(hosts, true, empty_map);
+    EXPECT_EQ(writer_host_info_a.GetHost(), host_info.GetHost());
 }
 
 TEST_F(RandomHostSelectorTest, get_writer_from_many) {
     RandomHostSelector host_selector;
     std::vector<HostInfo> hosts = {writer_host_info_a, writer_host_info_b, writer_host_info_down,
         reader_host_info_a, reader_host_info_b, reader_host_info_down};
-    HostInfo host_info = host_selector.get_host(hosts, true, empty_map);
-    EXPECT_TRUE(host_info.is_host_writer());
-    EXPECT_TRUE(host_info.is_host_up());
+    HostInfo host_info = host_selector.GetHost(hosts, true, empty_map);
+    EXPECT_TRUE(host_info.IsHostWriter());
+    EXPECT_TRUE(host_info.IsHostUp());
 }
 
 TEST_F(RandomHostSelectorTest, get_writer_fail_all_readers) {
     RandomHostSelector host_selector;
     std::vector<HostInfo> hosts = {reader_host_info_a, reader_host_info_b};
-    EXPECT_THROW(host_selector.get_host(hosts, true, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, true, empty_map), std::runtime_error);
 }
 
 TEST_F(RandomHostSelectorTest, get_reader_one_down) {
     RandomHostSelector host_selector;
     std::vector<HostInfo> hosts = {reader_host_info_a, reader_host_info_down};
-    HostInfo host_info = host_selector.get_host(hosts, false, empty_map);
-    EXPECT_EQ(reader_host_info_a.get_host(), host_info.get_host());
+    HostInfo host_info = host_selector.GetHost(hosts, false, empty_map);
+    EXPECT_EQ(reader_host_info_a.GetHost(), host_info.GetHost());
 }
 
 TEST_F(RandomHostSelectorTest, no_hosts) {
     RandomHostSelector host_selector;
     std::vector<HostInfo> hosts = {};
-    EXPECT_THROW(host_selector.get_host(hosts, false, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, false, empty_map), std::runtime_error);
 }

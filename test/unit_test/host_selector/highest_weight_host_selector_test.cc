@@ -56,14 +56,14 @@ protected:
 
 TEST_F(HighestWeightHostSelectorTest, get_highest_reader) {
     HighestWeightHostSelector host_selector;
-    HostInfo host_info = host_selector.get_host(all_hosts, false, empty_map);
-    EXPECT_EQ(reader_host_info_b.get_host(), host_info.get_host());
+    HostInfo host_info = host_selector.GetHost(all_hosts, false, empty_map);
+    EXPECT_EQ(reader_host_info_b.GetHost(), host_info.GetHost());
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_highest_writer) {
     HighestWeightHostSelector host_selector;
-    HostInfo host_info = host_selector.get_host(all_hosts, true, empty_map);
-    EXPECT_EQ(writer_host_info_b.get_host(), host_info.get_host());
+    HostInfo host_info = host_selector.GetHost(all_hosts, true, empty_map);
+    EXPECT_EQ(writer_host_info_b.GetHost(), host_info.GetHost());
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_reader_fail_all_writers) {
@@ -74,7 +74,7 @@ TEST_F(HighestWeightHostSelectorTest, get_reader_fail_all_writers) {
         writer_host_info_c,
         writer_host_info_down_a
     };
-    EXPECT_THROW(host_selector.get_host(hosts, false, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, false, empty_map), std::runtime_error);
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_writer_fail_all_readers) {
@@ -85,7 +85,7 @@ TEST_F(HighestWeightHostSelectorTest, get_writer_fail_all_readers) {
         reader_host_info_c,
         reader_host_info_down_a
     };
-    EXPECT_THROW(host_selector.get_host(hosts, true, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, true, empty_map), std::runtime_error);
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_reader_all_down) {
@@ -94,7 +94,7 @@ TEST_F(HighestWeightHostSelectorTest, get_reader_all_down) {
         reader_host_info_down_a,
         reader_host_info_down_b
     };
-    EXPECT_THROW(host_selector.get_host(hosts, false, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, false, empty_map), std::runtime_error);
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_writer_all_down) {
@@ -103,17 +103,17 @@ TEST_F(HighestWeightHostSelectorTest, get_writer_all_down) {
         writer_host_info_down_a,
         writer_host_info_down_b
     };
-    EXPECT_THROW(host_selector.get_host(hosts, true, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, true, empty_map), std::runtime_error);
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_reader_no_hosts) {
     HighestWeightHostSelector host_selector;
     std::vector<HostInfo> hosts = {};
-    EXPECT_THROW(host_selector.get_host(hosts, false, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, false, empty_map), std::runtime_error);
 }
 
 TEST_F(HighestWeightHostSelectorTest, get_writer_no_hosts) {
     HighestWeightHostSelector host_selector;
     std::vector<HostInfo> hosts = {};
-    EXPECT_THROW(host_selector.get_host(hosts, true, empty_map), std::runtime_error);
+    EXPECT_THROW(host_selector.GetHost(hosts, true, empty_map), std::runtime_error);
 }

@@ -20,11 +20,11 @@
 
 #include "logger_wrapper.h"
 
-void LoggerWrapper::initialize() {
-    initialize(logger_config::LOG_LOCATION, 4);
+void LoggerWrapper::Initialize() {
+    Initialize(logger_config::LOG_LOCATION, 4);
 }
 
-void LoggerWrapper::initialize(std::string log_location, int threshold) {
+void LoggerWrapper::Initialize(std::string log_location, int threshold) {
     threshold = threshold >= 0 ? threshold : 4; // Set to 4 to disable console output.
     static LoggerWrapper instance;
     if (!instance.init) {

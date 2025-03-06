@@ -54,7 +54,7 @@ std::string OktaCredentialsProvider::GetSAMLAssertion(std::string& err_info) {
 
     std::smatch matches;
     if (std::regex_search(body, matches, std::regex(SAML_RESPONSE_PATTERN))) {
-        return HtmlUtil::escape_html_entity(matches.str(1));
+        return HtmlUtil::EscapeHtmlEntity(matches.str(1));
     }
     LOG(WARNING) << "No SAML response found in response";
     return "";

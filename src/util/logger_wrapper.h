@@ -38,8 +38,8 @@ namespace logger_config {
 // Initializes glog once
 class LoggerWrapper {
 public:
-    static void initialize();
-    static void initialize(std::string log_location, int threshold);
+    static void Initialize();
+    static void Initialize(std::string log_location, int threshold);
 
     // Prevent copy constructors
     LoggerWrapper(const LoggerWrapper&) = delete;

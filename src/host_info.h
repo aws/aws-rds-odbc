@@ -42,24 +42,24 @@ public:
 
     ~HostInfo() = default;
 
-    bool equal_host_port_pair(const HostInfo& hi) const;
-    bool is_host_down() const;
-    bool is_host_up() const;
-    bool is_host_writer() const;
+    bool EqualHostPortPair(const HostInfo& hi) const;
+    bool IsHostDown() const;
+    bool IsHostUp() const;
+    bool IsHostWriter() const;
 
-    void mark_as_writer(bool writer);
+    void MarkAsWriter(bool writer);
 
-    std::string get_host() const;
-    int get_port() const;
-    std::string get_host_port_pair() const;
-    uint64_t get_weight() const;
-    SQL_TIMESTAMP_STRUCT get_last_updated_time() const;
+    std::string GetHost() const;
+    int GetPort() const;
+    std::string GetHostPortPair() const;
+    uint64_t GetWeight() const;
+    SQL_TIMESTAMP_STRUCT GetLastUpdatedTime() const;
 
-    void set_host_state(HOST_STATE state);
-    HOST_STATE get_host_state() const;
+    void SetHostState(HOST_STATE state);
+    HOST_STATE GetHostState() const;
 
-    void set_host_availability_strategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy);
-    std::shared_ptr<HostAvailabilityStrategy> get_host_availability_strategy() const;
+    void SetHostAvailabilityStrategy(std::shared_ptr<HostAvailabilityStrategy> new_host_availability_strategy);
+    std::shared_ptr<HostAvailabilityStrategy> GetHostAvailabilityStrategy() const;
 
     std::string session_id;
     std::string replica_lag;

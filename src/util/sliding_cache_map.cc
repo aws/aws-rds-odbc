@@ -17,12 +17,12 @@
 #include "host_selector/round_robin_property.h"
 
 template <typename K, typename V>
-void SlidingCacheMap<K, V>::put(const K& key, const V& value) {
-    put(key, value, DEFAULT_EXPIRATION_SEC);
+void SlidingCacheMap<K, V>::Put(const K& key, const V& value) {
+    Put(key, value, DEFAULT_EXPIRATION_SEC);
 }
 
 template <typename K, typename V>
-void SlidingCacheMap<K, V>::put(const K& key, const V& value, int sec_ttl) {
+void SlidingCacheMap<K, V>::Put(const K& key, const V& value, int sec_ttl) {
     std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point expiry_time =
         std::chrono::steady_clock::now() + std::chrono::seconds(sec_ttl);
@@ -30,7 +30,7 @@ void SlidingCacheMap<K, V>::put(const K& key, const V& value, int sec_ttl) {
 }
 
 template <typename K, typename V>
-V SlidingCacheMap<K, V>::get(const K& key) {
+V SlidingCacheMap<K, V>::Get(const K& key) {
     std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     if (auto itr = cache.find(key); itr != cache.end()) {
@@ -47,7 +47,7 @@ V SlidingCacheMap<K, V>::get(const K& key) {
 }
 
 template <typename K, typename V>
-bool SlidingCacheMap<K, V>::find(const K& key) {
+bool SlidingCacheMap<K, V>::Find(const K& key) {
     std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     if (auto itr = cache.find(key); itr != cache.end()) {
@@ -64,7 +64,7 @@ bool SlidingCacheMap<K, V>::find(const K& key) {
 }
 
 template <typename K, typename V>
-unsigned int SlidingCacheMap<K, V>::size() {
+unsigned int SlidingCacheMap<K, V>::Size() {
     std::lock_guard<std::mutex> lock(cache_lock);
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     for (auto itr = cache.begin(); itr != cache.end();) {
@@ -78,7 +78,7 @@ unsigned int SlidingCacheMap<K, V>::size() {
 }
 
 template <typename K, typename V>
-void SlidingCacheMap<K, V>::clear() {
+void SlidingCacheMap<K, V>::Clear() {
     std::lock_guard<std::mutex> lock(cache_lock);
     cache.clear();
 }

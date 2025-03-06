@@ -43,116 +43,116 @@ class SlidingCacheMapTest : public testing::Test {
 
 TEST_F(SlidingCacheMapTest, put_cache) {
     SlidingCacheMap<std::string, std::string> cache;
-    cache.put(cache_key_a, cache_val_a);
-    cache.put(cache_key_b, cache_val_b, cache_exp_long);
-    EXPECT_STREQ(cache_val_a.c_str(), cache.get(cache_key_a).c_str());
-    EXPECT_STREQ(cache_val_b.c_str(), cache.get(cache_key_b).c_str());
+    cache.Put(cache_key_a, cache_val_a);
+    cache.Put(cache_key_b, cache_val_b, cache_exp_long);
+    EXPECT_STREQ(cache_val_a.c_str(), cache.Get(cache_key_a).c_str());
+    EXPECT_STREQ(cache_val_b.c_str(), cache.Get(cache_key_b).c_str());
 }
 
 TEST_F(SlidingCacheMapTest, put_cache_update) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_EQ(0, cache.size());
-    cache.put(cache_key_a, cache_val_a);
-    cache.put(cache_key_b, cache_val_b, cache_exp_short);
-    EXPECT_EQ(2, cache.size());
-    EXPECT_STREQ(cache_val_b.c_str(), cache.get(cache_key_b).c_str());
+    EXPECT_EQ(0, cache.Size());
+    cache.Put(cache_key_a, cache_val_a);
+    cache.Put(cache_key_b, cache_val_b, cache_exp_short);
+    EXPECT_EQ(2, cache.Size());
+    EXPECT_STREQ(cache_val_b.c_str(), cache.Get(cache_key_b).c_str());
 
-    cache.put(cache_key_b, cache_val_b, cache_exp_long);
+    cache.Put(cache_key_b, cache_val_b, cache_exp_long);
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_mid));
-    EXPECT_EQ(2, cache.size());
-    EXPECT_STREQ(cache_val_b.c_str(), cache.get(cache_key_b).c_str());
+    EXPECT_EQ(2, cache.Size());
+    EXPECT_STREQ(cache_val_b.c_str(), cache.Get(cache_key_b).c_str());
 }
 
 TEST_F(SlidingCacheMapTest, get_cache_hit) {
     SlidingCacheMap<std::string, std::string> cache;
-    cache.put(cache_key_a, cache_val_a);
-    EXPECT_STREQ(cache_val_a.c_str(), cache.get(cache_key_a).c_str());
+    cache.Put(cache_key_a, cache_val_a);
+    EXPECT_STREQ(cache_val_a.c_str(), cache.Get(cache_key_a).c_str());
 }
 
 TEST_F(SlidingCacheMapTest, get_cache_miss) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_STREQ(cache_empty.c_str(), cache.get(cache_key_a).c_str());
+    EXPECT_STREQ(cache_empty.c_str(), cache.Get(cache_key_a).c_str());
 }
 
 TEST_F(SlidingCacheMapTest, get_cache_expire) {
     SlidingCacheMap<std::string, std::string> cache;
-    cache.put(cache_key_a, cache_val_a, cache_exp_short);
+    cache.Put(cache_key_a, cache_val_a, cache_exp_short);
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_mid));
-    EXPECT_STREQ(cache_empty.c_str(), cache.get(cache_key_a).c_str());
+    EXPECT_STREQ(cache_empty.c_str(), cache.Get(cache_key_a).c_str());
 }
 
 TEST_F(SlidingCacheMapTest, find_cache_miss) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_FALSE(cache.find("Missing"));
+    EXPECT_FALSE(cache.Find("Missing"));
 }
 
 TEST_F(SlidingCacheMapTest, find_cache_hit) {
     SlidingCacheMap<std::string, std::string> cache;
-    cache.put(cache_key_a, cache_val_a);
-    EXPECT_TRUE(cache.find(cache_key_a));
+    cache.Put(cache_key_a, cache_val_a);
+    EXPECT_TRUE(cache.Find(cache_key_a));
 }
 
 TEST_F(SlidingCacheMapTest, cache_size) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_EQ(0, cache.size());
-    cache.put(cache_key_a, cache_val_a);
-    cache.put(cache_key_b, cache_val_b);
-    EXPECT_EQ(2, cache.size());
+    EXPECT_EQ(0, cache.Size());
+    cache.Put(cache_key_a, cache_val_a);
+    cache.Put(cache_key_b, cache_val_b);
+    EXPECT_EQ(2, cache.Size());
 }
 
 TEST_F(SlidingCacheMapTest, cache_size_expire) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_EQ(0, cache.size());
-    cache.put(cache_key_a, cache_val_a, cache_exp_short);
-    cache.put(cache_key_b, cache_val_b, cache_exp_short);
-    EXPECT_EQ(2, cache.size());
+    EXPECT_EQ(0, cache.Size());
+    cache.Put(cache_key_a, cache_val_a, cache_exp_short);
+    cache.Put(cache_key_b, cache_val_b, cache_exp_short);
+    EXPECT_EQ(2, cache.Size());
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_mid));
-    EXPECT_EQ(0, cache.size());
+    EXPECT_EQ(0, cache.Size());
 }
 
 TEST_F(SlidingCacheMapTest, cache_clear) {
     SlidingCacheMap<std::string, std::string> cache;
-    cache.put(cache_key_a, cache_val_a);
-    cache.put(cache_key_b, cache_val_b);
-    EXPECT_EQ(2, cache.size());
-    cache.clear();
-    EXPECT_EQ(0, cache.size());
+    cache.Put(cache_key_a, cache_val_a);
+    cache.Put(cache_key_b, cache_val_b);
+    EXPECT_EQ(2, cache.Size());
+    cache.Clear();
+    EXPECT_EQ(0, cache.Size());
 }
 
 TEST_F(SlidingCacheMapTest, ttl_update_find) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_EQ(0, cache.size());
-    cache.put(cache_key_a, cache_val_a, cache_exp_mid);
-    EXPECT_EQ(1, cache.size());
+    EXPECT_EQ(0, cache.Size());
+    cache.Put(cache_key_a, cache_val_a, cache_exp_mid);
+    EXPECT_EQ(1, cache.Size());
 
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_short));
 
     // Touch to refresh TTL
-    EXPECT_TRUE(cache.find(cache_key_a));
+    EXPECT_TRUE(cache.Find(cache_key_a));
 
     // Sleep again combined with previous to expire original put
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_short));
 
     // Should be valid due to earlier `find()` updates TTL
-    EXPECT_EQ(1, cache.size());
-    EXPECT_STREQ(cache_val_a.c_str(), cache.get(cache_key_a).c_str());
+    EXPECT_EQ(1, cache.Size());
+    EXPECT_STREQ(cache_val_a.c_str(), cache.Get(cache_key_a).c_str());
 }
 
 TEST_F(SlidingCacheMapTest, ttl_update_get) {
     SlidingCacheMap<std::string, std::string> cache;
-    EXPECT_EQ(0, cache.size());
-    cache.put(cache_key_a, cache_val_a, cache_exp_mid);
-    EXPECT_EQ(1, cache.size());
+    EXPECT_EQ(0, cache.Size());
+    cache.Put(cache_key_a, cache_val_a, cache_exp_mid);
+    EXPECT_EQ(1, cache.Size());
 
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_short));
 
     // Touch to refresh TTL
-    EXPECT_STREQ(cache_val_a.c_str(), cache.get(cache_key_a).c_str());
+    EXPECT_STREQ(cache_val_a.c_str(), cache.Get(cache_key_a).c_str());
 
     // Sleep again combined with previous to expire original put
     std::this_thread::sleep_for(std::chrono::seconds(cache_exp_short));
 
     // Should be valid due to earlier `get()` updates TTL
-    EXPECT_EQ(1, cache.size());
-    EXPECT_STREQ(cache_val_a.c_str(), cache.get(cache_key_a).c_str());
+    EXPECT_EQ(1, cache.Size());
+    EXPECT_STREQ(cache_val_a.c_str(), cache.Get(cache_key_a).c_str());
 }

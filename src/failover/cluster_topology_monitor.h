@@ -61,22 +61,22 @@ public:
         uint64_t high_refresh_rate_ns, uint64_t refresh_rate_ns);
     ~ClusterTopologyMonitor();
 
-    void set_cluster_id(const std::string& cluster_id);
-    std::vector<HostInfo> force_refresh(bool verify_writer, uint64_t timeout_ms);
-    std::vector<HostInfo> force_refresh(SQLHDBC hdbc, uint64_t timeout_ms);
+    void SetClusterId(const std::string& cluster_id);
+    std::vector<HostInfo> ForceRefresh(bool verify_writer, uint64_t timeout_ms);
+    std::vector<HostInfo> ForceRefresh(SQLHDBC hdbc, uint64_t timeout_ms);
 
-    void start_monitor();
+    void StartMonitor();
 
 protected:
     void run();
-    std::vector<HostInfo> wait_for_topology_update(uint64_t timeout_ms);
-    void delay_main_thread(bool use_high_refresh_rate);
-    std::vector<HostInfo> fetch_topology_update_cache(SQLHDBC hdbc);
-    void update_topology_cache(const std::vector<HostInfo>& hosts);
+    std::vector<HostInfo> WaitForTopologyUpdate(uint64_t timeout_ms);
+    void DelayMainThread(bool use_high_refresh_rate);
+    std::vector<HostInfo> FetchTopologyUpdateCache(SQLHDBC hdbc);
+    void UpdateTopologyCache(const std::vector<HostInfo>& hosts);
     #ifdef UNICODE
-    std::wstring conn_for_host(const std::string& new_host);
+    std::wstring ConnForHost(const std::string& new_host);
     #else
-    std::string conn_for_host(const std::string& new_host);
+    std::string ConnForHost(const std::string& new_host);
     #endif
 
 private:

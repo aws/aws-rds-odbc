@@ -14,10 +14,10 @@
 
 #include "simple_host_availability_strategy.h"
 
-void SimpleHostAvailabilityStrategy::set_host_availability(HostAvailability HostAvailability) {
+void SimpleHostAvailabilityStrategy::SetHostAvailability(HostAvailability HostAvailability) {
     // Do nothing
 }
 
-HostAvailability SimpleHostAvailabilityStrategy::get_host_availability(HostAvailability rawHostAvailability) {
+HostAvailability SimpleHostAvailabilityStrategy::GetHostAvailability(HostAvailability rawHostAvailability) {
     return rawHostAvailability;
 }

@@ -39,13 +39,13 @@ typedef std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 
 class StringHelper {
    public:
-    static std::wstring to_wstring(const std::string& src) {
+    static std::wstring ToWstring(const std::string& src) {
         if (src.empty()) {
             return std::wstring();
         }
         return converter{}.from_bytes(src);
     }
-    static std::string to_string(const std::wstring& src) {
+    static std::string ToString(const std::wstring& src) {
         if (src.empty()) {
             return std::string();
         }

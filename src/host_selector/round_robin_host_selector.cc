@@ -18,14 +18,14 @@
 std::mutex RoundRobinHostSelector::cache_mutex;
 SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> RoundRobinHostSelector::round_robin_cache;
 
-void RoundRobinHostSelector::set_round_robin_weight(std::vector<HostInfo> hosts,
+void RoundRobinHostSelector::SetRoundRobinWeight(std::vector<HostInfo> hosts,
     std::unordered_map<std::string, std::string>& properties) {
 
     std::string host_weight_str;
     for (int i = 0; i < hosts.size(); i++) {
-        host_weight_str += hosts.at(i).get_host();
+        host_weight_str += hosts.at(i).GetHost();
         host_weight_str += ":";
-        host_weight_str += std::to_string(hosts.at(i).get_weight());
+        host_weight_str += std::to_string(hosts.at(i).GetWeight());
         if (i < hosts.size() - 1) {
             host_weight_str += ",";
         }
@@ -33,12 +33,12 @@ void RoundRobinHostSelector::set_round_robin_weight(std::vector<HostInfo> hosts,
     properties[round_robin_property::HOST_WEIGHT_KEY] = host_weight_str;
 }
 
-void RoundRobinHostSelector::clear_cache() {
+void RoundRobinHostSelector::ClearCache() {
     std::lock_guard<std::mutex> lock(cache_mutex);
-    round_robin_cache.clear();
+    round_robin_cache.Clear();
 }
 
-HostInfo RoundRobinHostSelector::get_host(std::vector<HostInfo> hosts, bool is_writer,
+HostInfo RoundRobinHostSelector::GetHost(std::vector<HostInfo> hosts, bool is_writer,
     std::unordered_map<std::string, std::string> properties) {
 
     std::lock_guard<std::mutex> lock(cache_mutex);
@@ -47,7 +47,7 @@ HostInfo RoundRobinHostSelector::get_host(std::vector<HostInfo> hosts, bool is_w
     selection.reserve(hosts.size());
 
     std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(selection), [&is_writer](const HostInfo& host) {
-        return host.is_host_up() && (is_writer ? host.is_host_writer() : true);
+        return host.IsHostUp() && (is_writer ? host.IsHostWriter() : true);
     });
 
     if (selection.empty()) {
@@ -56,20 +56,20 @@ HostInfo RoundRobinHostSelector::get_host(std::vector<HostInfo> hosts, bool is_w
 
     struct {
         bool operator()(const HostInfo& a, const HostInfo& b) const {
-            return a.get_host() < b.get_host();
+            return a.GetHost() < b.GetHost();
         }
     } host_name_sort;
     std::sort(selection.begin(), selection.end(), host_name_sort);
 
     create_cache_entries(selection, properties);
-    std::string cluster_id_key = selection.at(0).get_host();
-    std::shared_ptr<round_robin_property::RoundRobinClusterInfo> cluster_info = round_robin_cache.get(cluster_id_key);
+    std::string cluster_id_key = selection.at(0).GetHost();
+    std::shared_ptr<round_robin_property::RoundRobinClusterInfo> cluster_info = round_robin_cache.Get(cluster_id_key);
 
     std::shared_ptr<HostInfo> last_host = cluster_info->last_host;
     int last_host_idx = NO_HOST_IDX;
     if (last_host) {
         for (int i = 0; i < selection.size(); i++) {
-            if (selection.at(i).get_host() == last_host->get_host()) {
+            if (selection.at(i).GetHost() == last_host->GetHost()) {
                 last_host_idx = i;
             }
         }
@@ -85,7 +85,7 @@ HostInfo RoundRobinHostSelector::get_host(std::vector<HostInfo> hosts, bool is_w
             target_host_idx = 0;
         }
         int weight = cluster_info->default_weight;
-        if (auto itr = cluster_info->cluster_weight_map.find(selection.at(target_host_idx).get_host()); itr != cluster_info->cluster_weight_map.end()) {
+        if (auto itr = cluster_info->cluster_weight_map.find(selection.at(target_host_idx).GetHost()); itr != cluster_info->cluster_weight_map.end()) {
             weight = itr->second;
         }
         cluster_info->weigth_counter = weight;
@@ -130,9 +130,9 @@ void RoundRobinHostSelector::create_cache_entries(const std::vector<HostInfo>& h
     const std::unordered_map<std::string, std::string>& props) {
 
     std::vector<HostInfo> hosts_with_cached_entry;
-    hosts_with_cached_entry.reserve(round_robin_cache.size());
+    hosts_with_cached_entry.reserve(round_robin_cache.Size());
     std::copy_if(hosts.begin(), hosts.end(), std::back_inserter(hosts_with_cached_entry), [this](const HostInfo& host) {
-        return RoundRobinHostSelector::round_robin_cache.find(host.get_host());
+        return RoundRobinHostSelector::round_robin_cache.Find(host.GetHost());
     });
 
     // Update cache entries, else create new cache
@@ -142,8 +142,8 @@ void RoundRobinHostSelector::create_cache_entries(const std::vector<HostInfo>& h
         update_props_host_weight(cluster_info, props);
         update_cache(hosts, cluster_info);
     } else {        
-        std::string cluster_id_key = hosts_with_cached_entry.at(0).get_host();
-        std::shared_ptr<round_robin_property::RoundRobinClusterInfo> cluster_info = round_robin_cache.get(cluster_id_key);
+        std::string cluster_id_key = hosts_with_cached_entry.at(0).GetHost();
+        std::shared_ptr<round_robin_property::RoundRobinClusterInfo> cluster_info = round_robin_cache.Get(cluster_id_key);
         if (check_prop_change(cluster_info->last_default_weight_str, round_robin_property::DEFAULT_WEIGHT_KEY, props)) {
             cluster_info->default_weight = 1;
             update_props_default_weight(cluster_info, props);
@@ -161,8 +161,8 @@ void RoundRobinHostSelector::update_cache(const std::vector<HostInfo>& hosts,
     const std::shared_ptr<round_robin_property::RoundRobinClusterInfo>& cluster_info) {
 
     for (const HostInfo& host : hosts) {
-        round_robin_cache.put(
-            host.get_host(),
+        round_robin_cache.Put(
+            host.GetHost(),
             cluster_info
         );
     }
