@@ -22,6 +22,7 @@
 #include "limitless_query_helper.h"
 #include "odbc_helper.h"
 #include "rds_utils.h"
+#include "string_helper.h"
 
 static LimitlessMonitorService limitless_monitor_service;
 
@@ -60,8 +61,7 @@ bool LimitlessMonitorService::NewService(
         auto it = connection_string_map.find(SERVER_KEY);
         if (it != connection_string_map.end()) {
             #ifdef UNICODE
-            std::wstring whost = connection_string_map[SERVER_KEY];
-            std::string host(whost.begin(), whost.end());
+            std::string host = StringHelper::ToString(connection_string_map[SERVER_KEY]);
             #else
             std::string host = connection_string_map[SERVER_KEY];
             #endif

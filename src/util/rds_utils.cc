@@ -29,7 +29,7 @@ namespace {
     const std::regex AURORA_CUSTOM_CLUSTER_PATTERN(R"#((.+)\.(cluster-custom-)+([a-zA-Z0-9]+\.[a-zA-Z0-9\-]+\.rds\.amazonaws\.com))#",
                                                    std::regex_constants::icase);
     const std::regex AURORA_CHINA_DNS_PATTERN(
-        R"#((.+)\.(proxy-|cluster-|cluster-ro-|cluster-custom-)?([a-zA-Z0-9]+\.(rds\.[a-zA-Z0-9\-]+|[a-zA-Z0-9\-]+\.rds)\.amazonaws\.com\.cn))#",
+        R"#((.+)\.(proxy-|cluster-|cluster-ro-|cluster-custom-|shardgrp-)?([a-zA-Z0-9]+\.(rds\.[a-zA-Z0-9\-]+|[a-zA-Z0-9\-]+\.rds)\.amazonaws\.com\.cn))#",
         std::regex_constants::icase);
     const std::regex AURORA_CHINA_PROXY_DNS_PATTERN(
         R"#((.+)\.(proxy-)+([a-zA-Z0-9]+\.(rds\.[a-zA-Z0-9\-]+|[a-zA-Z0-9\-]+\.rds)\.amazonaws\.com\.cn))#", std::regex_constants::icase);
