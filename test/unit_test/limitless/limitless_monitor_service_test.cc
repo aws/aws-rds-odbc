@@ -73,7 +73,7 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
     std::string test_service_id = "";
 
     limitless_monitor_service.NewService(test_service_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor);
-    EXPECT_EQ(test_service_id, "shardgrp-1234");
+    EXPECT_EQ(test_service_id, "limitless");
     // mock_monitor is now nullptr, as limitless_monitor_service moves it
 
     bool service_exists = limitless_monitor_service.CheckService(test_service_id);
@@ -116,11 +116,11 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
 
     // spin up the monitors
     limitless_monitor_service.NewService(mock_monitor1_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor1);
-    EXPECT_EQ(mock_monitor1_id, "shardgrp-1234"); // as mock_monitor1_id is "", it is overwritten
+    EXPECT_EQ(mock_monitor1_id, "limitless"); // as mock_monitor1_id is "", it is overwritten
     limitless_monitor_service.NewService(mock_monitor2_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor2);
     EXPECT_EQ(mock_monitor2_id, "monitor2"); // monitor2 and monitor3 shouldn't be overwritten, as they are provided
     limitless_monitor_service.NewService(mock_monitor3_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor3);
-    EXPECT_EQ(mock_monitor2_id, "monitor3");
+    EXPECT_EQ(mock_monitor3_id, "monitor3");
     // mock_monitor(1|2|3) are now nullptr, as limitless_monitor_service moves them
 
     // double check that this returns false, as monitor 1 already exists
