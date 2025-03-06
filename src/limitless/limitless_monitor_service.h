@@ -52,7 +52,7 @@ public:
 
     bool CheckService(const std::string& service_id);
 
-    bool NewService(const std::string& service_id, const SQLTCHAR *connection_string_c_str, int host_port, std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor);
+    bool NewService(std::string& service_id, const SQLTCHAR *connection_string_c_str, int host_port, std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor);
 
     void IncrementReferenceCounter(const std::string& service_id);
 
@@ -69,10 +69,12 @@ private:
 
 // move to connection_string_keys.h when created
 #ifdef UNICODE
+#define SERVER_KEY                          L"SERVER"
 #define LIMITLESS_MODE_KEY                  L"LIMITLESSMODE"
 #define LIMITLESS_MONITOR_INTERVAL_MS_KEY   L"LIMITLESSMONITORINTERVALMS"
 #define LIMITLESS_MODE_VALUE_LAZY           L"lazy"
 #else
+#define SERVER_KEY                          "SERVER"
 #define LIMITLESS_MODE_KEY                  "LIMITLESSMODE"
 #define LIMITLESS_MONITOR_INTERVAL_MS_KEY   "LIMITLESSMONITORINTERVALMS"
 #define LIMITLESS_MODE_VALUE_LAZY           "lazy"
@@ -104,11 +106,12 @@ bool CheckLimitlessCluster(SQLHDBC hdbc);
  *
  * @param connection_string_c_str the connection string to specify the driver and server
  * @param host_port the port to the database, used to create the host list
- * @param service_id_c_str an identifier used to track the reference count of the polling thread
+ * @param service_id_c_str an identifier used to track the reference count of the polling thread - overwritten if empty
+ * @param service_id_size size of service_id_c_str to overwrite if service_id_c_str is empty
  * @param db_instance a struct containing allocated memory space to return a transaction router
  * @return True if a transaction router was found and updated the LimitlessInstance object
  */
-bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance);
+bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, char *service_id_c_str, size_t service_id_size, const LimitlessInstance *db_instance);
 
 /**
  * Decrements the reference count of a given service ID.

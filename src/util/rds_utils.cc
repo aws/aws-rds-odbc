@@ -17,7 +17,7 @@
 
 namespace {
     const std::regex AURORA_DNS_PATTERN(
-        R"#((.+)\.(proxy-|cluster-|cluster-ro-|cluster-custom-)?([a-zA-Z0-9]+\.([a-zA-Z0-9\-]+)\.rds\.amazonaws\.com))#",
+        R"#((.+)\.(proxy-|cluster-|cluster-ro-|cluster-custom-|shardgrp-)?([a-zA-Z0-9]+\.([a-zA-Z0-9\-]+)\.rds\.amazonaws\.com))#",
         std::regex_constants::icase);
     const std::regex AURORA_PROXY_DNS_PATTERN(R"#((.+)\.(proxy-)+([a-zA-Z0-9]+\.[a-zA-Z0-9\-]+\.rds\.amazonaws\.com))#", std::regex_constants::icase);
     const std::regex AURORA_CLUSTER_PATTERN(R"#((.+)\.(cluster-|cluster-ro-)+([a-zA-Z0-9]+\.[a-zA-Z0-9\-]+\.rds\.amazonaws\.com))#",

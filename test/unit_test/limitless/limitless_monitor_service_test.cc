@@ -42,12 +42,12 @@ class LimitlessMonitorServiceTest : public testing::Test {
     // Runs once per suite
     static void SetUpTestSuite() {
         #ifdef UNICODE
-        conn_str_lazy = L"LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
+        conn_str_lazy = L"SERVER=limitless.shardgrp-1234.us-east-2.rds.amazonaws.com;LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
         test_connection_string_lazy_c_str = (SQLTCHAR *)conn_str_lazy.c_str();
         conn_str_immediate = L"LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
         test_connection_string_immediate_c_str = (SQLTCHAR *)conn_str_immediate.c_str();
         #else
-        conn_str_lazy = "LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
+        conn_str_lazy = "SERVER=limitless.shardgrp-1234.us-east-2.rds.amazonaws.com;LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
         test_connection_string_lazy_c_str = (SQLTCHAR *)conn_str_lazy.c_str();
         conn_str_immediate = "LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
         test_connection_string_immediate_c_str = (SQLTCHAR *)conn_str_immediate.c_str();
@@ -70,9 +70,10 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
     LimitlessMonitorService limitless_monitor_service;
-    std::string test_service_id = "service_1";
+    std::string test_service_id = "";
 
     limitless_monitor_service.NewService(test_service_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor);
+    EXPECT_EQ(test_service_id, "shardgrp-1234");
     // mock_monitor is now nullptr, as limitless_monitor_service moves it
 
     bool service_exists = limitless_monitor_service.CheckService(test_service_id);
@@ -109,14 +110,17 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
         .Times(1).WillOnce(Invoke(mock_monitor3.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
     LimitlessMonitorService limitless_monitor_service;
-    std::string mock_monitor1_id = "monitor1";
+    std::string mock_monitor1_id = "";
     std::string mock_monitor2_id = "monitor2";
     std::string mock_monitor3_id = "monitor3";
 
     // spin up the monitors
     limitless_monitor_service.NewService(mock_monitor1_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor1);
+    EXPECT_EQ(mock_monitor1_id, "shardgrp-1234"); // as mock_monitor1_id is "", it is overwritten
     limitless_monitor_service.NewService(mock_monitor2_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor2);
+    EXPECT_EQ(mock_monitor2_id, "monitor2"); // monitor2 and monitor3 shouldn't be overwritten, as they are provided
     limitless_monitor_service.NewService(mock_monitor3_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor3);
+    EXPECT_EQ(mock_monitor2_id, "monitor3");
     // mock_monitor(1|2|3) are now nullptr, as limitless_monitor_service moves them
 
     // double check that this returns false, as monitor 1 already exists
