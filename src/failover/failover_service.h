@@ -37,7 +37,7 @@
 #include "../util/sliding_cache_map.h"
 
 #define BUFFER_SIZE 1024
-#define MAX_CLUSTER_ID_LEN 2048
+#define MAX_CLUSTER_ID_LEN 1024
 
 extern "C" {
 #endif
@@ -141,12 +141,14 @@ public:
     FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
         std::shared_ptr<std::map<std::wstring, std::wstring>> conn_info,
         std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-        const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor);
+        const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
+        const std::shared_ptr<IOdbcHelper>& odbc_helper);
 #else
     FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
         std::shared_ptr<std::map<std::string, std::string>> conn_info,
         std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-        const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor);
+        const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
+        const std::shared_ptr<IOdbcHelper>& odbc_helper);
 #endif
     ~FailoverService();
 
@@ -156,13 +158,13 @@ private:
     static const int MAX_STATE_LENGTH = 32;
     static const int MAX_MSG_LENGTH = 1024;
     static bool check_should_failover(const char* sql_state);
+    static void remove_candidate(const std::string& host, std::vector<HostInfo>& candidates);
     bool failover_reader(SQLHDBC hdbc);
     bool failover_writer(SQLHDBC hdbc);
     void connect_to_host(SQLHDBC hdbc, const std::string& host_string);
     bool is_connected_to_reader(SQLHDBC hdbc);
     bool is_connected_to_writer(SQLHDBC hdbc);
     void init_failover_mode(const std::string& host);
-    void remove_candidate(const std::string& host, std::vector<HostInfo>& candidates);
     std::shared_ptr<HostSelector> get_reader_host_selector() const;
 
     std::string cluster_id_;
@@ -175,6 +177,7 @@ private:
     std::shared_ptr<HostSelector> host_selector_;
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map_;
     std::shared_ptr<ClusterTopologyMonitor> topology_monitor_;
+    std::shared_ptr<IOdbcHelper> odbc_helper_;
     FailoverMode failover_mode_ = UNKNOWN_FAILOVER_MODE;
     int failover_timeout_;
 };

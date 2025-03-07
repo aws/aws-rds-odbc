@@ -18,6 +18,17 @@
 
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));
 
+bool OdbcHelper::ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) {
+    SQLRETURN rc = 0;
+#ifdef UNICODE
+    rc = SQLDriverConnectW(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+#else
+    rc = SQLDriverConnect(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+#endif
+
+    return CheckResult(rc, "Failed to connect to host.", out_conn, SQL_HANDLE_DBC);
+}
+
 bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     if (SQL_SUCCEEDED(rc)) {
         // Successfully fetched row.

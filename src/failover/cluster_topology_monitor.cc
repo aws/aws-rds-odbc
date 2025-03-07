@@ -347,7 +347,7 @@ bool ClusterTopologyMonitor::handle_regular_mode() {
     std::vector<HostInfo> hosts;
     {
         std::lock_guard hdbc_lock(hdbc_mutex_);
-        hosts = FetchTopologyUpdateCache(reinterpret_cast<SQLHDBC>(*main_hdbc_.get()));
+        hosts = FetchTopologyUpdateCache(reinterpret_cast<SQLHDBC>(main_hdbc_ ? *main_hdbc_.get() : SQL_NULL_HDBC));
     }
 
     // No hosts, switch to panic

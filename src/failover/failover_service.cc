@@ -25,12 +25,14 @@ static std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> glob
 FailoverService::FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
                                  std::shared_ptr<std::map<std::wstring, std::wstring>> conn_info,
                                  std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-                                 const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor)
+                                 const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
+                                 const std::shared_ptr<IOdbcHelper>& odbc_helper)
     : cluster_id_{ std::move(cluster_id) },
       dialect_{ std::move(dialect) },
       conn_info_{ std::move(conn_info) },
       topology_map_{ std::move(topology_map) },
-      topology_monitor_{ std::move(topology_monitor) } {
+      topology_monitor_{ std::move(topology_monitor) },
+      odbc_helper_{ std::move(odbc_helper) } {
     this->init_failover_mode(host);
     this->host_selector_ = get_reader_host_selector();
     failover_timeout_ = std::atoi(StringHelper::ToString(this->conn_info_->at(FAILOVER_TIMEOUT_KEY)).c_str());
@@ -40,12 +42,14 @@ FailoverService::FailoverService(const std::string& host, const std::string& clu
 FailoverService::FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
                                  std::shared_ptr<std::map<std::string, std::string>> conn_info,
                                  std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-                                 const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor)
+                                 const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
+                                 const std::shared_ptr<IOdbcHelper>& odbc_helper)
     : cluster_id_{ std::move(cluster_id) },
       dialect_{ std::move(dialect) },
       conn_info_{ std::move(conn_info) },
       topology_map_{ std::move(topology_map) },
-      topology_monitor_{ std::move(topology_monitor) } {
+      topology_monitor_{ std::move(topology_monitor) },
+      odbc_helper_{ std::move(odbc_helper) } {
     this->init_failover_mode(host);
     this->host_selector_ = get_reader_host_selector();
     failover_timeout_ = std::atoi(this->conn_info_->at(FAILOVER_TIMEOUT_KEY).c_str());
@@ -161,7 +165,6 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
         }
     }
 
-    int num_hosts = reader_candidates.size();
     std::unordered_map<std::string, std::string> properties;
     RoundRobinHostSelector::SetRoundRobinWeight(reader_candidates, properties);
 
@@ -174,7 +177,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
             host_string = host.GetHost();
             connect_to_host(hdbc, host_string);
             bool is_reader = false;
-            if (OdbcHelper::CheckConnection(hdbc)) {
+            if (odbc_helper_->CheckConnection(hdbc)) {
                 is_reader = is_connected_to_reader(hdbc);
                 if (is_reader || this->failover_mode_ != STRICT_READER) {
                     LOG(INFO) << "[Failover Service] connected to a new reader for: " << host_string;
@@ -182,7 +185,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
                 }
             }
             remove_candidate(host_string, remaining_readers);
-            SQLDisconnect(hdbc);
+            odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
 
             if (!is_reader) {
                 // The reader candidate is actually a writer, which is not valid when failoverMode is STRICT_READER.
@@ -207,8 +210,8 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
         // Try the original writer, which may have been demoted to a reader.
         host_string = original_writer.GetHost();
         connect_to_host(hdbc, host_string);
-        if (!OdbcHelper::CheckConnection(hdbc)) {
-            SQLDisconnect(hdbc);
+        if (!odbc_helper_->CheckConnection(hdbc)) {
+            odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
             LOG(INFO) << "[Failover Service] Failed to connect to host: " << original_writer;
         }
 
@@ -219,7 +222,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
     } while (get_current() < end);
 
     // Timed out.
-    SQLDisconnect(hdbc);
+    odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
     LOG(INFO) << "[Failover Service] The reader failover process was not able to establish a connection before timing out.";
     return false;
 }
@@ -238,7 +241,7 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     LOG(INFO) << "[Failover Service] writer failover connection to a new writer: " << host_string;
 
     connect_to_host(hdbc, host_string);
-    if (OdbcHelper::CheckConnection(hdbc)) {
+    if (odbc_helper_->CheckConnection(hdbc)) {
         if (!is_connected_to_reader(hdbc)) {
             LOG(INFO) << "[Failover Service] writer failover connected to a new writer for: " << host_string;
             return true;
@@ -247,7 +250,7 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
         return false;
     }
     LOG(INFO) << "[Failover Service] writer failover unable to connect to any instance for: " << cluster_id_;
-    SQLDisconnect(hdbc);
+    odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
     return false;
 }
 
@@ -255,12 +258,11 @@ void FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_stri
 #ifdef UNICODE
     conn_info_->insert_or_assign(SERVER_HOST_KEY, StringHelper::ToWstring(host_string));
     std::wstring conn_str = ConnectionStringHelper::BuildConnectionStringW(*conn_info_);
-    SQLDriverConnectW(hdbc, nullptr, AS_SQLTCHAR(conn_str.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
 #else
     conn_info_->insert_or_assign(SERVER_HOST_KEY, host_string);
     std::string conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
-    SQLDriverConnect(hdbc, nullptr, AS_SQLTCHAR(conn_str.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
 #endif
+    odbc_helper_->ConnStrConnect(AS_SQLTCHAR(conn_str.c_str()), hdbc);
 }
 
 bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
@@ -272,20 +274,20 @@ bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
     SQLHSTMT stmt = SQL_NULL_HANDLE;
     SQLINTEGER is_reader = 0;
 
-    if (!OdbcHelper::AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] reader check failed to allocate handle")) {
+    if (!odbc_helper_->AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] reader check failed to allocate handle")) {
         return false;
     }
-    if (!OdbcHelper::ExecuteQuery(stmt, AS_SQLTCHAR(dialect_->GetIsReaderQuery().c_str()),
+    if (!odbc_helper_->ExecuteQuery(stmt, AS_SQLTCHAR(dialect_->GetIsReaderQuery().c_str()),
                                   "[Failover Service] reader check failed to execute topology query")) {
         return false;
     }
-    if (!OdbcHelper::BindColumn(stmt, 1, SQL_C_SLONG, &is_reader, sizeof(is_reader),
+    if (!odbc_helper_->BindColumn(stmt, 1, SQL_C_SLONG, &is_reader, sizeof(is_reader),
                                 "[Failover Service] reader check failed to bind is_reader column")) {
         return false;
     }
 
-    if (OdbcHelper::FetchResults(stmt, "[Failover Service] failed to fetch if is_reader from results")) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
+    if (odbc_helper_->FetchResults(stmt, "[Failover Service] failed to fetch if is_reader from results")) {
+        odbc_helper_->Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
     }
     return (is_reader == 1);
 }
@@ -295,19 +297,19 @@ bool FailoverService::is_connected_to_writer(SQLHDBC hdbc) {
     SQLHSTMT stmt = SQL_NULL_HANDLE;
     SQLTCHAR writer_id[BUFFER_SIZE];
 
-    if (!OdbcHelper::AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] writer failed to allocate handle")) {
+    if (!odbc_helper_->AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] writer failed to allocate handle")) {
         return false;
     }
-    if (!OdbcHelper::ExecuteQuery(stmt, AS_SQLTCHAR(dialect_->GetWriterIdQuery().c_str()),
+    if (!odbc_helper_->ExecuteQuery(stmt, AS_SQLTCHAR(dialect_->GetWriterIdQuery().c_str()),
                                   "[Failover Service] writer failed to execute writer query")) {
         return false;
     }
-    if (!OdbcHelper::BindColumn(stmt, 1, SQL_C_CHAR, writer_id, sizeof(writer_id), "[Failover Service] writer failed to bind writer_id column")) {
+    if (!odbc_helper_->BindColumn(stmt, 1, SQL_C_CHAR, writer_id, sizeof(writer_id), "[Failover Service] writer failed to bind writer_id column")) {
         return false;
     }
 
-    if (OdbcHelper::FetchResults(stmt, "[Failover Service] writer failed to fetch writer from results")) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
+    if (odbc_helper_->FetchResults(stmt, "[Failover Service] writer failed to fetch writer from results")) {
+        odbc_helper_->Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
     }
     return writer_id[0] != TEXT('\0');
 }
@@ -386,7 +388,8 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
                     std::make_shared<ClusterTopologyQueryHelper>(dialect_obj->GetDefaultPort(), endpoint_template,
                                                                  dialect_obj->GetTopologyQuery(), dialect_obj->GetWriterIdQuery(),
                                                                  dialect_obj->GetNodeIdQuery()),
-                    ignore_topology_request_ms, high_refresh_rate_ms, refresh_rate_ms));
+                    ignore_topology_request_ms, high_refresh_rate_ms, refresh_rate_ms),
+                std::make_shared<OdbcHelperWrapper>());
 
             // Check again to see if the other thread has set service tracker for cluster id
             // If still empty, put new tracker. Let tracker descope and free itself otherwise

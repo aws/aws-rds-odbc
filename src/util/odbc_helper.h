@@ -33,6 +33,7 @@ public:
     static const int MAX_MSG_LENGTH = 1024;
     static SQLTCHAR *check_connection_query;
 
+    static bool ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn);
     static bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type);
     static bool CheckConnection(SQLHDBC conn);
     static void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt);
@@ -47,6 +48,7 @@ private:
 
 class IOdbcHelper {
 public:
+    virtual bool ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) = 0;
     virtual bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) = 0;
     virtual bool CheckConnection(SQLHDBC conn) = 0;
     virtual void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) = 0;
@@ -58,6 +60,7 @@ public:
 
 class OdbcHelperWrapper : public IOdbcHelper {
 public:
+    bool ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) override { return OdbcHelper::ConnStrConnect(conn_str, out_conn); };
     bool CheckResult(SQLRETURN rc, const std::string& log_message, SQLHANDLE handle, int32_t handle_type) override { return OdbcHelper::CheckResult(rc, log_message, handle, handle_type); };
     bool CheckConnection(SQLHDBC conn) override { return OdbcHelper::CheckConnection(conn); };
     void Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) override { OdbcHelper::Cleanup(henv, conn, hstmt); };

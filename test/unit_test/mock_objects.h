@@ -122,6 +122,7 @@ public:
 
 class MOCK_ODBC_HELPER : public IOdbcHelper {
 public:
+    MOCK_METHOD(bool, ConnStrConnect, (SQLTCHAR*,SQLHDBC&), ());
     MOCK_METHOD(bool, CheckResult, (SQLRETURN, const std::string&, SQLHANDLE, int32_t), ());
     MOCK_METHOD(bool, CheckConnection, (SQLHDBC), ());
     MOCK_METHOD(void, Cleanup, (SQLHENV, SQLHDBC, SQLHSTMT), ());
