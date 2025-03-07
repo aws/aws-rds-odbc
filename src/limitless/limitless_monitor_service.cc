@@ -21,6 +21,8 @@
 
 #include "limitless_query_helper.h"
 #include "odbc_helper.h"
+#include "rds_utils.h"
+#include "string_helper.h"
 
 static LimitlessMonitorService limitless_monitor_service;
 
@@ -39,16 +41,12 @@ bool LimitlessMonitorService::CheckService(const std::string& service_id) {
 }
 
 bool LimitlessMonitorService::NewService(
-    const std::string& service_id,
+    std::string& service_id,
     const SQLTCHAR *connection_string_c_str,
     int host_port,
     std::shared_ptr<LimitlessRouterMonitor> limitless_router_monitor
 ) {
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
-    if (this->services.contains(service_id)) {
-        LOG(ERROR) << "Attempted to recreate existing monitor with service ID " << service_id;
-        return false;
-    }
 
     // parse the connection string to extract useful limitless information
     #ifdef UNICODE
@@ -58,6 +56,28 @@ bool LimitlessMonitorService::NewService(
     std::map<std::string, std::string> connection_string_map;
     ConnectionStringHelper::ParseConnectionString(reinterpret_cast<const char *>(connection_string_c_str), connection_string_map);
     #endif
+
+    if (service_id.empty()) {
+        auto it = connection_string_map.find(SERVER_KEY);
+        if (it != connection_string_map.end()) {
+            #ifdef UNICODE
+            std::string host = StringHelper::ToString(connection_string_map[SERVER_KEY]);
+            #else
+            std::string host = connection_string_map[SERVER_KEY];
+            #endif
+            service_id = RdsUtils::GetRdsClusterId(host);
+
+            if (service_id.empty()) {
+                LOG(ERROR) << "No service ID provided and could not get cluster ID from host " << host;
+                return false;
+            }
+        }
+    }
+
+    if (this->services.contains(service_id)) {
+        LOG(ERROR) << "Attempted to recreate existing monitor with service ID " << service_id;
+        return false;
+    }
 
     bool block_and_query_immediately = true;
 
@@ -169,12 +189,17 @@ bool CheckLimitlessCluster(SQLHDBC hdbc) {
     return result;
 }
 
-bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, const char *service_id_c_str, const LimitlessInstance *db_instance) {
+bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, char *service_id_c_str, size_t service_id_size, const LimitlessInstance *db_instance) {
     std::string service_id(service_id_c_str);
 
-    if (!limitless_monitor_service.CheckService(service_id)) {
+    if (service_id.empty() || !limitless_monitor_service.CheckService(service_id)) {
+        bool service_id_was_empty = service_id.empty();
         if (!limitless_monitor_service.NewService(service_id, connection_string_c_str, host_port, std::make_shared<LimitlessRouterMonitor>())) {
             return false;
+        }
+        // overwrite the provided service ID if it was overwritten
+        if (service_id_was_empty) {
+            strncpy(service_id_c_str, service_id.c_str(), service_id_size);
         }
     } else {
         limitless_monitor_service.IncrementReferenceCounter(service_id);
