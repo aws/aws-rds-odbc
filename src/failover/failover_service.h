@@ -117,10 +117,12 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
 void StopFailoverService(const char* service_id_c_str);
 
 /**
- * Given a service ID and the current connect (hdbc), it will attempt to disconnect the current connection
- * and reconnect to a new host from the topology map of the service ID.
+ * Given a service ID and the current connection's SQL State,
+ * if the SQL State is communication link error, Failover will attempt to update topology and
+ * and return a new HDBC connection
  * 
  * @param service_id_c_str an identifier used to track the reference count of the failover service
+ * @param sql_state the SQL State of the connection
  * @return a FailoverResult object indicating whether the connection has been established, and if so the new connection.
  */
 FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state);
@@ -135,6 +137,8 @@ public:
     static const uint32_t DEFAULT_HIGH_REFRESH_RATE_MS =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(10)).count();
     static const uint32_t DEFAULT_REFRESH_RATE_MS =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
+    static const uint32_t DEFAULT_FAILOVER_TIMEOUT_MS =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
 
 #ifdef UNICODE
@@ -153,6 +157,7 @@ public:
     ~FailoverService();
 
     bool Failover(SQLHDBC hdbc, const char* sql_state);
+    HostInfo GetCurrentHost();
 
 private:
     static const int MAX_STATE_LENGTH = 32;
@@ -167,6 +172,7 @@ private:
     void init_failover_mode(const std::string& host);
     std::shared_ptr<HostSelector> get_reader_host_selector() const;
 
+    HostInfo curr_host_;
     std::string cluster_id_;
     std::shared_ptr<Dialect> dialect_;
     #ifdef UNICODE
@@ -179,7 +185,7 @@ private:
     std::shared_ptr<ClusterTopologyMonitor> topology_monitor_;
     std::shared_ptr<IOdbcHelper> odbc_helper_;
     FailoverMode failover_mode_ = UNKNOWN_FAILOVER_MODE;
-    int failover_timeout_;
+    uint32_t failover_timeout_;
 };
 
 typedef struct FailoverServiceTracker {

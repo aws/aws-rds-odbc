@@ -21,6 +21,19 @@ static SlidingCacheMap<std::string, std::shared_ptr<FailoverServiceTracker>> glo
 static std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> global_topology_map =
     std::make_shared<SlidingCacheMap<std::string, std::vector<HostInfo>>>();
 
+template <typename T, class U>
+static U parse_num(const T& num_to_parse, const U& default_num) {
+    U ret = default_num;
+    try {
+        ret = std::stoull(num_to_parse);
+    } catch (const std::invalid_argument& ex) {
+        LOG(WARNING) << "Could not be parsed as a number, returning the default." << ex.what();
+    } catch (const std::out_of_range& ex) {
+        LOG(WARNING) << "Number was out of range, returning the default." << ex.what();
+    }
+    return ret;
+}
+
 #ifdef UNICODE
 FailoverService::FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
                                  std::shared_ptr<std::map<std::wstring, std::wstring>> conn_info,
@@ -35,8 +48,10 @@ FailoverService::FailoverService(const std::string& host, const std::string& clu
       odbc_helper_{ std::move(odbc_helper) } {
     this->init_failover_mode(host);
     this->host_selector_ = get_reader_host_selector();
-    failover_timeout_ = std::atoi(StringHelper::ToString(this->conn_info_->at(FAILOVER_TIMEOUT_KEY)).c_str());
+    failover_timeout_ = parse_num(conn_info_->find(FAILOVER_TIMEOUT_KEY) != conn_info_->end() ?
+        conn_info_->at(FAILOVER_TIMEOUT_KEY) : TEXT(""), DEFAULT_FAILOVER_TIMEOUT_MS);
     topology_monitor_->StartMonitor();
+    curr_host_ = HostInfo(host, dialect_->GetDefaultPort(), UP, false, nullptr, 0);
 }
 #else
 FailoverService::FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
@@ -52,8 +67,10 @@ FailoverService::FailoverService(const std::string& host, const std::string& clu
       odbc_helper_{ std::move(odbc_helper) } {
     this->init_failover_mode(host);
     this->host_selector_ = get_reader_host_selector();
-    failover_timeout_ = std::atoi(this->conn_info_->at(FAILOVER_TIMEOUT_KEY).c_str());
+    failover_timeout_ = parse_num(conn_info_->find(FAILOVER_TIMEOUT_KEY) != conn_info_->end() ?
+        conn_info_->at(FAILOVER_TIMEOUT_KEY) : TEXT(""), DEFAULT_FAILOVER_TIMEOUT_MS);
     topology_monitor_->StartMonitor();
+    curr_host_ = HostInfo(host, dialect_->GetDefaultPort(), UP, false, nullptr, 0);
 }
 #endif
 
@@ -122,6 +139,10 @@ bool FailoverService::Failover(SQLHDBC hdbc, const char* sql_state) {
     return failover_reader(hdbc);
 }
 
+HostInfo FailoverService::GetCurrentHost() {
+    return curr_host_;
+}
+
 bool FailoverService::check_should_failover(const char* sql_state) {
     // Check if the SQL State is related to a communication error
     const char* start = "08";
@@ -173,7 +194,13 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
     do {
         std::vector<HostInfo> remaining_readers(reader_candidates);
         while (!remaining_readers.empty() && (curr_time = get_current()) < end) {
-            HostInfo host = host_selector_->GetHost(reader_candidates, false, properties);
+            HostInfo host;
+            try {
+                host = host_selector_->GetHost(reader_candidates, false, properties);
+            } catch (const std::exception& e) {
+                LOG(INFO) << "[Failover Service] no hosts in topology for: " << cluster_id_;
+                return false;
+            }
             host_string = host.GetHost();
             connect_to_host(hdbc, host_string);
             bool is_reader = false;
@@ -181,6 +208,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
                 is_reader = is_connected_to_reader(hdbc);
                 if (is_reader || this->failover_mode_ != STRICT_READER) {
                     LOG(INFO) << "[Failover Service] connected to a new reader for: " << host_string;
+                    curr_host_ = host;
                     return true;
                 }
             }
@@ -217,6 +245,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
 
         if (is_connected_to_reader(hdbc) || failover_mode_ != STRICT_READER) {
             LOG(INFO) << "[Failover Service] reader failover connected to writer instance for: " << host_string;
+            curr_host_ = original_writer;
             return true;
         }
     } while (get_current() < end);
@@ -236,7 +265,13 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     std::vector<HostInfo> hosts = topology_map_->Get(cluster_id_);
     std::unordered_map<std::string, std::string> properties;
     RoundRobinHostSelector::SetRoundRobinWeight(hosts, properties);
-    HostInfo host = host_selector_->GetHost(hosts, true, properties);
+    HostInfo host;    
+    try {
+        host = host_selector_->GetHost(hosts, true, properties);
+    } catch (const std::exception& e) {
+        LOG(INFO) << "[Failover Service] no hosts in topology for: " << cluster_id_;
+        return false;
+    }
     std::string host_string = host.GetHost();
     LOG(INFO) << "[Failover Service] writer failover connection to a new writer: " << host_string;
 
@@ -244,6 +279,7 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     if (odbc_helper_->CheckConnection(hdbc)) {
         if (!is_connected_to_reader(hdbc)) {
             LOG(INFO) << "[Failover Service] writer failover connected to a new writer for: " << host_string;
+            curr_host_ = host;
             return true;
         }
         LOG(ERROR) << "The new writer was identified to be " << host_string << ", but querying the instance for its role returned a reader.";
@@ -266,7 +302,7 @@ void FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_stri
 }
 
 bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
-    if (hdbc  == SQL_NULL_HDBC) {
+    if (hdbc == SQL_NULL_HDBC) {
         return false;
     }
 
@@ -287,7 +323,7 @@ bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
     }
 
     if (odbc_helper_->FetchResults(stmt, "[Failover Service] failed to fetch if is_reader from results")) {
-        odbc_helper_->Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
+        return false;
     }
     return (is_reader == 1);
 }
@@ -309,22 +345,9 @@ bool FailoverService::is_connected_to_writer(SQLHDBC hdbc) {
     }
 
     if (odbc_helper_->FetchResults(stmt, "[Failover Service] writer failed to fetch writer from results")) {
-        odbc_helper_->Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
+        return false;
     }
     return writer_id[0] != TEXT('\0');
-}
-
-template <typename T, class U>
-static U parse_num(const T& num_to_parse, const U& default_num) {
-    U ret = default_num;
-    try {
-        ret = std::stoull(num_to_parse);
-    } catch (const std::invalid_argument& ex) {
-        LOG(WARNING) << "Could not be parsed as a number, returning the default." << ex.what();
-    } catch (const std::out_of_range& ex) {
-        LOG(WARNING) << "Number was out of range, returning the default." << ex.what();
-    }
-    return ret;
 }
 
 bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const SQLTCHAR* conn_cstr) {

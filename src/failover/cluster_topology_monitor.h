@@ -52,11 +52,11 @@ public:
         uint32_t high_refresh_rate_ms, uint32_t refresh_rate_ms);
     ~ClusterTopologyMonitor();
 
-    void SetClusterId(const std::string& cluster_id);
-    std::vector<HostInfo> ForceRefresh(bool verify_writer, uint32_t timeout_ms);
-    std::vector<HostInfo> ForceRefresh(SQLHDBC hdbc, uint32_t timeout_ms);
+    virtual void SetClusterId(const std::string& cluster_id);
+    virtual std::vector<HostInfo> ForceRefresh(bool verify_writer, uint32_t timeout_ms);
+    virtual std::vector<HostInfo> ForceRefresh(SQLHDBC hdbc, uint32_t timeout_ms);
 
-    void StartMonitor();
+    virtual void StartMonitor();
 
 protected:
     void Run();
