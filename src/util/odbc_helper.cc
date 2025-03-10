@@ -113,7 +113,8 @@ bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string&
 
 bool OdbcHelper::BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) {
     SQLRETURN rc;
-    rc = SQLBindCol(stmt, col_num, type, dest, dest_size, nullptr);
+    SQLLEN ret_len = 0;
+    rc = SQLBindCol(stmt, col_num, type, dest, dest_size, &ret_len);
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
         Cleanup(nullptr, nullptr, stmt);
         return false;
@@ -149,8 +150,8 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
             LOG(ERROR) << "Invalid handle";
         } else if (SQL_SUCCEEDED(ret)) {
             #ifdef UNICODE
-            LOG(ERROR) << LoggerWrapper::ToStringFromWchar(AS_CONST_WCHAR(sqlstate)) << ": "
-                       << LoggerWrapper::ToStringFromWchar(AS_CONST_WCHAR(message));
+            LOG(ERROR) << StringHelper::ToString(AS_WCHAR(sqlstate)) << ": "
+                       << StringHelper::ToString(AS_WCHAR(message));
             #else
             LOG(ERROR) << sqlstate << ": " << message;
             #endif
