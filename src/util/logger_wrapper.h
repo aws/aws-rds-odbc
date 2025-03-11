@@ -38,17 +38,18 @@ namespace logger_config {
 // Initializes glog once
 class LoggerWrapper {
 public:
+    LoggerWrapper() = default;
+
     static void Initialize();
     static void Initialize(std::string log_location, int threshold);
+
+    static void Shutdown();
 
     // Prevent copy constructors
     LoggerWrapper(const LoggerWrapper&) = delete;
     LoggerWrapper(LoggerWrapper&&) = delete;
     LoggerWrapper& operator=(const LoggerWrapper&) = delete;
     LoggerWrapper& operator=(LoggerWrapper&&) = delete;
-
-protected:
-    LoggerWrapper() = default;
 
 private:
     static void set_log_directory(const std::string& directory_path);
