@@ -25,6 +25,11 @@ extern "C" {
  */
 void InitializeRdsLogger(const char* log_dir, int threshold);
 
+/**
+ * Shutdown the logger for the AWS RDS ODBC library.
+ */
+void ShutdownRdsLogger();
+
 #ifdef __cplusplus
 }
 

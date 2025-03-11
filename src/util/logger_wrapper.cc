@@ -20,13 +20,14 @@
 
 #include "logger_wrapper.h"
 
+static LoggerWrapper instance;
+
 void LoggerWrapper::Initialize() {
     Initialize(logger_config::LOG_LOCATION, 4);
 }
 
 void LoggerWrapper::Initialize(std::string log_location, int threshold) {
     threshold = threshold >= 0 ? threshold : 4; // Set to 4 to disable console output.
-    static LoggerWrapper instance;
     if (!instance.init) {
         FLAGS_stderrthreshold = threshold;
         FLAGS_timestamp_in_logfile_name = false;
@@ -36,6 +37,13 @@ void LoggerWrapper::Initialize(std::string log_location, int threshold) {
         set_log_directory(log_location);
         google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
         instance.init = true;
+    }
+}
+
+void LoggerWrapper::Shutdown() {
+    if (instance.init) {
+        instance.init = false;
+        google::ShutdownGoogleLogging();
     }
 }
 

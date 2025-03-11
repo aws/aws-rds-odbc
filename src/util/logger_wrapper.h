@@ -41,6 +41,8 @@ public:
     static void Initialize();
     static void Initialize(std::string log_location, int threshold);
 
+    static void Shutdown();
+
     // Prevent copy constructors
     LoggerWrapper(const LoggerWrapper&) = delete;
     LoggerWrapper(LoggerWrapper&&) = delete;
