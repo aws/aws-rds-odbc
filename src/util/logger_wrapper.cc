@@ -42,8 +42,8 @@ void LoggerWrapper::Initialize(std::string log_location, int threshold) {
 
 void LoggerWrapper::Shutdown() {
     if (instance.init) {
-        instance.init = false;
         google::ShutdownGoogleLogging();
+        instance.init = false;
     }
 }
 
