@@ -18,3 +18,7 @@
 void InitializeRdsLogger(const char* log_dir, int threshold) {
     LoggerWrapper::Initialize(log_dir, threshold);
 }
+
+void ShutdownRdsLogger() {
+    LoggerWrapper::Shutdown();
+}
