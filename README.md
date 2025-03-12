@@ -1,6 +1,6 @@
 # Amazon Web Services (AWS) RDS Library for ODBC Drivers
 
-[![License](https://img.shields.io/badge/license-GPLv2-blue)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apachev2-blue)](LICENSE)
 
 The Amazon Web Services (AWS) RDS Library for ODBC drivers allow the Amazon Web Services (AWS) ODBC drivers to take
 advantage of AWS RDS functionality inside an Amazon Aurora database (DB) cluster.
