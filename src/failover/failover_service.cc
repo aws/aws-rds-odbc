@@ -306,47 +306,56 @@ bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
         return false;
     }
 
-    SQLRETURN rc;
     SQLHSTMT stmt = SQL_NULL_HANDLE;
     SQLINTEGER is_reader = 0;
 
     if (!odbc_helper_->AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] reader check failed to allocate handle")) {
         return false;
     }
+
     if (!odbc_helper_->ExecuteQuery(stmt, AS_SQLTCHAR(dialect_->GetIsReaderQuery().c_str()),
                                   "[Failover Service] reader check failed to execute topology query")) {
         return false;
     }
-    if (!odbc_helper_->BindColumn(stmt, 1, SQL_C_SLONG, &is_reader, sizeof(is_reader),
-                                "[Failover Service] reader check failed to bind is_reader column")) {
+
+    SQLLEN rt = 0;
+    SQLRETURN rc = SQLBindCol(stmt, 1, SQL_C_SLONG, &is_reader, sizeof(is_reader), &rt);
+    if (!OdbcHelper::CheckResult(rc, "[Failover Service] reader check failed to bind is_reader column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
     }
 
     if (odbc_helper_->FetchResults(stmt, "[Failover Service] failed to fetch if is_reader from results")) {
         return false;
     }
+
     return (is_reader == 1);
 }
 
 bool FailoverService::is_connected_to_writer(SQLHDBC hdbc) {
-    SQLRETURN rc;
     SQLHSTMT stmt = SQL_NULL_HANDLE;
     SQLTCHAR writer_id[BUFFER_SIZE];
 
     if (!odbc_helper_->AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] writer failed to allocate handle")) {
         return false;
     }
+
     if (!odbc_helper_->ExecuteQuery(stmt, AS_SQLTCHAR(dialect_->GetWriterIdQuery().c_str()),
                                   "[Failover Service] writer failed to execute writer query")) {
         return false;
     }
-    if (!odbc_helper_->BindColumn(stmt, 1, SQL_C_CHAR, writer_id, sizeof(writer_id), "[Failover Service] writer failed to bind writer_id column")) {
+
+    SQLLEN rt = 0;
+    SQLRETURN rc = SQLBindCol(stmt, 1, SQL_C_SLONG, &writer_id, sizeof(writer_id), &rt);
+    if (!OdbcHelper::CheckResult(rc, "[Failover Service] writer failed to bind writer_id column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
     }
 
     if (odbc_helper_->FetchResults(stmt, "[Failover Service] writer failed to fetch writer from results")) {
         return false;
     }
+
     return writer_id[0] != TEXT('\0');
 }
 
