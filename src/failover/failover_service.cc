@@ -391,6 +391,11 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
 
     if (cluster_id.empty()) {
         cluster_id = RdsUtils::GetRdsClusterId(host);
+    #ifdef UNICODE
+        conn_info[CLUSTER_ID_KEY] = StringHelper::ToWstring(cluster_id);
+    #else
+        conn_info[CLUSTER_ID_KEY] = cluster_id;
+    #endif
         // If the original input was empty, copy the generated ID back to caller
         strncpy(service_id_c_str, cluster_id.c_str(), MAX_CLUSTER_ID_LEN);
     }
@@ -463,5 +468,9 @@ FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_
     SQLAllocHandle(SQL_HANDLE_DBC, local_henv, &local_hdbc);
     bool failover_success = tracker->service->Failover(local_hdbc, sql_state);
     tracker->failover_inprogress.fetch_sub(1);
+    if (!failover_success) {
+        OdbcHelper::Cleanup(local_henv, local_hdbc, SQL_NULL_HSTMT);
+        LOG(WARNING) << "[Failover Service] Unsuccessful failover for: " << cluster_id;
+    }
     return FailoverResult{ .connection_changed = failover_success, .hdbc = local_hdbc };
 }

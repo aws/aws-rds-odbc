@@ -119,19 +119,19 @@ std::vector<HostInfo> ClusterTopologyQueryHelper::QueryTopology(SQLHDBC hdbc) {
         return std::vector<HostInfo>();
     }
 
-    rc = SQLBindCol(stmt, IS_WRITER_COL, SQL_C_TCHAR, &is_writer, sizeof(is_writer), &rt);
+    rc = SQLBindCol(stmt, IS_WRITER_COL, SQL_BIT, &is_writer, sizeof(is_writer), &rt);
     if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind is_writer column", stmt, SQL_HANDLE_STMT)) {
         OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
     }
 
-    rc = SQLBindCol(stmt, CPU_USAGE_COL, SQL_C_TCHAR, &cpu_usage, sizeof(cpu_usage), &rt);
+    rc = SQLBindCol(stmt, CPU_USAGE_COL, SQL_REAL, &cpu_usage, sizeof(cpu_usage), &rt);
     if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind cpu_usage column", stmt, SQL_HANDLE_STMT)) {
         OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
     }
 
-    rc = SQLBindCol(stmt, REPLICA_LAG_COL, SQL_C_TCHAR, &replica_lag_ms, sizeof(replica_lag_ms), &rt);
+    rc = SQLBindCol(stmt, REPLICA_LAG_COL, SQL_INTEGER, &replica_lag_ms, sizeof(replica_lag_ms), &rt);
     if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind replica_lag_ms column", stmt, SQL_HANDLE_STMT)) {
         OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
