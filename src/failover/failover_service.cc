@@ -360,7 +360,6 @@ bool FailoverService::is_connected_to_writer(SQLHDBC hdbc) {
 }
 
 bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const SQLTCHAR* conn_cstr) {
-
     std::string cluster_id(service_id_c_str);
     std::shared_ptr<Dialect> dialect_obj;
     switch (dialect) {
@@ -413,8 +412,10 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
     std::shared_ptr<FailoverServiceTracker> tracker;
     try {
         uint32_t ignore_topology_request_ms = parse_num(conn_info[IGNORE_TOPOLOGY_REQUEST_KEY], FailoverService::DEFAULT_IGNORE_TOPOLOGY_REQUEST_MS);
-        uint32_t high_refresh_rate_ms = parse_num(conn_info[HIGH_REFRESH_RATE_KEY], FailoverService::DEFAULT_IGNORE_TOPOLOGY_REQUEST_MS);
-        uint32_t refresh_rate_ms = parse_num(conn_info[REFRESH_RATE_KEY], FailoverService::DEFAULT_IGNORE_TOPOLOGY_REQUEST_MS);
+        uint32_t high_refresh_rate_ms = parse_num(conn_info[HIGH_REFRESH_RATE_KEY], FailoverService::DEFAULT_HIGH_REFRESH_RATE_MS);
+
+        uint32_t refresh_rate_ms = parse_num(conn_info[REFRESH_RATE_KEY], FailoverService::DEFAULT_REFRESH_RATE_MS);
+
 
         if (!global_failover_services.Find(cluster_id)) {
             tracker = std::make_shared<FailoverServiceTracker>();

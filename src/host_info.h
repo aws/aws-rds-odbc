@@ -81,7 +81,7 @@ private:
 
 inline std::ostream& operator<<(std::ostream& str, const HostInfo& v) {
     char buf[HostInfo::MAX_HOST_INFO_BUFFER_SIZE];
-    sprintf(buf, "HostSpec[host=%s, port=%d, %s]", v.GetHost().c_str(), v.GetPort(), v.IsHostWriter() ? "WRITER" : "READER");
+    sprintf(buf, "HostInfo[host=%s, port=%d, %s]", v.GetHost().c_str(), v.GetPort(), v.IsHostWriter() ? "WRITER" : "READER");
     return str << std::string(buf);
 }
 

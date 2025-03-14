@@ -36,7 +36,7 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
     }
 
     if (rc == SQL_NO_DATA) {
-        //No more data to fetch.
+        // No more data to fetch.
         return false;
     }
 
