@@ -40,6 +40,7 @@ std::string ClusterTopologyQueryHelper::GetWriterId(SQLHDBC hdbc) {
     SQLRETURN rc;
     SQLHSTMT stmt = SQL_NULL_HANDLE;
     SQLTCHAR writer_id[BUFFER_SIZE] = {0};
+    SQLLEN rt = 0;
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "ClusterTopologyQueryHelper failed to allocate handle")) {
         return std::string();
@@ -48,8 +49,10 @@ std::string ClusterTopologyQueryHelper::GetWriterId(SQLHDBC hdbc) {
     if (!OdbcHelper::ExecuteQuery(stmt, AS_SQLTCHAR(writer_id_query_.c_str()), "ClusterTopologyQueryHelper failed to execute writer query")) {
         return std::string();
     }
-
-    if (!OdbcHelper::BindColumn(stmt, NODE_ID_COL, SQL_C_TCHAR, writer_id, sizeof(writer_id), "ClusterTopologyQueryHelper failed to bind writer_id column")) {
+    
+    rc = SQLBindCol(stmt, NODE_ID_COL, SQL_C_TCHAR, &writer_id, sizeof(writer_id), &rt);
+    if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind writer_id column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::string();
     }
 
@@ -67,6 +70,7 @@ std::string ClusterTopologyQueryHelper::GetWriterId(SQLHDBC hdbc) {
 std::string ClusterTopologyQueryHelper::GetNodeId(SQLHDBC hdbc) {
     SQLHSTMT stmt = SQL_NULL_HANDLE;
     SQLTCHAR node_id[BUFFER_SIZE] = {0};
+    SQLLEN rt = 0;
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "ClusterTopologyQueryHelper failed to allocate handle")) {
         return std::string();
@@ -76,11 +80,13 @@ std::string ClusterTopologyQueryHelper::GetNodeId(SQLHDBC hdbc) {
         return std::string();
     }
 
-    if (!OdbcHelper::BindColumn(stmt, NODE_ID_COL, SQL_C_TCHAR, node_id, sizeof(node_id), "ClusterTopologyQueryHelper failed to bind node_id column")) {
+    SQLRETURN rc = SQLBindCol(stmt, NODE_ID_COL, SQL_C_TCHAR, &node_id, sizeof(node_id), &rt);
+    if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind node_id column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::string();
     }
 
-    if (!OdbcHelper::FetchResults(stmt, "ClusterTopologyQueryHelper failed to fetch ndoe ID from results")) {
+    if (!OdbcHelper::FetchResults(stmt, "ClusterTopologyQueryHelper failed to fetch node ID from results")) {
         return std::string();
     }
 
@@ -97,6 +103,7 @@ std::vector<HostInfo> ClusterTopologyQueryHelper::QueryTopology(SQLHDBC hdbc) {
     bool is_writer;
     SQLREAL cpu_usage;
     SQLINTEGER replica_lag_ms;
+    SQLLEN rt = 0;
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "ClusterTopologyQueryHelper failed to allocate handle")) {
         return std::vector<HostInfo>();
@@ -106,16 +113,27 @@ std::vector<HostInfo> ClusterTopologyQueryHelper::QueryTopology(SQLHDBC hdbc) {
         return std::vector<HostInfo>();
     }
 
-    if (!OdbcHelper::BindColumn(stmt, NODE_ID_COL, SQL_C_TCHAR, node_id, sizeof(node_id), "ClusterTopologyQueryHelper failed to bind node_id column")) {
+    SQLRETURN rc = SQLBindCol(stmt, NODE_ID_COL, SQL_C_TCHAR, &node_id, sizeof(node_id), &rt);
+    if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind node_id column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
     }
-    if (!OdbcHelper::BindColumn(stmt, IS_WRITER_COL, SQL_BIT, &is_writer, sizeof(is_writer), "ClusterTopologyQueryHelper failed to bind is_writer column")) {
+
+    rc = SQLBindCol(stmt, IS_WRITER_COL, SQL_C_TCHAR, &is_writer, sizeof(is_writer), &rt);
+    if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind is_writer column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
     }
-    if (!OdbcHelper::BindColumn(stmt, CPU_USAGE_COL, SQL_REAL, &cpu_usage, sizeof(cpu_usage), "ClusterTopologyQueryHelper failed to bind cpu_usage column")) {
+
+    rc = SQLBindCol(stmt, CPU_USAGE_COL, SQL_C_TCHAR, &cpu_usage, sizeof(cpu_usage), &rt);
+    if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind cpu_usage column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
     }
-    if (!OdbcHelper::BindColumn(stmt, REPLICA_LAG_COL, SQL_INTEGER, &replica_lag_ms, sizeof(replica_lag_ms), "ClusterTopologyQueryHelper failed to bind replica_lag_ms column")) {
+
+    rc = SQLBindCol(stmt, REPLICA_LAG_COL, SQL_C_TCHAR, &replica_lag_ms, sizeof(replica_lag_ms), &rt);
+    if (!OdbcHelper::CheckResult(rc, "ClusterTopologyQueryHelper failed to bind replica_lag_ms column", stmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return std::vector<HostInfo>();
     }
 

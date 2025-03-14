@@ -116,7 +116,7 @@ bool OdbcHelper::BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT typ
     SQLLEN ret_len = 0;
     rc = SQLBindCol(stmt, col_num, type, dest, dest_size, &ret_len);
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
-        Cleanup(nullptr, nullptr, stmt);
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
     };
     return true;
@@ -126,7 +126,7 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
     SQLRETURN rc;
     rc = SQLFetch(stmt);
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
-        Cleanup(nullptr, nullptr, stmt);
+        Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
     }
     return true;
