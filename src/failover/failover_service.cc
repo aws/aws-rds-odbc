@@ -401,12 +401,13 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
     if (cluster_id.empty()) {
         cluster_id = RdsUtils::GetRdsClusterId(host);
     #ifdef UNICODE
-        conn_info[CLUSTER_ID_KEY] = StringHelper::ToWstring(cluster_id);
+        conn_info_ptr->insert_or_assign(CLUSTER_ID_KEY, StringHelper::ToWstring(cluster_id));
     #else
-        conn_info[CLUSTER_ID_KEY] = cluster_id;
+        conn_info_ptr->insert_or_assign(CLUSTER_ID_KEY, cluster_id);
     #endif
         // If the original input was empty, copy the generated ID back to caller
         strncpy(service_id_c_str, cluster_id.c_str(), MAX_CLUSTER_ID_LEN);
+        LOG(INFO) << "[Failover Service] Generated ClusterId from host: " << cluster_id;
     }
 
     std::shared_ptr<FailoverServiceTracker> tracker;
