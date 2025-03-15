@@ -108,6 +108,11 @@ bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle,
     return true;
 }
 
+bool OdbcHelper::SetHenvToOdbc3(SQLHENV henv, const std::string& log_message) {
+    SQLRETURN rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
+    return OdbcHelper::CheckResult(rc, log_message, henv, SQL_HANDLE_ENV);
+}
+
 bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) {
     if (SQL_NULL_HANDLE == stmt) {
         LOG(WARNING) << "Attempted to execute query using null HSTMT";

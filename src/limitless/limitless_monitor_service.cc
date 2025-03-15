@@ -20,6 +20,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 
 #include <glog/logging.h>
 
@@ -174,8 +175,31 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     return host;
 }
 
-bool CheckLimitlessCluster(SQLHDBC hdbc) {
-    return LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
+bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str) {
+    SQLHENV henv = SQL_NULL_HANDLE;
+    SQLHDBC hdbc = SQL_NULL_HANDLE;
+
+    if (!OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, nullptr, henv, "Could not allocate environment handle during limitless check") ||
+        !OdbcHelper::SetHenvToOdbc3(henv, "Could not set henv to odbc3 during limitless check")) {
+        OdbcHelper::Cleanup(henv, SQL_NULL_HANDLE, SQL_NULL_HANDLE);
+        return false;
+    }
+
+    if (!OdbcHelper::AllocateHandle(SQL_HANDLE_DBC, henv, hdbc, "ERROR: could not allocate connection handle during limitless check")) {
+        OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
+        return false;
+    }
+
+    // TODO: Replace with odbc helper connection from failover PR...
+    SQLRETURN rc = SQLDriverConnect(hdbc, nullptr, const_cast<SQLTCHAR*>(connection_string_c_str), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+    if (!OdbcHelper::CheckResult(rc, "ERROR: Could not connect during limitless cluster check", hdbc, SQL_HANDLE_DBC)) {
+        OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
+        return false;
+    }
+
+    bool is_limitess_cluster = LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
+    OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
+    return is_limitess_cluster;
 }
 
 bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, char *service_id_c_str, size_t service_id_size, const LimitlessInstance *db_instance) {

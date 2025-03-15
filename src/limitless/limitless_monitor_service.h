@@ -77,7 +77,7 @@ typedef struct {
  * @param connection_string_c_str the connection string to specify the driver and server
  * @return True if the given connection string connects to a Limitless Cluster
  */
-bool CheckLimitlessCluster(SQLHDBC hdbc);
+bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str);
 
 /**
  * Increments a reference count for the given service ID, spinning a transaction router polling thread

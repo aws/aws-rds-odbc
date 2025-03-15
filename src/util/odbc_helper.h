@@ -35,6 +35,7 @@ public:
     static bool CheckConnection(SQLHDBC hdbc);
     static void Cleanup(SQLHENV henv, SQLHDBC hdbc, SQLHSTMT hstmt);
     static bool AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle, SQLHANDLE& output_handle, const std::string& log_message);
+    static bool SetHenvToOdbc3(SQLHENV henv, const std::string& log_message);
     static bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message);
     static bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message);
     static bool FetchResults(SQLHSTMT stmt, const std::string& log_message);
@@ -50,6 +51,7 @@ public:
     virtual bool CheckConnection(SQLHDBC hdbc) = 0;
     virtual void Cleanup(SQLHENV henv, SQLHDBC hdbc, SQLHSTMT hstmt) = 0;
     virtual bool AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle, SQLHANDLE& output_handle, const std::string& log_message) = 0;
+    virtual bool SetHenvToOdbc3(SQLHENV henv, const std::string& log_message) = 0;
     virtual bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) = 0;
     virtual bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) = 0;
     virtual bool FetchResults(SQLHSTMT stmt, const std::string& log_message) = 0;
@@ -62,6 +64,7 @@ public:
     bool CheckConnection(SQLHDBC hdbc) override { return OdbcHelper::CheckConnection(hdbc); };
     void Cleanup(SQLHENV henv, SQLHDBC hdbc, SQLHSTMT hstmt) override { OdbcHelper::Cleanup(henv, hdbc, hstmt); };
     bool AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle, SQLHANDLE& output_handle, const std::string& log_message) override { return OdbcHelper::AllocateHandle(handle_type, input_handle, output_handle, log_message); };
+    bool SetHenvToOdbc3(SQLHENV henv, const std::string& log_message) override {return OdbcHelper::SetHenvToOdbc3(henv, log_message); };
     bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) override { return OdbcHelper::ExecuteQuery(stmt, query, log_message); };
     bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) override { return OdbcHelper::BindColumn(stmt, col_num, type, dest, dest_size, log_message); };
     bool FetchResults(SQLHSTMT stmt, const std::string& log_message) override { return OdbcHelper::FetchResults(stmt, log_message); };
