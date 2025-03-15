@@ -16,6 +16,5 @@ The Limitless Connection Feature is compatible with AWS authentication methods. 
 > While it won't result in issues, the Failover feature was not designed to be used with Aurora Limitless Database.
 > Enabling both features will introduce unnecessary computation and memory overhead with no added benefits.
 
-
 ## Sample Code
 [Limitless Example](./limitless_example.cpp)
