@@ -31,25 +31,19 @@
 #define strcmp_case_insensitive(str1, str2) strcmpi(str1, str2)
 #endif
 
-#if defined(__APPLE__) || defined(__linux__)
-typedef std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-#else
-typedef std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-#endif
-
 class StringHelper {
    public:
     static std::wstring ToWstring(const std::string& src) {
         if (src.empty()) {
             return std::wstring();
         }
-        return converter{}.from_bytes(src);
+        return std::wstring(src.begin(), src.end());
     }
     static std::string ToString(const std::wstring& src) {
         if (src.empty()) {
             return std::string();
         }
-        return converter{}.to_bytes(src);
+        return std::string(src.begin(), src.end());
     }
 };
 

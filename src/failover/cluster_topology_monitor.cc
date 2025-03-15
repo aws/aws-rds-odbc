@@ -38,9 +38,9 @@ ClusterTopologyMonitor::ClusterTopologyMonitor(
         throw std::runtime_error(std::string("Cluster Topology Monitor unable to allocate HENV for ClusterId: ") + cluster_id);
     }
     #ifdef UNICODE
-    conn_str_ = std::wstring(reinterpret_cast<const wchar_t*>(conn_cstr));
+    conn_str_ = std::wstring(AS_CONST_WCHAR(conn_cstr));
     #else
-    conn_str_ = std::string(reinterpret_cast<const char*>(conn_cstr));
+    conn_str_ = std::string(AS_CONST_CHAR(conn_cstr));
     #endif
 }
 
