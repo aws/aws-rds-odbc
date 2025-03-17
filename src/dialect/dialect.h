@@ -15,15 +15,15 @@
 #ifndef DIALECT_H
 #define DIALECT_H
 
-#include <string>
+#include "string_helper.h"
 
 class Dialect {
 public:
     virtual int GetDefaultPort() { return 0; };
-    virtual std::string GetTopologyQuery() { return ""; };
-    virtual std::string GetWriterIdQuery() { return ""; };
-    virtual std::string GetNodeIdQuery() { return ""; };
-    virtual std::string GetIsReaderQuery() { return ""; };
+    virtual SQLSTR GetTopologyQuery() { return CONSTRUCT_SQLSTR(""); };
+    virtual SQLSTR GetWriterIdQuery() { return CONSTRUCT_SQLSTR(""); };
+    virtual SQLSTR GetNodeIdQuery() { return CONSTRUCT_SQLSTR(""); };
+    virtual SQLSTR GetIsReaderQuery() { return CONSTRUCT_SQLSTR(""); };
 };
 
 #endif // DIALECT_H

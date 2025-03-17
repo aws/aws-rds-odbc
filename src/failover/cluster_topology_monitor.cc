@@ -461,7 +461,6 @@ ClusterTopologyMonitor::NodeMonitoringThread::NodeMonitoringThread(ClusterTopolo
     this->main_monitor_ = monitor;
     this->host_info_ = host_info;
     this->writer_host_info_ = writer_host_info;
-    SQLAllocHandle(SQL_HANDLE_DBC, main_monitor_->henv_, &hdbc_);
     node_thread_ = std::make_shared<std::thread>(&NodeMonitoringThread::run, this);
 }
 
@@ -488,7 +487,9 @@ void ClusterTopologyMonitor::NodeMonitoringThread::run() {
         bool should_stop = main_monitor_->node_threads_stop_.load();
         while (!should_stop) {
             if (!main_monitor_->odbc_helper_->CheckConnection(hdbc_)) {
-                LOG(WARNING) << "Failover Monitor for: " << thread_host << " not connected. Trying to reconnect";
+                if (hdbc_ == SQL_NULL_HDBC) {
+                    LOG(WARNING) << "Failover Monitor for: " << thread_host << " not connected. Trying to reconnect";
+                }
                 handle_reconnect(conn_cstr);
             } else {
                 // Get Writer ID

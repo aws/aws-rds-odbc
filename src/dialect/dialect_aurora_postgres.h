@@ -18,33 +18,29 @@
 #include "dialect.h"
 
 class DialectAuroraPostgres : public Dialect {
-public:
+   public:
     int GetDefaultPort() override { return DEFAULT_POSTGRES_PORT; };
-    std::string GetTopologyQuery() override { return TOPOLOGY_QUERY; };
-    std::string GetWriterIdQuery() override { return WRITER_ID_QUERY; };
-    std::string GetNodeIdQuery() override { return NODE_ID_QUERY; };
-    std::string GetIsReaderQuery() override { return IS_READER_QUERY; };
+    SQLSTR GetTopologyQuery() override { return TOPOLOGY_QUERY; };
+    SQLSTR GetWriterIdQuery() override { return WRITER_ID_QUERY; };
+    SQLSTR GetNodeIdQuery() override { return NODE_ID_QUERY; };
+    SQLSTR GetIsReaderQuery() override { return IS_READER_QUERY; };
 
-private:
+   private:
     const int DEFAULT_POSTGRES_PORT = 5432;
-
-    const std::string TOPOLOGY_QUERY =
+    const SQLSTR TOPOLOGY_QUERY = CONSTRUCT_SQLSTR(
         "SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, \
-            CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) \
-            FROM aurora_replica_status() \
-            WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' \
-            OR LAST_UPDATE_TIMESTAMP IS NULL";
+        CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) \
+        FROM aurora_replica_status() \
+        WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' \
+        OR LAST_UPDATE_TIMESTAMP IS NULL");
 
-    const std::string WRITER_ID_QUERY =
-        "SELECT SERVER_ID FROM aurora_replica_status() \
-        WHERE SESSION_ID = 'MASTER_SESSION_ID' \
-        AND SERVER_ID = aurora_db_instance_identifier()";
+    const SQLSTR WRITER_ID_QUERY = CONSTRUCT_SQLSTR(
+        "SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' \
+        AND SERVER_ID = aurora_db_instance_identifier()");
 
-    const std::string NODE_ID_QUERY =
-        "SELECT aurora_db_instance_identifier()";
+    const SQLSTR NODE_ID_QUERY = CONSTRUCT_SQLSTR("SELECT aurora_db_instance_identifier()");
 
-    const std::string IS_READER_QUERY =
-        "SELECT pg_is_in_recovery()";
+    const SQLSTR IS_READER_QUERY = CONSTRUCT_SQLSTR("SELECT pg_is_in_recovery()");
 };
 
-#endif // DIALECT_AURORA_POSTGRES_H
+#endif  // DIALECT_AURORA_POSTGRES_H

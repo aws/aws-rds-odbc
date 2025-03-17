@@ -196,13 +196,18 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
         while (!remaining_readers.empty() && (curr_time = get_current()) < end) {
             HostInfo host;
             try {
-                host = host_selector_->GetHost(reader_candidates, false, properties);
+                host = host_selector_->GetHost(remaining_readers, false, properties);
             } catch (const std::exception& e) {
                 LOG(INFO) << "[Failover Service] no hosts in topology for: " << cluster_id_;
                 return false;
             }
             host_string = host.GetHost();
-            connect_to_host(hdbc, host_string);
+            bool is_connected = connect_to_host(hdbc, host_string);
+            if (!is_connected) {
+                remove_candidate(host_string, remaining_readers);
+                continue;
+            }
+
             bool is_reader = false;
             if (odbc_helper_->CheckConnection(hdbc)) {
                 is_reader = is_connected_to_reader(hdbc);
@@ -237,17 +242,21 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
 
         // Try the original writer, which may have been demoted to a reader.
         host_string = original_writer.GetHost();
-        connect_to_host(hdbc, host_string);
-        if (!odbc_helper_->CheckConnection(hdbc)) {
-            odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+        bool is_connected = connect_to_host(hdbc, host_string);
+        if (is_connected) {
+            if (!odbc_helper_->CheckConnection(hdbc)) {
+                odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+                continue;
+            }
+            if (is_connected_to_reader(hdbc) || failover_mode_ != STRICT_READER) {
+                LOG(INFO) << "[Failover Service] reader failover connected to writer instance for: " << host_string;
+                curr_host_ = original_writer;
+                return true;
+            }
+        } else {
             LOG(INFO) << "[Failover Service] Failed to connect to host: " << original_writer;
         }
 
-        if (is_connected_to_reader(hdbc) || failover_mode_ != STRICT_READER) {
-            LOG(INFO) << "[Failover Service] reader failover connected to writer instance for: " << host_string;
-            curr_host_ = original_writer;
-            return true;
-        }
     } while (get_current() < end);
 
     // Timed out.
@@ -275,7 +284,12 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     std::string host_string = host.GetHost();
     LOG(INFO) << "[Failover Service] writer failover connection to a new writer: " << host_string;
 
-    connect_to_host(hdbc, host_string);
+    bool is_connected = connect_to_host(hdbc, host_string);
+    if (!is_connected) {
+        LOG(INFO) << "[Failover Service] writer failover unable to connect to any instance for: " << cluster_id_;
+        odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+        return false;
+    }
     if (odbc_helper_->CheckConnection(hdbc)) {
         if (!is_connected_to_reader(hdbc)) {
             LOG(INFO) << "[Failover Service] writer failover connected to a new writer for: " << host_string;
@@ -290,15 +304,16 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     return false;
 }
 
-void FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_string) {
+bool FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_string) {
+    LOG(INFO) << "Attempting to connect to host: " << host_string;
 #ifdef UNICODE
     conn_info_->insert_or_assign(SERVER_HOST_KEY, StringHelper::ToWstring(host_string));
-    std::wstring conn_str = ConnectionStringHelper::BuildConnectionStringW(*conn_info_);
+    SQLSTR conn_str = ConnectionStringHelper::BuildConnectionStringW(*conn_info_);
 #else
     conn_info_->insert_or_assign(SERVER_HOST_KEY, host_string);
-    std::string conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
+    SQLSTR conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
 #endif
-    odbc_helper_->ConnStrConnect(AS_SQLTCHAR(conn_str.c_str()), hdbc);
+    return odbc_helper_->ConnStrConnect(AS_SQLTCHAR(conn_str.c_str()), hdbc);
 }
 
 bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
@@ -325,7 +340,7 @@ bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
         return false;
     }
 
-    if (odbc_helper_->FetchResults(stmt, "[Failover Service] failed to fetch if is_reader from results")) {
+    if (!odbc_helper_->FetchResults(stmt, "[Failover Service] failed to fetch if is_reader from results")) {
         return false;
     }
 
@@ -352,7 +367,7 @@ bool FailoverService::is_connected_to_writer(SQLHDBC hdbc) {
         return false;
     }
 
-    if (odbc_helper_->FetchResults(stmt, "[Failover Service] writer failed to fetch writer from results")) {
+    if (!odbc_helper_->FetchResults(stmt, "[Failover Service] writer failed to fetch writer from results")) {
         return false;
     }
 

@@ -166,7 +166,7 @@ private:
     static void remove_candidate(const std::string& host, std::vector<HostInfo>& candidates);
     bool failover_reader(SQLHDBC hdbc);
     bool failover_writer(SQLHDBC hdbc);
-    void connect_to_host(SQLHDBC hdbc, const std::string& host_string);
+    bool connect_to_host(SQLHDBC hdbc, const std::string& host_string);
     bool is_connected_to_reader(SQLHDBC hdbc);
     bool is_connected_to_writer(SQLHDBC hdbc);
     void init_failover_mode(const std::string& host);

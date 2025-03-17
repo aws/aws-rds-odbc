@@ -16,25 +16,13 @@
 
 #include <cmath>
 
-ClusterTopologyQueryHelper::ClusterTopologyQueryHelper(
-    int port,
-    const std::string& endpoint_template,
-    const std::string& topology_query,
-    const std::string& writer_id_query,
-    const std::string& node_id_query):
-    port{port} {
-    #ifdef UNICODE
-    endpoint_template_ = StringHelper::ToWstring(endpoint_template);
-    topology_query_ = StringHelper::ToWstring(topology_query);
-    writer_id_query_ = StringHelper::ToWstring(writer_id_query);
-    node_id_query_ = StringHelper::ToWstring(node_id_query);
-    #else
-        endpoint_template_ = endpoint_template;
-        topology_query_ = topology_query;
-        writer_id_query_ = writer_id_query;
-        node_id_query_ = node_id_query;
-    #endif
-}
+ClusterTopologyQueryHelper::ClusterTopologyQueryHelper(int port, std::string endpoint_template, SQLSTR topology_query, SQLSTR writer_id_query,
+                                                       SQLSTR node_id_query)
+    : port{ port },
+      endpoint_template_{ std::move(endpoint_template) },
+      topology_query_{ std::move(topology_query) },
+      writer_id_query_{ std::move(writer_id_query) },
+      node_id_query_{ std::move(node_id_query) } {}
 
 std::string ClusterTopologyQueryHelper::GetWriterId(SQLHDBC hdbc) {
     SQLRETURN rc;
@@ -154,11 +142,10 @@ HostInfo ClusterTopologyQueryHelper::CreateHost(SQLTCHAR* node_id, bool is_write
 }
 
 std::string ClusterTopologyQueryHelper::GetEndpoint(SQLTCHAR* node_id) {
+std::string res(endpoint_template_);
 #ifdef UNICODE
-    std::string res = StringHelper::ToString(endpoint_template_);
     std::string node_id_str = StringHelper::ToString(AS_WCHAR(node_id));
 #else
-    std::string res(endpoint_template_);
     std::string node_id_str = AS_CHAR(node_id);
 #endif
     int pos = res.find(REPLACE_CHAR);

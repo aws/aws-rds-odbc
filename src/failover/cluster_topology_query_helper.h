@@ -29,8 +29,8 @@
 #include "../util/odbc_helper.h"
 
 class ClusterTopologyQueryHelper {
-public:
-    ClusterTopologyQueryHelper(int port, const std::string& endpoint_template, const std::string& topology_query, const std::string& writer_id_query, const std::string& node_id_query);
+   public:
+    ClusterTopologyQueryHelper(int port, std::string endpoint_template, SQLSTR topology_query, SQLSTR writer_id_query, SQLSTR node_id_query);
     virtual std::string GetWriterId(SQLHDBC hdbc);
     virtual std::string GetNodeId(SQLHDBC hdbc);
     virtual std::vector<HostInfo> QueryTopology(SQLHDBC hdbc);
@@ -42,20 +42,13 @@ private:
 
     // Query & Template to be passed in from caller, below are examples of APG
     // ?.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
-#ifdef UNICODE
-    std::wstring endpoint_template_;
-    // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL
-    std::wstring topology_query_;
-    // SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' AND SERVER_ID = aurora_db_instance_identifier()
-    std::wstring writer_id_query_;
-    // SELECT aurora_db_instance_identifier()
-    std::wstring node_id_query_;
-#else
     std::string endpoint_template_;
-    std::string topology_query_;
-    std::string writer_id_query_;
-    std::string node_id_query_;
-#endif
+    // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL
+    SQLSTR topology_query_;
+    // SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' AND SERVER_ID = aurora_db_instance_identifier()
+    SQLSTR writer_id_query_;
+    // SELECT aurora_db_instance_identifier()
+    SQLSTR node_id_query_;
 
 #ifdef UNICODE
     static constexpr wchar_t REPLACE_CHAR = L'?';

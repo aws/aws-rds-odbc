@@ -15,20 +15,35 @@
 #ifndef STRING_HELPER_H_
 #define STRING_HELPER_H_
 
-#include <codecvt>
+#include <cstring>
 #include <locale>
-#include <string.h>
+#include <string>
 
 #define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
 #define AS_CHAR(str) (reinterpret_cast<char*>(str))
 #define AS_CONST_CHAR(str) (reinterpret_cast<const char*>(str))
 #define AS_WCHAR(str) (reinterpret_cast<wchar_t*>(str))
 #define AS_CONST_WCHAR(str) (reinterpret_cast<const wchar_t*>(str))
+#define CONCATENATE(e1, e2) e1 ## e2
+
+#ifdef UNICODE
+// Return L"s"
+#define CONSTRUCT_SQLSTR(s) CONCATENATE(L, s)
+#else
+// No-op
+#define CONSTRUCT_SQLSTR(s) s
+#endif
 
 #if defined(__APPLE__) || defined(__linux__)
 #define strcmp_case_insensitive(str1, str2) strcasecmp(str1, str2)
 #else
 #define strcmp_case_insensitive(str1, str2) strcmpi(str1, str2)
+#endif
+
+#ifdef UNICODE
+typedef std::wstring SQLSTR;
+#else
+typedef std::string SQLSTR;
 #endif
 
 class StringHelper {
