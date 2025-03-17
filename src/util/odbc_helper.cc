@@ -109,7 +109,7 @@ bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle,
 }
 
 bool OdbcHelper::SetHenvToOdbc3(SQLHENV henv, const std::string& log_message) {
-    SQLRETURN rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
+    SQLRETURN rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
     return OdbcHelper::CheckResult(rc, log_message, henv, SQL_HANDLE_ENV);
 }
 

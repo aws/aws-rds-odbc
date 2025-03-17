@@ -190,7 +190,7 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str) {
         return false;
     }
 
-    // TODO: Replace with odbc helper connection from failover PR...
+    // TODO(sfavian): Replace with odbc helper connection from failover PR...
     SQLRETURN rc = SQLDriverConnect(hdbc, nullptr, const_cast<SQLTCHAR*>(connection_string_c_str), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
     if (!OdbcHelper::CheckResult(rc, "ERROR: Could not connect during limitless cluster check", hdbc, SQL_HANDLE_DBC)) {
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
