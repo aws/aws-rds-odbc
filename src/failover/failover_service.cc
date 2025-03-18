@@ -137,15 +137,16 @@ std::shared_ptr<HostSelector> FailoverService::get_reader_host_selector() const 
     }
 }
 
-bool FailoverService::Failover(SQLHDBC hdbc, const char* sql_state) {
+bool FailoverService::Failover(SQLHDBC hdbc, SQLHENV henv, const char* sql_state) {
     if (!check_should_failover(sql_state)) {
+        LOG(WARNING) << "[Failover Service] SQL State: " << sql_state << " not supported for Failover.";
         return false;
     }
 
     if (failover_mode_ == STRICT_WRITER) {
-        return failover_writer(hdbc);
+        return failover_writer(hdbc, henv);
     }
-    return failover_reader(hdbc);
+    return failover_reader(hdbc, henv);
 }
 
 HostInfo FailoverService::GetCurrentHost() {
@@ -163,7 +164,7 @@ void FailoverService::remove_candidate(const std::string& host, std::vector<Host
                      candidates.end());
 }
 
-bool FailoverService::failover_reader(SQLHDBC hdbc) {
+bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
     auto get_current = [] {
         return std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     };
@@ -211,8 +212,9 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
                 return false;
             }
             host_string = host.GetHost();
-            bool is_connected = connect_to_host(hdbc, host_string);
+            bool is_connected = connect_to_host(hdbc, henv, host_string);
             if (!is_connected) {
+                odbc_helper_->Cleanup(SQL_NULL_HENV, hdbc, SQL_NULL_HSTMT);
                 remove_candidate(host_string, remaining_readers);
                 continue;
             }
@@ -251,7 +253,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
 
         // Try the original writer, which may have been demoted to a reader.
         host_string = original_writer.GetHost();
-        bool is_connected = connect_to_host(hdbc, host_string);
+        bool is_connected = connect_to_host(hdbc, henv, host_string);
         if (is_connected) {
             if (!odbc_helper_->CheckConnection(hdbc)) {
                 odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
@@ -274,7 +276,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
     return false;
 }
 
-bool FailoverService::failover_writer(SQLHDBC hdbc) {
+bool FailoverService::failover_writer(SQLHDBC hdbc, SQLHENV henv) {
     topology_monitor_->ForceRefresh(true, failover_timeout_);
 
     conn_info_->insert_or_assign(ENABLE_FAILOVER_KEY, BOOL_TRUE);
@@ -293,7 +295,7 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     std::string host_string = host.GetHost();
     LOG(INFO) << "[Failover Service] writer failover connection to a new writer: " << host_string;
 
-    bool is_connected = connect_to_host(hdbc, host_string);
+    bool is_connected = connect_to_host(hdbc, henv, host_string);
     if (!is_connected) {
         LOG(INFO) << "[Failover Service] writer failover unable to connect to any instance for: " << cluster_id_;
         odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
@@ -313,7 +315,7 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     return false;
 }
 
-bool FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_string) {
+bool FailoverService::connect_to_host(SQLHDBC hdbc, SQLHENV henv, const std::string& host_string) {
     LOG(INFO) << "Attempting to connect to host: " << host_string;
 #ifdef UNICODE
     conn_info_->insert_or_assign(SERVER_HOST_KEY, StringHelper::ToWstring(host_string));
@@ -322,6 +324,11 @@ bool FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_stri
     conn_info_->insert_or_assign(SERVER_HOST_KEY, host_string);
     SQLSTR conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
 #endif
+
+    if (SQL_NULL_HANDLE != hdbc) {
+        SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+    }
+
     return odbc_helper_->ConnStrConnect(AS_SQLTCHAR(conn_str.c_str()), hdbc);
 }
 
@@ -485,7 +492,7 @@ void StopFailoverService(const char* service_id_c_str) {
     }
 }
 
-FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state) {
+FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state, SQLHENV henv) {
     std::string cluster_id(service_id_c_str);
     std::shared_ptr<FailoverServiceTracker> tracker;
     if (!global_failover_services.Find(cluster_id)) {
@@ -495,16 +502,13 @@ FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_
     tracker = global_failover_services.Get(cluster_id);
     // Set flag to ensure tracker is not cleaned up during failover disconnection
     tracker->failover_inprogress.fetch_add(1);
-    SQLHENV local_henv = SQL_NULL_HANDLE;
     SQLHDBC local_hdbc = SQL_NULL_HDBC;
     // open a new connection
-    SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &local_henv);
-    SQLSetEnvAttr(local_henv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
-    SQLAllocHandle(SQL_HANDLE_DBC, local_henv, &local_hdbc);
-    bool failover_success = tracker->service->Failover(local_hdbc, sql_state);
+    SQLAllocHandle(SQL_HANDLE_DBC, henv, &local_hdbc);
+    bool failover_success = tracker->service->Failover(local_hdbc, henv, sql_state);
     tracker->failover_inprogress.fetch_sub(1);
     if (!failover_success) {
-        OdbcHelper::Cleanup(local_henv, local_hdbc, SQL_NULL_HSTMT);
+        OdbcHelper::Cleanup(SQL_NULL_HENV, local_hdbc, SQL_NULL_HSTMT);
         LOG(WARNING) << "[Failover Service] Unsuccessful failover for: " << cluster_id;
     }
     return FailoverResult{ .connection_changed = failover_success, .hdbc = local_hdbc };

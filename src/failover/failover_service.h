@@ -123,9 +123,10 @@ void StopFailoverService(const char* service_id_c_str);
  * 
  * @param service_id_c_str an identifier used to track the reference count of the failover service
  * @param sql_state the SQL State of the connection
+ * @param henv an already allocated SQL HENV
  * @return a FailoverResult object indicating whether the connection has been established, and if so the new connection.
  */
-FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state);
+FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state, SQLHENV henv);
 
 #ifdef __cplusplus
 }
@@ -152,7 +153,7 @@ public:
 #endif
     ~FailoverService();
 
-    bool Failover(SQLHDBC hdbc, const char* sql_state);
+    bool Failover(SQLHDBC hdbc, SQLHENV henv, const char* sql_state);
     HostInfo GetCurrentHost();
 
 private:
@@ -160,9 +161,9 @@ private:
     static const int MAX_MSG_LENGTH = 1024;
     static bool check_should_failover(const char* sql_state);
     static void remove_candidate(const std::string& host, std::vector<HostInfo>& candidates);
-    bool failover_reader(SQLHDBC hdbc);
-    bool failover_writer(SQLHDBC hdbc);
-    bool connect_to_host(SQLHDBC hdbc, const std::string& host_string);
+    bool failover_reader(SQLHDBC hdbc, SQLHENV henv);
+    bool failover_writer(SQLHDBC hdbc, SQLHENV henv);
+    bool connect_to_host(SQLHDBC hdbc, SQLHENV henv, const std::string& host_string);
     bool is_connected_to_reader(SQLHDBC hdbc);
     bool is_connected_to_writer(SQLHDBC hdbc);
     void init_failover_mode(const std::string& host);
