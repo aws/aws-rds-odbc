@@ -43,7 +43,7 @@ TEST_F(ClusterTopologyQueryHelperTest, CreateHost) {
     float weight = std::round(replica_lag) * 100L + std::round(cpu_usage);
 
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
-        std::make_shared<ClusterTopologyQueryHelper>(port, "?", "", "", "");
+        std::make_shared<ClusterTopologyQueryHelper>(port, "?", TEXT(""), TEXT(""), TEXT(""));
 
     HostInfo host = query_helper->CreateHost(node_id, false, cpu_usage, replica_lag);
     std::string expected;
@@ -61,7 +61,7 @@ TEST_F(ClusterTopologyQueryHelperTest, CreateHost) {
 
 TEST_F(ClusterTopologyQueryHelperTest, GetEndpoint) {
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
-        std::make_shared<ClusterTopologyQueryHelper>(1234, "?", "", "", "");
+        std::make_shared<ClusterTopologyQueryHelper>(1234, "?", TEXT(""), TEXT(""), TEXT(""));
     SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node-id"));
     std::string expected;
 #ifdef UNICODE
@@ -76,7 +76,7 @@ TEST_F(ClusterTopologyQueryHelperTest, GetEndpoint) {
 TEST_F(ClusterTopologyQueryHelperTest, GetEndpoint_extra_values) {
     std::string endpoint_template = "?.other-values";
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
-        std::make_shared<ClusterTopologyQueryHelper>(1234, endpoint_template, "", "", "");
+        std::make_shared<ClusterTopologyQueryHelper>(1234, endpoint_template, TEXT(""), TEXT(""), TEXT(""));
     SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node-id"));
     std::string expected;
 #ifdef UNICODE
