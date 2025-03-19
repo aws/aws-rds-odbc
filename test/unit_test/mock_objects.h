@@ -33,7 +33,6 @@
 #include "limitless_monitor_service.h"
 
 #include "util/odbc_helper.h"
-#include "util/string_helper.h"
 
 #define TEST_LIMITLESS_MONITOR_INTERVAL_MS 250
 
@@ -136,7 +135,7 @@ public:
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
 public:
-    MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", "", "", "") {}
+    MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER() : ClusterTopologyQueryHelper(0, "", TEXT(""), TEXT(""), TEXT("")) {}
     MOCK_METHOD(std::string, GetWriterId, (SQLHDBC), ());
     MOCK_METHOD(std::string, GetNodeId, (SQLHDBC), ());
     MOCK_METHOD(std::vector<HostInfo>, QueryTopology, (SQLHDBC), ());
