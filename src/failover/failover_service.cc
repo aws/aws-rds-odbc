@@ -21,6 +21,15 @@ static SlidingCacheMap<std::string, std::shared_ptr<FailoverServiceTracker>> glo
 static std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> global_topology_map =
     std::make_shared<SlidingCacheMap<std::string, std::vector<HostInfo>>>();
 
+const uint32_t FailoverService::DEFAULT_IGNORE_TOPOLOGY_REQUEST_MS =
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
+const uint32_t FailoverService::DEFAULT_HIGH_REFRESH_RATE_MS =
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(10)).count();
+const uint32_t FailoverService::DEFAULT_REFRESH_RATE_MS =
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
+const uint32_t FailoverService::DEFAULT_FAILOVER_TIMEOUT_MS =
+    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
+
 template <typename T, class U>
 static U parse_num(const T& num_to_parse, const U& default_num) {
     U ret = default_num;

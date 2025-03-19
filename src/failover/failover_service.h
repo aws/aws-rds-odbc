@@ -132,14 +132,10 @@ FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_
 
 class FailoverService {
 public:
-    static const uint32_t DEFAULT_IGNORE_TOPOLOGY_REQUEST_MS =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
-    static const uint32_t DEFAULT_HIGH_REFRESH_RATE_MS =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(10)).count();
-    static const uint32_t DEFAULT_REFRESH_RATE_MS =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
-    static const uint32_t DEFAULT_FAILOVER_TIMEOUT_MS =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
+    static const uint32_t DEFAULT_IGNORE_TOPOLOGY_REQUEST_MS;
+    static const uint32_t DEFAULT_HIGH_REFRESH_RATE_MS;
+    static const uint32_t DEFAULT_REFRESH_RATE_MS;
+    static const uint32_t DEFAULT_FAILOVER_TIMEOUT_MS;
 
 #ifdef UNICODE
     FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
