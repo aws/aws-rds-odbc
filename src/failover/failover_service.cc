@@ -14,6 +14,7 @@
 
 #include "failover_service.h"
 
+#include "cluster_topology_info.h"
 #include "../util/rds_utils.h"
 #include "../util/string_helper.h"
 
@@ -137,16 +138,17 @@ std::shared_ptr<HostSelector> FailoverService::get_reader_host_selector() const 
     }
 }
 
-bool FailoverService::Failover(SQLHDBC hdbc, SQLHENV henv, const char* sql_state) {
+bool FailoverService::Failover(SQLHDBC hdbc, const char* sql_state) {
     if (!check_should_failover(sql_state)) {
         LOG(WARNING) << "[Failover Service] SQL State: " << sql_state << " not supported for Failover.";
         return false;
     }
 
+    conn_info_->insert_or_assign(ENABLE_FAILOVER_KEY, BOOL_TRUE);
     if (failover_mode_ == STRICT_WRITER) {
-        return failover_writer(hdbc, henv);
+        return failover_writer(hdbc);
     }
-    return failover_reader(hdbc, henv);
+    return failover_reader(hdbc);
 }
 
 HostInfo FailoverService::GetCurrentHost() {
@@ -164,7 +166,7 @@ void FailoverService::remove_candidate(const std::string& host, std::vector<Host
                      candidates.end());
 }
 
-bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
+bool FailoverService::failover_reader(SQLHDBC hdbc) {
     auto get_current = [] {
         return std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
     };
@@ -175,8 +177,6 @@ bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
     // When we pass a timeout of 0, we inform the plugin service that it should update its topology without waiting
     // for it to get updated, since we do not need updated topology to establish a reader connection.
     topology_monitor_->ForceRefresh(false, 0);
-
-    conn_info_->insert_or_assign(ENABLE_FAILOVER_KEY, BOOL_TRUE);
 
     // The roles in this list might not be accurate, depending on whether the new topology has become available yet.
     std::vector<HostInfo> hosts = topology_map_->Get(cluster_id_);
@@ -204,17 +204,22 @@ bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
     do {
         std::vector<HostInfo> remaining_readers(reader_candidates);
         while (!remaining_readers.empty() && (curr_time = get_current()) < end) {
+            LOG(INFO) << "Failover for ClusterId: " << cluster_id_ << ". Remaining Hosts: " << ClusterTopologyInfo::LogTopology(remaining_readers);
             HostInfo host;
             try {
                 host = host_selector_->GetHost(remaining_readers, false, properties);
+                host_string = host.GetHost();
+                LOG(INFO) << "[Failover Service] Selected Host: " << host_string;
             } catch (const std::exception& e) {
                 LOG(INFO) << "[Failover Service] no hosts in topology for: " << cluster_id_;
                 return false;
             }
-            host_string = host.GetHost();
-            bool is_connected = connect_to_host(hdbc, henv, host_string);
+            bool is_connected = connect_to_host(hdbc, host_string);
             if (!is_connected) {
-                odbc_helper_->Cleanup(SQL_NULL_HENV, hdbc, SQL_NULL_HSTMT);
+                LOG(INFO) << "[Failover Service] unable to connect to: " << host_string;
+                // odbc_helper_->Cleanup(SQL_NULL_HENV, hdbc, SQL_NULL_HSTMT);
+                SQLDisconnect(hdbc);
+                LOG(INFO) << "[Failover Service] Cleaned up first connection, not connected: " << host_string << ", " << hdbc;
                 remove_candidate(host_string, remaining_readers);
                 continue;
             }
@@ -222,14 +227,16 @@ bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
             bool is_reader = false;
             if (odbc_helper_->CheckConnection(hdbc)) {
                 is_reader = is_connected_to_reader(hdbc);
-                if (is_reader || this->failover_mode_ != STRICT_READER) {
+                if (is_reader || (this->failover_mode_ != STRICT_READER)) {
                     LOG(INFO) << "[Failover Service] connected to a new reader for: " << host_string;
                     curr_host_ = host;
                     return true;
                 }
+                LOG(INFO) << "[Failover Service] Strict Reader Mode, not connected to a reader: " << host_string;
             }
             remove_candidate(host_string, remaining_readers);
-            odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+            SQLDisconnect(hdbc);
+            LOG(INFO) << "[Failover Service] Cleaned up first connection, required a strict reader: " << host_string << ", " << hdbc;
 
             if (!is_reader) {
                 // The reader candidate is actually a writer, which is not valid when failoverMode is STRICT_READER.
@@ -253,10 +260,10 @@ bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
 
         // Try the original writer, which may have been demoted to a reader.
         host_string = original_writer.GetHost();
-        bool is_connected = connect_to_host(hdbc, henv, host_string);
+        bool is_connected = connect_to_host(hdbc, host_string);
         if (is_connected) {
             if (!odbc_helper_->CheckConnection(hdbc)) {
-                odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+                SQLDisconnect(hdbc);
                 continue;
             }
             if (is_connected_to_reader(hdbc) || failover_mode_ != STRICT_READER) {
@@ -271,15 +278,13 @@ bool FailoverService::failover_reader(SQLHDBC hdbc, SQLHENV henv) {
     } while (get_current() < end);
 
     // Timed out.
-    odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+    SQLDisconnect(hdbc);
     LOG(INFO) << "[Failover Service] The reader failover process was not able to establish a connection before timing out.";
     return false;
 }
 
-bool FailoverService::failover_writer(SQLHDBC hdbc, SQLHENV henv) {
+bool FailoverService::failover_writer(SQLHDBC hdbc) {
     topology_monitor_->ForceRefresh(true, failover_timeout_);
-
-    conn_info_->insert_or_assign(ENABLE_FAILOVER_KEY, BOOL_TRUE);
 
     // Try connecting to a writer
     std::vector<HostInfo> hosts = topology_map_->Get(cluster_id_);
@@ -295,10 +300,10 @@ bool FailoverService::failover_writer(SQLHDBC hdbc, SQLHENV henv) {
     std::string host_string = host.GetHost();
     LOG(INFO) << "[Failover Service] writer failover connection to a new writer: " << host_string;
 
-    bool is_connected = connect_to_host(hdbc, henv, host_string);
+    bool is_connected = connect_to_host(hdbc, host_string);
     if (!is_connected) {
         LOG(INFO) << "[Failover Service] writer failover unable to connect to any instance for: " << cluster_id_;
-        odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+        SQLDisconnect(hdbc);
         return false;
     }
     if (odbc_helper_->CheckConnection(hdbc)) {
@@ -311,11 +316,11 @@ bool FailoverService::failover_writer(SQLHDBC hdbc, SQLHENV henv) {
         return false;
     }
     LOG(INFO) << "[Failover Service] writer failover unable to connect to any instance for: " << cluster_id_;
-    odbc_helper_->Cleanup(nullptr, hdbc, nullptr);
+    SQLDisconnect(hdbc);
     return false;
 }
 
-bool FailoverService::connect_to_host(SQLHDBC hdbc, SQLHENV henv, const std::string& host_string) {
+bool FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_string) {
     LOG(INFO) << "Attempting to connect to host: " << host_string;
 #ifdef UNICODE
     conn_info_->insert_or_assign(SERVER_HOST_KEY, StringHelper::ToWstring(host_string));
@@ -325,20 +330,17 @@ bool FailoverService::connect_to_host(SQLHDBC hdbc, SQLHENV henv, const std::str
     SQLSTR conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
 #endif
 
-    if (SQL_NULL_HANDLE != hdbc) {
-        SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-    }
-
     return odbc_helper_->ConnStrConnect(AS_SQLTCHAR(conn_str.c_str()), hdbc);
 }
 
 bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
-    if (hdbc == SQL_NULL_HDBC) {
+    if (SQL_NULL_HDBC == hdbc) {
+        LOG(WARNING) << "[Failover Service] null HDBC passed to reader check.";
         return false;
     }
 
     SQLHSTMT stmt = SQL_NULL_HANDLE;
-    SQLINTEGER is_reader = 0;
+    bool is_reader = false;
 
     if (!odbc_helper_->AllocateHandle(SQL_HANDLE_STMT, hdbc, stmt, "[Failover Service] reader check failed to allocate handle")) {
         return false;
@@ -350,7 +352,7 @@ bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
     }
 
     SQLLEN rt = 0;
-    SQLRETURN rc = SQLBindCol(stmt, 1, SQL_C_SLONG, &is_reader, sizeof(is_reader), &rt);
+    SQLRETURN rc = SQLBindCol(stmt, 1, SQL_BIT, &is_reader, sizeof(is_reader), &rt);
     if (!OdbcHelper::CheckResult(rc, "[Failover Service] reader check failed to bind is_reader column", stmt, SQL_HANDLE_STMT)) {
         OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
         return false;
@@ -360,7 +362,9 @@ bool FailoverService::is_connected_to_reader(SQLHDBC hdbc) {
         return false;
     }
 
-    return (is_reader == 1);
+    LOG(INFO) << "[Failover Service] check reader queried: " << is_reader;
+    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
+    return is_reader;
 }
 
 bool FailoverService::is_connected_to_writer(SQLHDBC hdbc) {
@@ -505,7 +509,7 @@ FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_
     SQLHDBC local_hdbc = SQL_NULL_HDBC;
     // open a new connection
     SQLAllocHandle(SQL_HANDLE_DBC, henv, &local_hdbc);
-    bool failover_success = tracker->service->Failover(local_hdbc, henv, sql_state);
+    bool failover_success = tracker->service->Failover(local_hdbc, sql_state);
     tracker->failover_inprogress.fetch_sub(1);
     if (!failover_success) {
         OdbcHelper::Cleanup(SQL_NULL_HENV, local_hdbc, SQL_NULL_HSTMT);

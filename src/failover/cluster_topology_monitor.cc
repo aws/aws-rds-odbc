@@ -65,7 +65,7 @@ ClusterTopologyMonitor::~ClusterTopologyMonitor() {
     // Cleanup Handles
     std::lock_guard hdbc_lock(hdbc_mutex_);
     dbc_clean_up(main_hdbc_);
-    odbc_helper_->Cleanup(henv_, nullptr, nullptr);
+    odbc_helper_->Cleanup(henv_, SQL_NULL_HDBC, SQL_NULL_HSTMT);
 }
 
 void ClusterTopologyMonitor::SetClusterId(const std::string& cluster_id) {

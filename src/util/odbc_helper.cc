@@ -19,10 +19,17 @@
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));
 
 bool OdbcHelper::ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) {
+    if (SQL_NULL_HANDLE == out_conn) {
+        LOG(WARNING) << "Attempted to connect using null HDBC";
+        return false;
+    }
+
     SQLRETURN rc = 0;
 #ifdef UNICODE
+    LOG(INFO) << "DEBUG: " << StringHelper::ToString(AS_WCHAR(conn_str));
     rc = SQLDriverConnectW(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
 #else
+    LOG(INFO) << "DEBUG: " << std::string(AS_CHAR(conn_str));
     rc = SQLDriverConnect(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
 #endif
 
@@ -47,13 +54,13 @@ bool OdbcHelper::CheckResult(SQLRETURN rc, const std::string& log_message, SQLHA
     return false;
 }
 
-bool OdbcHelper::CheckConnection(SQLHDBC conn) {
-    if (conn == SQL_NULL_HDBC) {
+bool OdbcHelper::CheckConnection(SQLHDBC hdbc) {
+    if (SQL_NULL_HDBC == hdbc) {
         return false;
     }
 
     HSTMT hstmt = SQL_NULL_HSTMT;
-    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, conn, &hstmt);
+    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
     if (!SQL_SUCCEEDED(rc)) {
         return false;
     }
@@ -65,16 +72,19 @@ bool OdbcHelper::CheckConnection(SQLHDBC conn) {
     return SQL_SUCCEEDED(rc);
 }
 
-void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC conn, SQLHSTMT hstmt) {
-    if (hstmt != SQL_NULL_HANDLE) {
+void OdbcHelper::Cleanup(SQLHENV henv, SQLHDBC hdbc, SQLHSTMT hstmt) {
+    if (SQL_NULL_HANDLE != hstmt) {
         SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+        hstmt = SQL_NULL_HSTMT;
     }
-    if (conn != SQL_NULL_HANDLE) {
-        SQLDisconnect(conn);
-        SQLFreeHandle(SQL_HANDLE_DBC, conn);
+    if (SQL_NULL_HANDLE != hdbc) {
+        SQLDisconnect(hdbc);
+        SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+        hdbc = SQL_NULL_HDBC;
     }
-    if (henv != SQL_NULL_HANDLE) {
+    if (SQL_NULL_HANDLE != henv) {
         SQLFreeHandle(SQL_HANDLE_ENV, henv);
+        henv = SQL_NULL_HENV;
     }
 }
 
