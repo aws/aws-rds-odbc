@@ -217,9 +217,6 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
             bool is_connected = connect_to_host(hdbc, host_string);
             if (!is_connected) {
                 LOG(INFO) << "[Failover Service] unable to connect to: " << host_string;
-                // odbc_helper_->Cleanup(SQL_NULL_HENV, hdbc, SQL_NULL_HSTMT);
-                SQLDisconnect(hdbc);
-                LOG(INFO) << "[Failover Service] Cleaned up first connection, not connected: " << host_string << ", " << hdbc;
                 remove_candidate(host_string, remaining_readers);
                 continue;
             }
@@ -303,7 +300,6 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
     bool is_connected = connect_to_host(hdbc, host_string);
     if (!is_connected) {
         LOG(INFO) << "[Failover Service] writer failover unable to connect to any instance for: " << cluster_id_;
-        SQLDisconnect(hdbc);
         return false;
     }
     if (odbc_helper_->CheckConnection(hdbc)) {
@@ -451,7 +447,6 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
 
         uint32_t refresh_rate_ms = parse_num(conn_info[REFRESH_RATE_KEY], FailoverService::DEFAULT_REFRESH_RATE_MS);
 
-
         if (!global_failover_services.Find(cluster_id)) {
             tracker = std::make_shared<FailoverServiceTracker>();
             tracker->reference_count = 1;
@@ -498,12 +493,17 @@ void StopFailoverService(const char* service_id_c_str) {
 
 FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state, SQLHENV henv) {
     std::string cluster_id(service_id_c_str);
+    FailoverResult res = FailoverResult{ .connection_changed = false, .hdbc = SQL_NULL_HDBC };
     std::shared_ptr<FailoverServiceTracker> tracker;
     if (!global_failover_services.Find(cluster_id)) {
-        LOG(INFO) << "[Failover Service] not found for: " << cluster_id << ". Cannot perform failover.";
+        LOG(INFO) << "[Failover Service] no tracker found for: " << cluster_id << ". Cannot perform failover.";
         return FailoverResult{ .connection_changed = false, .hdbc = SQL_NULL_HDBC };
     }
     tracker = global_failover_services.Get(cluster_id);
+    if (nullptr == tracker->service) {
+        LOG(INFO) << "[Failover Service] no active Failover Service: " << cluster_id << ". Cannot perform failover.";
+        return FailoverResult{ .connection_changed = false, .hdbc = SQL_NULL_HDBC };
+    }
     // Set flag to ensure tracker is not cleaned up during failover disconnection
     tracker->failover_inprogress.fetch_add(1);
     SQLHDBC local_hdbc = SQL_NULL_HDBC;
