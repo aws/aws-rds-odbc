@@ -14,9 +14,9 @@
 
 #include "failover_service.h"
 
-#include "cluster_topology_info.h"
 #include "../util/rds_utils.h"
 #include "../util/string_helper.h"
+#include "cluster_topology_info.h"
 
 static SlidingCacheMap<std::string, std::shared_ptr<FailoverServiceTracker>> global_failover_services;
 static std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> global_topology_map =
@@ -493,7 +493,6 @@ void StopFailoverService(const char* service_id_c_str) {
 
 FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_state, SQLHENV henv) {
     std::string cluster_id(service_id_c_str);
-    FailoverResult res = FailoverResult{ .connection_changed = false, .hdbc = SQL_NULL_HDBC };
     std::shared_ptr<FailoverServiceTracker> tracker;
     if (!global_failover_services.Find(cluster_id)) {
         LOG(INFO) << "[Failover Service] no tracker found for: " << cluster_id << ". Cannot perform failover.";
