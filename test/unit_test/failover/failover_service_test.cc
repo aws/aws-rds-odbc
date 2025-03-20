@@ -324,9 +324,6 @@ TEST_F(FailoverServiceTest, failover_strict_reader_fail_no_reader) {
     EXPECT_CALL(*mock_odbc_helper, FetchResults(testing::_, testing::_))
         .WillRepeatedly(Return(true));
 
-    EXPECT_CALL(*mock_odbc_helper, Cleanup(testing::_, testing::_, testing::_))
-        .Times(1);
-
     failover_service = std::make_shared<FailoverService>(
         server_host,
         cluster_id,

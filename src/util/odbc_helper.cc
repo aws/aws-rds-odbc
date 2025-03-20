@@ -26,10 +26,8 @@ bool OdbcHelper::ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) {
 
     SQLRETURN rc = 0;
 #ifdef UNICODE
-    LOG(INFO) << "DEBUG: " << StringHelper::ToString(AS_WCHAR(conn_str));
     rc = SQLDriverConnectW(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
 #else
-    LOG(INFO) << "DEBUG: " << std::string(AS_CHAR(conn_str));
     rc = SQLDriverConnect(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
 #endif
 
