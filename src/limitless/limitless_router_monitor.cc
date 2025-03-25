@@ -79,6 +79,7 @@ void LimitlessRouterMonitor::Open(
     if (block_and_query_immediately) {
         rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
         if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
+            SQLFreeHandle(SQL_HANDLE_ENV, henv);
             return; // fatal error; don't open thread
         }
 
