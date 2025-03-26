@@ -62,10 +62,6 @@ public:
         return std::wstring(src.begin(), src.end());
     }
 
-    static std::wstring ToWstring(const std::wstring& src) {
-        return src;
-    }
-
     static std::string ToString(SQLTCHAR *src) {
         #ifdef UNICODE
         std::wstring wstr = AS_WCHAR(src);
