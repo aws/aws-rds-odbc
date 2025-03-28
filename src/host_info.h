@@ -18,8 +18,9 @@
 #include <memory>
 #include <string>
 
+#include <sqltypes.h>
+
 #include "host_availability/host_availability_strategy.h"
-#include "logger_wrapper.h"
 
 enum HOST_STATE { UP, DOWN };
 
