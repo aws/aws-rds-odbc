@@ -15,15 +15,31 @@
 #ifndef STRING_HELPER_H_
 #define STRING_HELPER_H_
 
-#include <codecvt>
+#ifdef WIN32
+    #include <windows.h>
+#endif
+
+#include <sql.h>
+#include <sqlext.h>
+
+#include <cstring>
 #include <locale>
-#include <string.h>
+#include <string>
 
 #define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
 #define AS_CHAR(str) (reinterpret_cast<char*>(str))
 #define AS_CONST_CHAR(str) (reinterpret_cast<const char*>(str))
 #define AS_WCHAR(str) (reinterpret_cast<wchar_t*>(str))
 #define AS_CONST_WCHAR(str) (reinterpret_cast<const wchar_t*>(str))
+#define CONCATENATE(e1, e2) e1 ## e2
+
+#ifdef UNICODE
+// Return L"s"
+#define CONSTRUCT_SQLSTR(s) CONCATENATE(L, s)
+#else
+// No-op
+#define CONSTRUCT_SQLSTR(s) s
+#endif
 
 #if defined(__APPLE__) || defined(__linux__)
 #define strcmp_case_insensitive(str1, str2) strcasecmp(str1, str2)
@@ -31,25 +47,39 @@
 #define strcmp_case_insensitive(str1, str2) strcmpi(str1, str2)
 #endif
 
-#if defined(__APPLE__) || defined(__linux__)
-typedef std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+#ifdef UNICODE
+typedef std::wstring SQLSTR;
 #else
-typedef std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+typedef std::string SQLSTR;
 #endif
 
 class StringHelper {
-   public:
+public:
     static std::wstring ToWstring(const std::string& src) {
         if (src.empty()) {
             return std::wstring();
         }
-        return converter{}.from_bytes(src);
+        return std::wstring(src.begin(), src.end());
     }
+
+    static std::string ToString(SQLTCHAR *src) {
+        #ifdef UNICODE
+        std::wstring wstr = AS_WCHAR(src);
+        return std::string(wstr.begin(), wstr.end());
+        #else
+        return std::string(AS_CHAR(src));
+        #endif
+    }
+
     static std::string ToString(const std::wstring& src) {
         if (src.empty()) {
             return std::string();
         }
-        return converter{}.to_bytes(src);
+        return std::string(src.begin(), src.end());
+    }
+
+    static std::string ToString(const std::string& src) {
+        return src;
     }
 };
 

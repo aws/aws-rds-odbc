@@ -100,6 +100,13 @@ typedef struct {
 bool CheckLimitlessCluster(SQLHDBC hdbc);
 
 /**
+ * Checks if a limitless monitor service is running for the provided service ID
+ * 
+ * @param service_id_c_str the limitless monitor service ID to check
+ */
+bool CheckLimitlessMonitorService(const char *service_id_c_str);
+
+/**
  * Increments a reference count for the given service ID, spinning a transaction router polling thread
  * if service ID is unique. Once thread is ready, the given LimitlessInstance, db_instance, will get
  * an updated server host
