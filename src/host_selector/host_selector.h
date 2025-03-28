@@ -18,6 +18,8 @@
 #include "../host_info.h"
 
 #include <algorithm>
+#include <iterator>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
