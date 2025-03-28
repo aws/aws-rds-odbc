@@ -18,6 +18,10 @@
 #include <memory>
 #include <string>
 
+#ifdef WIN32
+    #include <windows.h>
+#endif
+
 #include <sqltypes.h>
 
 #include "host_availability/host_availability_strategy.h"

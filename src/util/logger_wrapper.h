@@ -24,12 +24,6 @@
 #include <filesystem>
 #include <glog/logging.h>
 
-#ifdef WIN32
-    #include <windows.h>
-#endif
-
-#include <sqltypes.h>
-
 namespace logger_config {
     const std::string PROGRAM_NAME = "aws-rds-odbc";
     const std::string LOG_LOCATION = std::filesystem::temp_directory_path().append(PROGRAM_NAME).string();
