@@ -14,7 +14,10 @@
 
 #include "random_host_selector.h"
 
+#include <algorithm>
+#include <iterator>
 #include <random>
+#include <stdexcept>
 
 HostInfo RandomHostSelector::GetHost(std::vector<HostInfo> hosts, bool is_writer,
     std::unordered_map<std::string, std::string>) {

@@ -14,6 +14,10 @@
 
 #include "round_robin_host_selector.h"
 
+#include <algorithm>
+#include <iterator>
+#include <stdexcept>
+
 // Initialize static members
 std::mutex RoundRobinHostSelector::cache_mutex;
 SlidingCacheMap<std::string, std::shared_ptr<round_robin_property::RoundRobinClusterInfo>> RoundRobinHostSelector::round_robin_cache;
