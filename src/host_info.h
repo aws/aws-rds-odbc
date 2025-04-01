@@ -22,6 +22,7 @@
     #include <windows.h>
 #endif
 #include <sqltypes.h>
+#include <ostream>
 
 #include "host_availability/host_availability_strategy.h"
 
