@@ -92,8 +92,14 @@ typedef enum {
     AURORA_POSTGRES
 } DatabaseDialect;
 
+typedef enum {
+    FAILOVER_FAILED,
+    FAILOVER_SKIPPED,
+    FAILOVER_SUCCEED
+} FailoverStatus;
+
 typedef struct {
-    bool connection_changed;
+    FailoverStatus status;
     SQLHDBC hdbc;
 } FailoverResult;
 
@@ -153,7 +159,7 @@ public:
 #endif
     ~FailoverService();
 
-    bool Failover(SQLHDBC hdbc, const char* sql_state);
+    FailoverStatus Failover(SQLHDBC hdbc, const char* sql_state);
     HostInfo GetCurrentHost();
 
 private:

@@ -115,7 +115,8 @@ TEST_F(FailoverServiceTest, failover_fail_wrong_state) {
         mock_topology_monitor,
         mock_odbc_helper
     );
-    EXPECT_FALSE(failover_service->Failover(hdbc, invalid_failover_sql_state));
+    EXPECT_EQ(failover_service->Failover(hdbc, invalid_failover_sql_state),
+        FAILOVER_SKIPPED);
 }
 
 TEST_F(FailoverServiceTest, failover_default_values_ro_cluster) {
@@ -157,7 +158,8 @@ TEST_F(FailoverServiceTest, failover_default_values_ro_cluster) {
         mock_topology_monitor,
         mock_odbc_helper
     );
-    EXPECT_TRUE(failover_service->Failover(hdbc, failover_sql_state));
+    EXPECT_EQ(failover_service->Failover(hdbc, failover_sql_state),
+        FAILOVER_SUCCEED);
     // TODO - Not fully testable, can't set internal return of `is_connected_to_reader()`
     // Since this is READER_OR_WRITER, it can still pass as it is able to connect
     // Failover on READER_OR_WRITER, will try to connect to readers first
@@ -196,7 +198,8 @@ TEST_F(FailoverServiceTest, failover_reader_or_writer_success) {
         mock_topology_monitor,
         mock_odbc_helper
     );
-    EXPECT_TRUE(failover_service->Failover(hdbc, failover_sql_state));
+    EXPECT_EQ(failover_service->Failover(hdbc, failover_sql_state),
+        FAILOVER_SUCCEED);
     // TODO - Not fully testable, can't set internal return of `is_connected_to_reader()`
     // Since this is READER_OR_WRITER, it can still pass as it is able to connect
     // Failover on READER_OR_WRITER, will try to connect to readers first
@@ -299,7 +302,8 @@ TEST_F(FailoverServiceTest, failover_fail_no_hosts) {
         mock_odbc_helper
     );
 
-    EXPECT_FALSE(failover_service->Failover(hdbc, failover_sql_state));
+    EXPECT_EQ(failover_service->Failover(hdbc, failover_sql_state),
+        FAILOVER_FAILED);
 }
 
 TEST_F(FailoverServiceTest, failover_strict_reader_fail_no_reader) {
@@ -334,7 +338,8 @@ TEST_F(FailoverServiceTest, failover_strict_reader_fail_no_reader) {
         mock_odbc_helper
     );
 
-    EXPECT_FALSE(failover_service->Failover(hdbc, failover_sql_state));
+    EXPECT_EQ(failover_service->Failover(hdbc, failover_sql_state),
+        FAILOVER_FAILED);
 }
 
 TEST_F(FailoverServiceTest, failover_strict_writer_fail_no_writer) {
@@ -356,5 +361,6 @@ TEST_F(FailoverServiceTest, failover_strict_writer_fail_no_writer) {
         mock_odbc_helper
     );
 
-    EXPECT_FALSE(failover_service->Failover(hdbc, failover_sql_state));
+    EXPECT_EQ(failover_service->Failover(hdbc, failover_sql_state),
+        FAILOVER_FAILED);
 }

@@ -177,17 +177,21 @@ std::shared_ptr<HostSelector> FailoverService::get_reader_host_selector() const 
     }
 }
 
-bool FailoverService::Failover(SQLHDBC hdbc, const char* sql_state) {
+FailoverStatus FailoverService::Failover(SQLHDBC hdbc, const char* sql_state) {
     if (!check_should_failover(sql_state)) {
         LOG(WARNING) << "[Failover Service] SQL State: " << sql_state << " not supported for Failover.";
-        return false;
+        return FAILOVER_SKIPPED;
     }
 
     conn_info_->insert_or_assign(ENABLE_FAILOVER_KEY, BOOL_TRUE);
+    bool failover_result = false;
     if (failover_mode_ == STRICT_WRITER) {
-        return failover_writer(hdbc);
+        failover_result = failover_writer(hdbc);
+    } else {
+        failover_result = failover_reader(hdbc);
     }
-    return failover_reader(hdbc);
+
+    return failover_result ? FAILOVER_SUCCEED : FAILOVER_FAILED;
 }
 
 HostInfo FailoverService::GetCurrentHost() {
@@ -527,23 +531,23 @@ FailoverResult FailoverConnection(const char* service_id_c_str, const char* sql_
     std::string cluster_id(service_id_c_str);
     if (!FailoverServiceTrackerHandler::Contains(cluster_id)) {
         LOG(INFO) << "[Failover Service] no tracker found for: " << cluster_id << ". Cannot perform failover.";
-        return FailoverResult{ .connection_changed = false, .hdbc = SQL_NULL_HDBC };
+        return FailoverResult{ .status = FAILOVER_FAILED, .hdbc = SQL_NULL_HDBC };
     }
     std::shared_ptr<FailoverServiceTracker> tracker = FailoverServiceTrackerHandler::Get(cluster_id);
     if (nullptr == tracker->service) {
         LOG(INFO) << "[Failover Service] no active Failover Service: " << cluster_id << ". Cannot perform failover.";
-        return FailoverResult{ .connection_changed = false, .hdbc = SQL_NULL_HDBC };
+        return FailoverResult{ .status = FAILOVER_FAILED, .hdbc = SQL_NULL_HDBC };
     }
     // Set flag to ensure tracker is not cleaned up during failover disconnection
     tracker->failover_inprogress.fetch_add(1);
     SQLHDBC local_hdbc = SQL_NULL_HDBC;
     // open a new connection
     SQLAllocHandle(SQL_HANDLE_DBC, henv, &local_hdbc);
-    bool failover_success = tracker->service->Failover(local_hdbc, sql_state);
+    FailoverStatus status = tracker->service->Failover(local_hdbc, sql_state);
     tracker->failover_inprogress.fetch_sub(1);
-    if (!failover_success) {
+    if (FAILOVER_SUCCEED != status) {
         OdbcHelper::Cleanup(SQL_NULL_HENV, local_hdbc, SQL_NULL_HSTMT);
         LOG(WARNING) << "[Failover Service] Unsuccessful failover for: " << cluster_id;
     }
-    return FailoverResult{ .connection_changed = failover_success, .hdbc = local_hdbc };
+    return FailoverResult{ .status = status, .hdbc = local_hdbc };
 }
