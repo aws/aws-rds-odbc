@@ -109,6 +109,16 @@ bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle,
 }
 
 bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) {
+    if (SQL_NULL_HANDLE == stmt) {
+        LOG(WARNING) << "Attempted to execute query using null HSTMT";
+        return false;
+    }
+
+    if (!query) {
+        LOG(WARNING) << "Attempted to execute query without a valid query pointer";
+        return false;
+    }
+
     SQLRETURN rc;
     rc = SQLExecDirect(stmt, query, SQL_NTS);
 
@@ -120,6 +130,11 @@ bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string&
 }
 
 bool OdbcHelper::BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) {
+    if (SQL_NULL_HANDLE == stmt) {
+        LOG(WARNING) << "Attempted to bind columns to a null HSTMT";
+        return false;
+    }
+
     SQLRETURN rc;
     SQLLEN ret_len = 0;
     rc = SQLBindCol(stmt, col_num, type, dest, dest_size, &ret_len);
@@ -131,6 +146,11 @@ bool OdbcHelper::BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT typ
 }
 
 bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
+    if (SQL_NULL_HANDLE == stmt) {
+        LOG(WARNING) << "Attempted to fetch results using a null HSTMT";
+        return false;
+    }
+
     SQLRETURN rc;
     rc = SQLFetch(stmt);
     if (!OdbcHelper::CheckResult(rc, log_message, stmt, SQL_HANDLE_STMT)) {
