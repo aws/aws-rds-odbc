@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
+#include <sstream>
 
 // Initialize static members
 std::mutex RoundRobinHostSelector::cache_mutex;
