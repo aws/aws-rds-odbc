@@ -16,7 +16,6 @@
 		733ED0CD2D28528D001BAC9D /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EC2CD3C3D1002268BF /* adfs_test.cc */; };
 		733ED0CE2D28528D001BAC9D /* round_robin_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 738543EB2CEE0E050019F6C6 /* round_robin_host_selector_test.cc */; };
 		733ED0CF2D28528D001BAC9D /* highest_weight_host_selector_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73CB8C0D2D132764002671DA /* highest_weight_host_selector_test.cc */; };
-		733ED0D02D28528D001BAC9D /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */; };
 		733ED0D12D28528D001BAC9D /* sliding_cache_map_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 731C538B2D0B15CC006D7569 /* sliding_cache_map_test.cc */; };
 		733ED0D22D28528D001BAC9D /* simple_host_availability_strategy_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */; };
 		733ED0D32D28528D001BAC9D /* odbc_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7369B6122CDE5CBC00C98EDF /* odbc_helper_test.cc */; };
@@ -52,7 +51,6 @@
 		73CFD9EE2CC92FA0005B92C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9ED2CC92FA0005B92C0 /* CoreFoundation.framework */; };
 		73CFD9F02CC92FD5005B92C0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73CFD9EF2CC92FD5005B92C0 /* Security.framework */; };
 		73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EC2CD3C3D1002268BF /* adfs_test.cc */; };
-		73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */; };
 		73D322F42CD3C3D1002268BF /* authentication_provider_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */; };
 		73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */; };
 		73DAE0262CDA89E500225BE1 /* secrets_manager_helper_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */; };
@@ -128,7 +126,6 @@
 		73CFD9EF2CC92FD5005B92C0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		73D322EC2CD3C3D1002268BF /* adfs_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = adfs_test.cc; sourceTree = "<group>"; };
 		73D322EE2CD3C3D1002268BF /* authentication_provider_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = authentication_provider_test.cc; sourceTree = "<group>"; };
-		73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_info_test.cc; sourceTree = "<group>"; };
 		73D322F52CD3CDBE002268BF /* simple_host_availability_strategy_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = simple_host_availability_strategy_test.cc; sourceTree = "<group>"; };
 		73DAE0252CDA89E500225BE1 /* secrets_manager_helper_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = secrets_manager_helper_test.cc; sourceTree = "<group>"; };
 		73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cluster_topology_monitor_test.cc; sourceTree = "<group>"; };
@@ -285,7 +282,6 @@
 			children = (
 				73DDE0762D440725003614BF /* cluster_topology_monitor_test.cc */,
 				73DDE0772D440725003614BF /* cluster_topology_query_helper_test.cc */,
-				73D322F02CD3C3D1002268BF /* cluster_topology_info_test.cc */,
 			);
 			path = failover;
 			sourceTree = "<group>";
@@ -411,7 +407,6 @@
 				733ED0CD2D28528D001BAC9D /* adfs_test.cc in Sources */,
 				733ED0CE2D28528D001BAC9D /* round_robin_host_selector_test.cc in Sources */,
 				733ED0CF2D28528D001BAC9D /* highest_weight_host_selector_test.cc in Sources */,
-				733ED0D02D28528D001BAC9D /* cluster_topology_info_test.cc in Sources */,
 				733ED0D12D28528D001BAC9D /* sliding_cache_map_test.cc in Sources */,
 				733ED0D22D28528D001BAC9D /* simple_host_availability_strategy_test.cc in Sources */,
 				733ED0D32D28528D001BAC9D /* odbc_helper_test.cc in Sources */,
@@ -437,7 +432,6 @@
 				73D322F22CD3C3D1002268BF /* adfs_test.cc in Sources */,
 				738543EC2CEE0E050019F6C6 /* round_robin_host_selector_test.cc in Sources */,
 				73CB8C0E2D132764002671DA /* highest_weight_host_selector_test.cc in Sources */,
-				73D322F32CD3C3D1002268BF /* cluster_topology_info_test.cc in Sources */,
 				731C538C2D0B15CC006D7569 /* sliding_cache_map_test.cc in Sources */,
 				73D322F72CD3CDBE002268BF /* simple_host_availability_strategy_test.cc in Sources */,
 				7369B6142CDE5CBC00C98EDF /* odbc_helper_test.cc in Sources */,
