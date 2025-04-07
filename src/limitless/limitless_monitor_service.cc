@@ -68,8 +68,8 @@ bool LimitlessMonitorService::NewService(
             service_id = RdsUtils::GetRdsClusterId(host);
 
             if (service_id.empty()) {
-                LOG(ERROR) << "No service ID provided and could not get cluster ID from host " << host;
-                return false;
+                service_id = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+                LOG(INFO) << "No service ID provided and could not parse service ID from host: " << host << ". Generated random service ID: " << service_id;
             }
         }
     }
