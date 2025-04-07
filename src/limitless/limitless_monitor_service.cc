@@ -69,8 +69,7 @@ bool LimitlessMonitorService::NewService(
 
             if (service_id.empty()) {
                 service_id = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
-                LOG(INFO) << "No service ID provided and could not parse service ID from host: " << host;
-                LOG(INFO) << ". Generated random service ID: " << service_id;
+                LOG(INFO) << "No service ID provided and could not parse service ID from host: " << host << ". Generated random service ID: " << service_id;
             }
         }
     }
