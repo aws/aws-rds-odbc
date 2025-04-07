@@ -69,3 +69,7 @@ jobs:
         run: |
           source ./venv/bin/activate
           CodeChecker parse --print-steps ./reports
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: always()
