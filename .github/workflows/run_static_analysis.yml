@@ -44,7 +44,7 @@ jobs:
       - name: Build and install AWS SDK C++
         if: steps.cache-dynamic-aws-sdk.outputs.cache-hit != 'true'
         run: |
-          ./scripts/build_aws_sdk_linux.sh $BUILD_TYPE
+          bash ./scripts/build_aws_sdk_macos $BUILD_TYPE
 
       - name: Create build environment
         run: cmake -E make_directory ./build
