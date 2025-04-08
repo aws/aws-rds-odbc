@@ -16,13 +16,12 @@
 #define HOST_INFO_H_
 
 #include <memory>
+#include <ostream>
 #include <string>
-
 #ifdef WIN32
     #include <windows.h>
 #endif
 #include <sqltypes.h>
-#include <ostream>
 
 #include "host_availability/host_availability_strategy.h"
 

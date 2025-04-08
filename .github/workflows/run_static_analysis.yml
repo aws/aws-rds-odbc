@@ -30,7 +30,7 @@ jobs:
           brew install cppcheck llvm unixodbc
           python3 -m venv ./venv
           source ./venv/bin/activate
-          python3 -m pip install codechecker
+          python3 -m pip install codechecker==6.24.4
 
       - name: Cache AWS SDK libraries
         id: cache-dynamic-aws-sdk
@@ -44,7 +44,7 @@ jobs:
       - name: Build and install AWS SDK C++
         if: steps.cache-dynamic-aws-sdk.outputs.cache-hit != 'true'
         run: |
-          ./scripts/build_aws_sdk_linux.sh $BUILD_TYPE
+          bash ./scripts/build_aws_sdk_macos $BUILD_TYPE
 
       - name: Create build environment
         run: cmake -E make_directory ./build

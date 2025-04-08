@@ -203,12 +203,12 @@ typedef struct FailoverServiceTracker {
 };
 
 class FailoverServiceTrackerHandler {
-    static std::mutex map_mutex_;
+    static std::mutex map_mutex;
     static std::unordered_map<std::string, std::shared_ptr<FailoverServiceTracker>> global_failover_services;
 public:
-    static void PutIfAbsent(std::string key, const std::shared_ptr<FailoverServiceTracker>& tracker);
-    static void Increment(std::string cluster_id);
-    static void Decrement(std::string cluster_id);
+    static void PutIfAbsent(const std::string& key, const std::shared_ptr<FailoverServiceTracker>& tracker);
+    static void Increment(const std::string& cluster_id);
+    static void Decrement(const std::string& cluster_id);
     static bool Contains(const std::string& cluster_id);
     static std::shared_ptr<FailoverServiceTracker> Get(const std::string& cluster_id);
 };
