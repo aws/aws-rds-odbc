@@ -33,6 +33,7 @@
 #include <unordered_map>
 
 #include "../util/logger_wrapper.h"
+#include "../util/string_to_number_converter.h"
 #include "secrets_manager_helper.h"
 
 static Aws::SDKOptions sdk_opts;
@@ -78,7 +79,7 @@ static bool ValidateOktaConf(FederatedAuthConfig config) {
 
 static uint64_t ParseNumber(const char* str_in, const uint64_t default_val) {
     try {
-        return atol(str_in);
+        return safe_atol(str_in);
     } catch (std::exception& e) {
         return default_val;
     }
@@ -213,7 +214,7 @@ void UpdateCachedToken(const char* db_hostname, const char* db_region, const cha
 
     TokenInfo ti;
     ti.token = std::string(token);
-    ti.expiration = curr_time_in_sec + atol(expiration_time);
+    ti.expiration = curr_time_in_sec + safe_atol(expiration_time);
     cached_tokens[key] = ti;
 }
 

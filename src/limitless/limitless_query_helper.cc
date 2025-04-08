@@ -20,6 +20,7 @@
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 #include "../util/text_helper.h"
+#include "../util/string_to_number_converter.h"
 
 SQLTCHAR* LimitlessQueryHelper::check_limitless_cluster_query =
 const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(TEXT(\
@@ -112,7 +113,7 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
 }
 
 HostInfo LimitlessQueryHelper::create_host(const SQLCHAR* load, const SQLCHAR* router_endpoint, const int host_port_to_map) {
-    int64_t weight = std::round(WEIGHT_SCALING - (atof(reinterpret_cast<const char *>(load)) * WEIGHT_SCALING));
+    int64_t weight = std::round(WEIGHT_SCALING - (safe_atof(reinterpret_cast<const char *>(load)) * WEIGHT_SCALING));
 
     if (weight < MIN_WEIGHT || weight > MAX_WEIGHT) {
         weight = MIN_WEIGHT;

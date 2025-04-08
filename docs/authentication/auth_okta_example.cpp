@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     // This will generate a new token replace the value of your new token
     GenerateConnectAuthToken(new_token, MAX_TOKEN_SIZE,
-        db_server, region, atoi(db_port), iam_db_username,
+        db_server, region, static_cast<int>(strtol(db_port, nullptr, 10)), iam_db_username,
         authType, authConfig);
 
     // Can also cache and store the value...
