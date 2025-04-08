@@ -19,8 +19,8 @@
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
-#include "../util/text_helper.h"
 #include "../util/string_to_number_converter.h"
+#include "../util/text_helper.h"
 
 SQLTCHAR* LimitlessQueryHelper::check_limitless_cluster_query =
 const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(TEXT(\
