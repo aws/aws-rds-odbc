@@ -19,7 +19,7 @@
 #include "cluster_topology_info.h"
 
 std::unordered_map<std::string, std::shared_ptr<FailoverServiceTracker>> FailoverServiceTrackerHandler::global_failover_services;
-std::mutex FailoverServiceTrackerHandler::map_mutex_;
+std::mutex FailoverServiceTrackerHandler::map_mutex;
 static std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> global_topology_map =
     std::make_shared<SlidingCacheMap<std::string, std::vector<HostInfo>>>();
 
@@ -32,24 +32,24 @@ const uint32_t FailoverService::DEFAULT_REFRESH_RATE_MS =
 const uint32_t FailoverService::DEFAULT_FAILOVER_TIMEOUT_MS =
     std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)).count();
 
-void FailoverServiceTrackerHandler::PutIfAbsent(std::string key, const std::shared_ptr<FailoverServiceTracker>& tracker) {
-    std::lock_guard lock(map_mutex_);
+void FailoverServiceTrackerHandler::PutIfAbsent(const std::string& key, const std::shared_ptr<FailoverServiceTracker>& tracker) {
+    std::lock_guard lock(map_mutex);
     if (!global_failover_services.contains(key)) {
         global_failover_services[key] = tracker;
         LOG(INFO) << "[Failover Service] created for: " << key;
     }
 }
 
-void FailoverServiceTrackerHandler::Increment(std::string cluster_id) {
-    std::lock_guard lock(map_mutex_);
-    std::shared_ptr<FailoverServiceTracker> tracker = global_failover_services.at(cluster_id);
+void FailoverServiceTrackerHandler::Increment(const std::string& cluster_id) {
+    std::lock_guard lock(map_mutex);
+    const std::shared_ptr<FailoverServiceTracker>& tracker = global_failover_services.at(cluster_id);
     tracker->reference_count.fetch_add(1);
     LOG(INFO) << "[Failover Service] additional reference for: " << cluster_id << ". Now at: " << tracker->reference_count;
  }
 
-void FailoverServiceTrackerHandler::Decrement(std::string cluster_id) {
-     std::lock_guard lock(map_mutex_);
-     std::shared_ptr<FailoverServiceTracker> tracker = global_failover_services.at(cluster_id);
+void FailoverServiceTrackerHandler::Decrement(const std::string& cluster_id) {
+     std::lock_guard lock(map_mutex);
+     const std::shared_ptr<FailoverServiceTracker>& tracker = global_failover_services.at(cluster_id);
      if (tracker->reference_count > 0) {
          tracker->reference_count.fetch_sub(1);
          LOG(INFO) << "[Failover Service] removing reference for: " << cluster_id << ". Now at: " << tracker->reference_count;
@@ -61,12 +61,12 @@ void FailoverServiceTrackerHandler::Decrement(std::string cluster_id) {
  }
 
 bool FailoverServiceTrackerHandler::Contains(const std::string& cluster_id) {
-     std::lock_guard lock(map_mutex_);
+     std::lock_guard lock(map_mutex);
     return global_failover_services.contains(cluster_id);
  }
 
 std::shared_ptr<FailoverServiceTracker> FailoverServiceTrackerHandler::Get(const std::string& cluster_id) {
-     std::lock_guard lock(map_mutex_);
+     std::lock_guard lock(map_mutex);
      return global_failover_services.at(cluster_id);
  }
 
