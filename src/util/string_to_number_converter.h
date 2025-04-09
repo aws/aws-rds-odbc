@@ -15,11 +15,14 @@
 #ifndef STRING_TO_NUMBER_CONVERTER_H
 #define STRING_TO_NUMBER_CONVERTER_H
 
-#include <cstdlib>
+class StringToNumberConverter {
+public:
+    static const int DECIMAL_BASE = 10;
 
-#define safe_atoi(val) static_cast<int>(std::strtol(val, NULL, 10))
-#define safe_atof(val) std::strtod(val, NULL)
-#define safe_atol(val) std::strtol(val, NULL, 10)
-#define safe_atoll(val) std::strtoll(val, NULL, 10)
+    static int Atoi(const char* str);
+    static double Atof(const char* str);
+    static long int Atol(const char* str);
+    static long long int Atoll(const char* str);
+};
 
 #endif //STRING_TO_NUMBER_CONVERTER_H
