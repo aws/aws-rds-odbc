@@ -20,7 +20,7 @@
 
 #include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
-#include "cluster_topology_info.h"
+#include "../util/cluster_topology_helper.h"
 #include "string_helper.h"
 
 ClusterTopologyMonitor::ClusterTopologyMonitor(
@@ -163,8 +163,8 @@ std::vector<HostInfo> ClusterTopologyMonitor::WaitForTopologyUpdate(uint32_t tim
     // TODO(karezche): refactor the code to compare references instead of values
     // Current implementation does not support comparing curr_hosts and new_hosts by their references.
     while (curr_time < end && curr_hosts == new_hosts) {
-        LOG(INFO) << "Host reference comparison has failed, curr_hosts: " << ClusterTopologyInfo::LogTopology(curr_hosts)
-                  << " new hosts: " << ClusterTopologyInfo::LogTopology(new_hosts);
+        LOG(INFO) << "Host reference comparison has failed, curr_hosts: " << ClusterTopologyHelper::LogTopology(curr_hosts)
+                  << " new hosts: " << ClusterTopologyHelper::LogTopology(new_hosts);
         topology_updated_.wait_for(topology_lock, std::chrono::milliseconds(TOPOLOGY_UPDATE_WAIT_MS));
         new_hosts = topology_map_->Get(cluster_id_);
         curr_time = std::chrono::steady_clock::time_point(std::chrono::high_resolution_clock::now().time_since_epoch());
@@ -346,7 +346,7 @@ bool ClusterTopologyMonitor::handle_regular_mode() {
     }
 
     if (high_refresh_end_time_ == epoch) {
-        ClusterTopologyInfo::LogTopology(hosts);
+        ClusterTopologyHelper::LogTopology(hosts);
     }
     DelayMainThread(false);
     return true;

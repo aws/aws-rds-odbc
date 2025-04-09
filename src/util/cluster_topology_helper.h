@@ -16,9 +16,11 @@
 #define CLUSTER_TOPOLOGY_HELPER_H
 
 #include <vector>
+
 #include "../host_info.h"
 
 class ClusterTopologyHelper {
+public:
     static std::string LogTopology(const std::vector<HostInfo>& topology);
 };
 
