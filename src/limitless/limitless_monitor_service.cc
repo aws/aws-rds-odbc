@@ -188,14 +188,6 @@ bool CheckLimitlessCluster(SQLHDBC hdbc) {
     return LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
 }
 
-bool CheckLimitlessMonitorService(const char *service_id_c_str) {
-    std::string service_id(service_id_c_str);
-    if (service_id.empty())
-        return false;
-
-    return limitless_monitor_service.CheckService(service_id);
-}
-
 bool GetLimitlessInstance(const SQLTCHAR *connection_string_c_str, int host_port, char *service_id_c_str, size_t service_id_size, const LimitlessInstance *db_instance) {
     std::string service_id(service_id_c_str);
 
