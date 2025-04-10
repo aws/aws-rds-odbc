@@ -18,7 +18,7 @@
 #include <cstdlib>
 #include <glog/logging.h>
 
-int StringToNumberConverter::Atoi(const char* str) {
+int StringToNumberConverter::toInt(const char* str) {
     char* endptr;
     errno = 0;
 
@@ -33,11 +33,11 @@ int StringToNumberConverter::Atoi(const char* str) {
     return static_cast<int>(val);
 }
 
-double StringToNumberConverter::Atof(const char* str) {
+double StringToNumberConverter::toDouble(const char* str) {
     char* endptr;
     errno = 0;
 
-    const double val = std::strtof(str, &endptr);
+    const double val = std::strtod(str, &endptr);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtol: " << errno;
     }
@@ -48,11 +48,11 @@ double StringToNumberConverter::Atof(const char* str) {
     return val;
 }
 
-int64_t StringToNumberConverter::Atol(const char* str) {
+int32_t StringToNumberConverter::toInt32(const char* str) {
     char* endptr;
     errno = 0;
 
-    const int64_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
+    const int32_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtol: " << errno;
     }
@@ -63,7 +63,7 @@ int64_t StringToNumberConverter::Atol(const char* str) {
     return val;
 }
 
-int64_t StringToNumberConverter::Atoll(const char* str) {
+int64_t StringToNumberConverter::toInt64(const char* str) {
     char* endptr;
     errno = 0;
 

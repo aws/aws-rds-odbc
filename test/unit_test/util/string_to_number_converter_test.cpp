@@ -30,14 +30,14 @@ protected:
 TEST_F(StringToNumberConverterTest, parse_str_to_int) {
     int expected = INT_MAX;
     std::string number = std::to_string(expected);
-    int actual = StringToNumberConverter::Atoi(number.c_str());
+    int actual = StringToNumberConverter::toInt(number.c_str());
     EXPECT_EQ(expected, actual);
 }
 
 TEST_F(StringToNumberConverterTest, parse_str_to_float) {
     const char* number = "3.1415";
     double expected = 3.1415;
-    double actual = StringToNumberConverter::Atof(number);
+    double actual = StringToNumberConverter::toDouble(number);
 
     // Floating point comparison
     EXPECT_TRUE(fabs(expected-actual) < 0.00001);
@@ -46,7 +46,7 @@ TEST_F(StringToNumberConverterTest, parse_str_to_float) {
 TEST_F(StringToNumberConverterTest, parse_str_to_long) {
     int64_t expected = LONG_MAX;
     std::string number = std::to_string(expected);
-    int64_t actual = StringToNumberConverter::Atol(number.c_str());
+    int64_t actual = StringToNumberConverter::toInt32(number.c_str());
 
     // Floating point comparison
     EXPECT_EQ(expected, actual);
@@ -55,7 +55,7 @@ TEST_F(StringToNumberConverterTest, parse_str_to_long) {
 TEST_F(StringToNumberConverterTest, parse_str_to_long_long) {
     int64_t expected = LLONG_MAX;
     std::string number = std::to_string(expected);
-    int64_t actual = StringToNumberConverter::Atoll(number.c_str());
+    int64_t actual = StringToNumberConverter::toInt64(number.c_str());
     EXPECT_EQ(expected, actual);
 }
 

@@ -21,10 +21,10 @@ class StringToNumberConverter {
 public:
     static const int DECIMAL_BASE = 10;
 
-    static int Atoi(const char* str);
-    static double Atof(const char* str);
-    static int64_t Atol(const char* str);
-    static int64_t Atoll(const char* str);
+    static int toInt(const char* str);
+    static double toDouble(const char* str);
+    static int32_t toInt32(const char* str);
+    static int64_t toInt64(const char* str);
 };
 
 #endif //STRING_TO_NUMBER_CONVERTER_H

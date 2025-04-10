@@ -79,7 +79,7 @@ static bool ValidateOktaConf(FederatedAuthConfig config) {
 
 static uint64_t ParseNumber(const char* str_in, const uint64_t default_val) {
     try {
-        return StringToNumberConverter::Atol(str_in);
+        return StringToNumberConverter::toInt32(str_in);
     } catch (std::exception& e) {
         return default_val;
     }
@@ -214,7 +214,7 @@ void UpdateCachedToken(const char* db_hostname, const char* db_region, const cha
 
     TokenInfo ti;
     ti.token = std::string(token);
-    ti.expiration = curr_time_in_sec + StringToNumberConverter::Atol(expiration_time);
+    ti.expiration = curr_time_in_sec + StringToNumberConverter::toInt32(expiration_time);
     cached_tokens[key] = ti;
 }
 
