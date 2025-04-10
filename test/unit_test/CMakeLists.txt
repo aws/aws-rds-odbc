@@ -71,6 +71,7 @@ add_executable(
   util/sliding_cache_map_test.cc
   util/odbc_helper_test.cc
   util/rds_utils_test.cc
+  util/string_to_number_converter_test.cpp
 )
 
 #-----------------------------------------------------

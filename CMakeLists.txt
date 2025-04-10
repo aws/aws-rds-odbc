@@ -83,6 +83,7 @@ set(SRC
   src/util/rds_logger_service.cc
   src/util/rds_utils.cc
   src/util/odbc_helper.cc
+  src/util/string_to_number_converter.cc
 )
 
 set(INC
@@ -120,6 +121,7 @@ set(INC
   src/util/rds_utils.h
   src/util/odbc_helper.h
   src/util/string_helper.h
+  src/util/string_to_number_converter.h
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
