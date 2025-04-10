@@ -15,14 +15,16 @@
 #ifndef STRING_TO_NUMBER_CONVERTER_H
 #define STRING_TO_NUMBER_CONVERTER_H
 
+#include <stdint.h>
+
 class StringToNumberConverter {
 public:
     static const int DECIMAL_BASE = 10;
 
     static int Atoi(const char* str);
     static double Atof(const char* str);
-    static long int Atol(const char* str);
-    static long long int Atoll(const char* str);
+    static int64_t Atol(const char* str);
+    static int64_t Atoll(const char* str);
 };
 
 #endif //STRING_TO_NUMBER_CONVERTER_H

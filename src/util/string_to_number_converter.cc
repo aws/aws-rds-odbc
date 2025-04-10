@@ -12,7 +12,7 @@ int StringToNumberConverter::Atoi(const char* str) {
     char* endptr;
     errno = 0;
 
-    const long val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
+    const int64_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtol: " << errno;
     }
@@ -38,11 +38,11 @@ double StringToNumberConverter::Atof(const char* str) {
     return val;
 }
 
-long int StringToNumberConverter::Atol(const char* str) {
+int64_t StringToNumberConverter::Atol(const char* str) {
     char* endptr;
     errno = 0;
 
-    const long val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
+    const int64_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtol: " << errno;
     }
@@ -53,11 +53,11 @@ long int StringToNumberConverter::Atol(const char* str) {
     return val;
 }
 
-long long int StringToNumberConverter::Atoll(const char* str) {
+int64_t StringToNumberConverter::Atoll(const char* str) {
     char* endptr;
     errno = 0;
 
-    long long val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
+    const int64_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtoll: " << errno;
     }
