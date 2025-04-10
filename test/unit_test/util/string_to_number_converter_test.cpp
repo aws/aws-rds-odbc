@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "string_to_number_converter.h"
 
@@ -27,9 +28,9 @@ protected:
 };
 
 TEST_F(StringToNumberConverterTest, parse_str_to_int) {
-    const char* number = "5432";
-    int expected = 5432;
-    int actual = StringToNumberConverter::Atoi(number);
+    int expected = INT_MAX;
+    std::string number = std::to_string(expected);
+    int actual = StringToNumberConverter::Atoi(number.c_str());
     EXPECT_EQ(expected, actual);
 }
 
@@ -43,18 +44,18 @@ TEST_F(StringToNumberConverterTest, parse_str_to_float) {
 }
 
 TEST_F(StringToNumberConverterTest, parse_str_to_long) {
-    const char* number = "4294967296";
-    int64_t expected = 4294967296;
-    int64_t actual = StringToNumberConverter::Atol(number);
+    int64_t expected = LONG_MAX;
+    std::string number = std::to_string(expected);
+    int64_t actual = StringToNumberConverter::Atol(number.c_str());
 
     // Floating point comparison
     EXPECT_EQ(expected, actual);
 }
 
 TEST_F(StringToNumberConverterTest, parse_str_to_long_long) {
-    const char* number = "9223372036854775807";
-    int64_t expected = 9223372036854775807;
-    int64_t actual = StringToNumberConverter::Atoll(number);
+    int64_t expected = LLONG_MAX;
+    std::string number = std::to_string(expected);
+    int64_t actual = StringToNumberConverter::Atoll(number.c_str());
     EXPECT_EQ(expected, actual);
 }
 
