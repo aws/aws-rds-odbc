@@ -67,7 +67,7 @@ int64_t StringToNumberConverter::Atoll(const char* str) {
     char* endptr;
     errno = 0;
 
-    const int64_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
+    const int64_t val = std::strtoll(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtoll: " << errno;
     }
