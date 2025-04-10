@@ -46,7 +46,7 @@ TEST_F(StringToNumberConverterTest, parse_str_to_float) {
 TEST_F(StringToNumberConverterTest, parse_str_to_long) {
     int64_t expected = LONG_MAX;
     std::string number = std::to_string(expected);
-    int64_t actual = StringToNumberConverter::toInt32(number.c_str());
+    int64_t actual = StringToNumberConverter::toLong(number.c_str());
 
     // Floating point comparison
     EXPECT_EQ(expected, actual);
@@ -55,7 +55,7 @@ TEST_F(StringToNumberConverterTest, parse_str_to_long) {
 TEST_F(StringToNumberConverterTest, parse_str_to_long_long) {
     int64_t expected = LLONG_MAX;
     std::string number = std::to_string(expected);
-    int64_t actual = StringToNumberConverter::toInt64(number.c_str());
+    int64_t actual = StringToNumberConverter::toLongLong(number.c_str());
     EXPECT_EQ(expected, actual);
 }
 

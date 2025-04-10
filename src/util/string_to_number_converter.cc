@@ -48,11 +48,11 @@ double StringToNumberConverter::toDouble(const char* str) {
     return val;
 }
 
-int32_t StringToNumberConverter::toInt32(const char* str) {
+int64_t StringToNumberConverter::toLong(const char* str) {
     char* endptr;
     errno = 0;
 
-    const int32_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
+    const int64_t val = std::strtol(str, &endptr, StringToNumberConverter::DECIMAL_BASE);
     if (errno != 0) {
         LOG(ERROR) << "Got the following error number from strtol: " << errno;
     }
@@ -63,7 +63,7 @@ int32_t StringToNumberConverter::toInt32(const char* str) {
     return val;
 }
 
-int64_t StringToNumberConverter::toInt64(const char* str) {
+int64_t StringToNumberConverter::toLongLong(const char* str) {
     char* endptr;
     errno = 0;
 

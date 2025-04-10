@@ -23,8 +23,8 @@ public:
 
     static int toInt(const char* str);
     static double toDouble(const char* str);
-    static int32_t toInt32(const char* str);
-    static int64_t toInt64(const char* str);
+    static int64_t toLong(const char* str);
+    static int64_t toLongLong(const char* str);
 };
 
 #endif //STRING_TO_NUMBER_CONVERTER_H
