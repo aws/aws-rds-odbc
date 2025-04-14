@@ -415,7 +415,7 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
     }
 
     std::map<MyStr, MyStr> conn_info;
-    ConnectionStringHelper::ParseConnectionString(conn_cstr, conn_info);
+    ConnectionStringHelper::ParseConnectionString(StringHelper::ToMyStr(conn_cstr), conn_info);
     // Simple wide to narrow conversion for endpoint template when unicode
     // RDS endpoints are alphanumeric only
     std::string endpoint_template = StringHelper::ToString(conn_info[ENDPOINT_TEMPLATE_KEY]);

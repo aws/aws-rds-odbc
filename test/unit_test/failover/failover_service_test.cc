@@ -21,27 +21,15 @@
 using ::testing::Return;
 
 namespace {
-    #ifdef UNICODE
-    const wchar_t* conn_str = TEXT(
+    MyStr conn_str = TEXT(
         "SERVER=database-pg-name.cluster-ro-XYZ.us-east-2.rds.amazonaws.com;"  \
         "ENABLECLUSTERFAILOVER=1;"                                          \
         "FAILOVERMODE=READER_OR_WRITER;"                                    \
         "READERHOSTSELECTORSTRATEGY=ROUND_ROBIN;"                           \
         "FAILOVERTIMEOUT=10000;");
-    const wchar_t* mode_strict_reader = TEXT("STRICT_READER");
-    const wchar_t* mode_strict_writer = TEXT("STRICT_WRITER");
-    const wchar_t* mode_reader_or_writer = TEXT("READER_OR_WRITER");
-    #else
-    const char* conn_str = TEXT( 
-        "SERVER=database-pg-name.cluster-ro-XYZ.us-east-2.rds.amazonaws.com;"  \
-        "ENABLECLUSTERFAILOVER=1;"                                          \
-        "FAILOVERMODE=READER_OR_WRITER;"                                    \
-        "READERHOSTSELECTORSTRATEGY=ROUND_ROBIN;"                           \
-        "FAILOVERTIMEOUT=10000;");
-    const char* mode_strict_reader = failover_mode_str[STRICT_READER];
-    const char* mode_strict_writer = failover_mode_str[STRICT_WRITER];
-    const char* mode_reader_or_writer = failover_mode_str[READER_OR_WRITER];
-    #endif
+    MyStr mode_strict_reader = TEXT("STRICT_READER");
+    MyStr mode_strict_writer = TEXT("STRICT_WRITER");
+    MyStr mode_reader_or_writer = TEXT("READER_OR_WRITER");
     const std::string server_host = "database-pg-name.cluster-ro-XYZ.us-east-2.rds.amazonaws.com";
     const std::string cluster_id = "clusterId";
     const std::shared_ptr<Dialect> driver_dialect = std::make_shared<DialectAuroraPostgres>();
@@ -70,15 +58,9 @@ protected:
         // Mock ODBC for Failover Service
         mock_odbc_helper = std::make_shared<MOCK_ODBC_HELPER>();
 
-        #ifdef UNICODE
-        std::map<std::wstring, std::wstring> conn_info;
-        ConnectionStringHelper::ParseConnectionStringW(conn_str, conn_info);
-        conn_info_ptr = std::make_shared<std::map<std::wstring, std::wstring>>(conn_info);
-        #else
-        std::map<std::string, std::string> conn_info;
+        std::map<MyStr, MyStr> conn_info;
         ConnectionStringHelper::ParseConnectionString(conn_str, conn_info);
-        conn_info_ptr = std::make_shared<std::map<std::string, std::string>>(conn_info);
-        #endif
+        conn_info_ptr = std::make_shared<std::map<MyStr, MyStr>>(conn_info);
 
         // Using HENV to dummy allocate a HDBC to set to anything other than `0` / SQL_NULL_HDBC
         OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, hdbc, "");
@@ -89,11 +71,7 @@ protected:
 
     SQLHDBC hdbc = SQL_NULL_HANDLE;
 
-    #ifdef UNICODE
-    std::shared_ptr<std::map<std::wstring, std::wstring>> conn_info_ptr;
-    #else
-    std::shared_ptr<std::map<std::string, std::string>> conn_info_ptr;
-    #endif
+    std::shared_ptr<std::map<MyStr, MyStr>> conn_info_ptr;
 
     std::shared_ptr<FailoverService> failover_service;
     std::vector<HostInfo> topology;

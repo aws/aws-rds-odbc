@@ -18,24 +18,28 @@
 #include "connection_string_helper.h"
 #include "text_helper.h"
 
-#ifdef UNICODE
-typedef std::wsmatch    MyMatch;
-typedef wchar_t         MyChar;
+namespace {
+    #ifdef UNICODE
+    typedef std::wsmatch MyMatch;
+    typedef wchar_t MyChar;
+    typedef std::wostringstream MyStream;
 
-#define MyUpper(c)      std::towupper(c)
-#else
-typedef std::cmatch     MyMatch;
-typedef unsigned char   MyChar;
+    #define MyUpper(c) std::towupper(c)
+    #else
+    typedef std::smatch MyMatch;
+    typedef unsigned char MyChar;
+    typedef std::ostringstream MyStream;
 
-#define MyUpper(c)      std::toupper(c)
-#endif
+    #define MyUpper(c) std::toupper(c)
+    #endif
+};
 
 void ConnectionStringHelper::ParseConnectionString(const MyStr &connection_string, std::map<MyStr, MyStr> &dest_map) {
     MyRegex pattern(TEXT("([^;=]+)=([^;]+)"));
     MyMatch match;
     MyStr conn_str = connection_string;
 
-    while (std::regex_search(conn_str.c_str(), match, pattern)) {
+    while (std::regex_search(conn_str, match, pattern)) {
         MyStr key = match[1].str();
         std::transform(key.begin(), key.end(), key.begin(), [](MyChar c) {
             return MyUpper(c);
@@ -48,11 +52,7 @@ void ConnectionStringHelper::ParseConnectionString(const MyStr &connection_strin
 }
 
 MyStr ConnectionStringHelper::BuildConnectionString(std::map<MyStr, MyStr> &input_map) {
-    #ifdef UNICODE
-    std::wostringstream conn_stream;
-    #else
-    std::ostringstream conn_stream;
-    #endif
+    MyStream conn_stream;
     for (const auto& e : input_map) {
         if (conn_stream.tellp() > 0) {
             conn_stream << ";";

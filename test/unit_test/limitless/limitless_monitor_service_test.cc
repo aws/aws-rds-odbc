@@ -21,6 +21,7 @@
 #include "../mock_objects.h"
 
 #include "connection_string_helper.h"
+#include "connection_string_keys.h"
 #include "limitless_monitor_service.h"
 
 using testing::Property;
@@ -31,27 +32,23 @@ using testing::Invoke;
 static const SQLTCHAR *test_connection_string_lazy_c_str;
 static const SQLTCHAR *test_connection_string_immediate_c_str;
 const static int test_host_port = 5432;
-#ifdef UNICODE
-std::wstring conn_str_lazy, conn_str_immediate;
-#else
-std::string conn_str_lazy, conn_str_immediate;
-#endif
+MyStr conn_str_lazy, conn_str_immediate;
 
 class LimitlessMonitorServiceTest : public testing::Test {
   protected:
     // Runs once per suite
     static void SetUpTestSuite() {
-        #ifdef UNICODE
-        conn_str_lazy = L"SERVER=limitless.shardgrp-1234.us-east-2.rds.amazonaws.com;LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
-        test_connection_string_lazy_c_str = (SQLTCHAR *)conn_str_lazy.c_str();
-        conn_str_immediate = L"LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_wstring(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + L";";
-        test_connection_string_immediate_c_str = (SQLTCHAR *)conn_str_immediate.c_str();
-        #else
-        conn_str_lazy = "SERVER=limitless.shardgrp-1234.us-east-2.rds.amazonaws.com;LIMITLESSMODE=lazy;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
-        test_connection_string_lazy_c_str = (SQLTCHAR *)conn_str_lazy.c_str();
-        conn_str_immediate = "LIMITLESSMODE=immediate;LIMITLESSMONITORINTERVALMS=" + std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS) + ";";
-        test_connection_string_immediate_c_str = (SQLTCHAR *)conn_str_immediate.c_str();
-        #endif
+        std::map<MyStr, MyStr> conn_str_map;
+        conn_str_map[SERVER_HOST_KEY] = TEXT("limitless.shardgrp-1234.us-east-2.rds.amazonaws.com");
+        conn_str_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY] = StringHelper::ToMyStr(std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS));
+
+        conn_str_map[LIMITLESS_MODE_KEY] = TEXT("lazy");
+        conn_str_lazy = ConnectionStringHelper::BuildConnectionString(conn_str_map);
+        test_connection_string_lazy_c_str = AS_SQLTCHAR(conn_str_lazy.c_str());
+
+        conn_str_map[LIMITLESS_MODE_KEY] = TEXT("immediate");
+        conn_str_immediate = ConnectionStringHelper::BuildConnectionString(conn_str_map);
+        test_connection_string_immediate_c_str = AS_SQLTCHAR(conn_str_immediate.c_str());
     }
     static void TearDownTestSuite() {}
 

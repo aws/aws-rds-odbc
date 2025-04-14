@@ -25,6 +25,7 @@
 #include <cstring>
 #include <locale>
 #include <string>
+#include <regex>
 
 #define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
 #define AS_CHAR(str) (reinterpret_cast<char*>(str))
@@ -36,25 +37,23 @@
 #ifdef UNICODE
 // Return L"s"
 #define CONSTRUCT_SQLSTR(s) CONCATENATE(L, s)
+typedef std::wstring SQLSTR;
+
+typedef std::wstring MyStr;
+typedef std::wregex MyRegex;
 #else
 // No-op
 #define CONSTRUCT_SQLSTR(s) s
+typedef std::string SQLSTR;
+
+typedef std::string MyStr;
+typedef std::regex MyRegex;
 #endif
 
 #if defined(__APPLE__) || defined(__linux__)
 #define strcmp_case_insensitive(str1, str2) strcasecmp(str1, str2)
 #else
 #define strcmp_case_insensitive(str1, str2) strcmpi(str1, str2)
-#endif
-
-#ifdef UNICODE
-typedef std::wstring SQLSTR;
-typedef std::wstring MyStr;
-typedef std::wregex MyRegex;
-#else
-typedef std::string SQLSTR;
-typedef std::string MyStr;
-typedef std::regex MyRegex;
 #endif
 
 class StringHelper {
