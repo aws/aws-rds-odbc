@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "cluster_topology_query_helper.h"
+#include "../util/string_helper.h"
 
 #include <cmath>
 
@@ -49,10 +50,7 @@ std::string ClusterTopologyQueryHelper::GetWriterId(SQLHDBC hdbc) {
     }
 
     OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-#ifdef UNICODE
-    return StringHelper::ToString(AS_WCHAR(writer_id));
-#endif
-    return std::string(AS_CHAR(writer_id));
+    return StringHelper::ToString(writer_id);
 }
 
 std::string ClusterTopologyQueryHelper::GetNodeId(SQLHDBC hdbc) {
@@ -79,10 +77,7 @@ std::string ClusterTopologyQueryHelper::GetNodeId(SQLHDBC hdbc) {
     }
 
     OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, stmt);
-#ifdef UNICODE
-    return StringHelper::ToString(AS_WCHAR(node_id));
-#endif
-    return std::string(AS_CHAR(node_id));
+    return StringHelper::ToString(node_id);
 }
 
 std::vector<HostInfo> ClusterTopologyQueryHelper::QueryTopology(SQLHDBC hdbc) {
@@ -143,11 +138,8 @@ HostInfo ClusterTopologyQueryHelper::CreateHost(SQLTCHAR* node_id, bool is_write
 
 std::string ClusterTopologyQueryHelper::GetEndpoint(SQLTCHAR* node_id) {
 std::string res(endpoint_template_);
-#ifdef UNICODE
-    std::string node_id_str = StringHelper::ToString(AS_WCHAR(node_id));
-#else
-    std::string node_id_str = AS_CHAR(node_id);
-#endif
+    std::string node_id_str = StringHelper::ToString(node_id);
+
     int pos = res.find(REPLACE_CHAR);
     if (pos != std::string::npos) {
         res.replace(pos, 1, node_id_str);

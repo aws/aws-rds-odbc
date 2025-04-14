@@ -16,7 +16,9 @@
 #include <cstring>
 
 #include "../util/logger_wrapper.h"
-#include "connection_string_helper.h"
+#include "../util/string_helper.h"
+#include "../util/connection_string_helper.h"
+#include "../util/connection_string_keys.h"
 #include "limitless_monitor_service.h"
 
 #include "limitless_query_helper.h"
@@ -49,22 +51,14 @@ bool LimitlessMonitorService::NewService(
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
 
     // parse the connection string to extract useful limitless information
-    #ifdef UNICODE
-    std::map<std::wstring, std::wstring> connection_string_map;
-    ConnectionStringHelper::ParseConnectionStringW(reinterpret_cast<const wchar_t *>(connection_string_c_str), connection_string_map);
-    #else
-    std::map<std::string, std::string> connection_string_map;
-    ConnectionStringHelper::ParseConnectionString(reinterpret_cast<const char *>(connection_string_c_str), connection_string_map);
-    #endif
+    std::map<MyStr, MyStr> connection_string_map;
+    MyStr conn_str = StringHelper::ToMyStr(connection_string_c_str);
+    ConnectionStringHelper::ParseConnectionString(conn_str, connection_string_map);
 
     if (service_id.empty()) {
-        auto it = connection_string_map.find(SERVER_KEY);
+        auto it = connection_string_map.find(SERVER_HOST_KEY);
         if (it != connection_string_map.end()) {
-            #ifdef UNICODE
-            std::string host = StringHelper::ToString(connection_string_map[SERVER_KEY]);
-            #else
-            std::string host = connection_string_map[SERVER_KEY];
-            #endif
+            std::string host = StringHelper::ToString(connection_string_map[SERVER_HOST_KEY]);
             service_id = RdsUtils::GetRdsClusterId(host);
 
             if (service_id.empty()) {
@@ -83,11 +77,7 @@ bool LimitlessMonitorService::NewService(
 
     auto it = connection_string_map.find(LIMITLESS_MODE_KEY);
     if (it != connection_string_map.end()) {
-        #ifdef UNICODE
-        std::wstring value = connection_string_map[LIMITLESS_MODE_KEY];
-        #else
-        std::string value = connection_string_map[LIMITLESS_MODE_KEY];
-        #endif
+        MyStr value = connection_string_map[LIMITLESS_MODE_KEY];
         if (value == LIMITLESS_MODE_VALUE_LAZY) {
             block_and_query_immediately = false;
         }
@@ -97,11 +87,7 @@ bool LimitlessMonitorService::NewService(
 
     it = connection_string_map.find(LIMITLESS_MONITOR_INTERVAL_MS_KEY);
     if (it != connection_string_map.end()) {
-        #ifdef UNICODE
-        std::wstring value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
-        #else
-        std::string value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
-        #endif
+        MyStr value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
         limitless_monitor_interval_ms = std::stoi(value);
     }
 

@@ -49,25 +49,24 @@
 
 #ifdef UNICODE
 typedef std::wstring SQLSTR;
+typedef std::wstring MyStr;
+typedef std::wregex MyRegex;
 #else
 typedef std::string SQLSTR;
+typedef std::string MyStr;
+typedef std::regex MyRegex;
 #endif
 
 class StringHelper {
 public:
-    static std::wstring ToWstring(const std::string& src) {
-        if (src.empty()) {
-            return std::wstring();
-        }
-        return std::wstring(src.begin(), src.end());
-    }
+    // StringHelper::ToString will take any string input and output a std::string
 
-    static std::string ToString(SQLTCHAR *src) {
+    static std::string ToString(const SQLTCHAR *src) {
         #ifdef UNICODE
-        std::wstring wstr = AS_WCHAR(src);
+        std::wstring wstr = AS_CONST_WCHAR(src);
         return std::string(wstr.begin(), wstr.end());
         #else
-        return std::string(AS_CHAR(src));
+        return std::string(AS_CONST_CHAR(src));
         #endif
     }
 
@@ -80,6 +79,38 @@ public:
 
     static std::string ToString(const std::string& src) {
         return src;
+    }
+
+    // StringHelper::ToMyStr will take any string input and output a MyStr
+
+    static MyStr ToMyStr(const SQLTCHAR *src) {
+        #ifdef UNICODE
+        return std::wstring(AS_CONST_WCHAR(src));
+        #else
+        return std::string(AS_CONST_CHAR(src));
+        #endif
+    }
+
+    static MyStr ToMyStr(const std::string &src) {
+        #ifdef UNICODE
+        if (src.empty()) {
+            return std::wstring();
+        }
+        return std::wstring(src.begin(), src.end());
+        #else
+        return src;
+        #endif
+    }
+
+    static MyStr ToMyStr(const std::wstring &src) {
+        #ifdef UNICODE
+        return src;
+        #else
+        if (src.empty()) {
+            return std::string();
+        }
+        return std::string(src.begin(), src.end());
+        #endif
     }
 };
 

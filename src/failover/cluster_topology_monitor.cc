@@ -37,11 +37,7 @@ ClusterTopologyMonitor::ClusterTopologyMonitor(
             henv_, SQL_HANDLE_ENV)) {
         throw std::runtime_error(std::string("Cluster Topology Monitor unable to allocate HENV for ClusterId: ") + cluster_id);
     }
-    #ifdef UNICODE
-    conn_str_ = std::wstring(AS_CONST_WCHAR(conn_cstr));
-    #else
-    conn_str_ = std::string(AS_CONST_CHAR(conn_cstr));
-    #endif
+    conn_str_ = StringHelper::ToMyStr(conn_cstr);
 }
 
 ClusterTopologyMonitor::~ClusterTopologyMonitor() {
@@ -116,11 +112,8 @@ void ClusterTopologyMonitor::StartMonitor() {
 }
 
 void ClusterTopologyMonitor::Run() {
-#ifdef UNICODE
     std::string c = StringHelper::ToString(this->conn_str_);
-#else
-    std::string c = this->conn_str_;
-#endif
+
     try {
         LOG(INFO) << "Start cluster topology monitoring thread for " << c;
         while (is_running_.load()) {
@@ -225,11 +218,10 @@ void ClusterTopologyMonitor::UpdateTopologyCache(const std::vector<HostInfo>& ho
     request_update_topology_cv_.notify_one();
 }
 
-#ifdef UNICODE
-std::wstring ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
-    std::wstring new_host_w(new_host.begin(), new_host.end());
-    std::map<std::wstring, std::wstring> conn_map;
-    ConnectionStringHelper::ParseConnectionStringW(conn_str_.c_str(), conn_map);
+MyStr ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
+    MyStr new_host_w = StringHelper::ToMyStr(new_host);
+    std::map<MyStr, MyStr> conn_map;
+    ConnectionStringHelper::ParseConnectionString(conn_str_, conn_map);
 
     if (conn_map.find(SERVER_HOST_KEY) != conn_map.end()) {
         conn_map[SERVER_HOST_KEY] = new_host_w;
@@ -238,23 +230,8 @@ std::wstring ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
         conn_map[ENABLE_FAILOVER_KEY] = BOOL_FALSE;
     }
 
-    return ConnectionStringHelper::BuildConnectionStringW(conn_map);
-}
-#else
-std::string ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
-    std::map<std::string, std::string> conn_map;
-    ConnectionStringHelper::ParseConnectionString(conn_str_.c_str(), conn_map);
-
-    if (conn_map.find(SERVER_HOST_KEY) != conn_map.end()) {
-        conn_map[SERVER_HOST_KEY] = new_host;
-    }
-    if (conn_map.find(ENABLE_FAILOVER_KEY) != conn_map.end()) {
-        conn_map[ENABLE_FAILOVER_KEY] = BOOL_FALSE;
-    }
-
     return ConnectionStringHelper::BuildConnectionString(conn_map);
 }
-#endif
 
 bool ClusterTopologyMonitor::in_panic_mode() {
     return !main_hdbc_
@@ -270,13 +247,8 @@ std::vector<HostInfo> ClusterTopologyMonitor::open_any_conn_get_hosts() {
         // open a new connection
         SQLSetEnvAttr(henv_, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
         SQLAllocHandle(SQL_HANDLE_DBC, henv_, &local_hdbc);
-        #ifdef UNICODE
-        rc = SQLDriverConnectW(local_hdbc, nullptr, conn_cstr, SQL_NTS,
-            nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-        #else
         rc = SQLDriverConnect(local_hdbc, nullptr, conn_cstr, SQL_NTS,
             nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-        #endif
         if (!odbc_helper_->CheckResult(rc, std::string("ClusterTopologyMonitor failed to open connection for clusterId: ") + cluster_id_, local_hdbc, SQL_HANDLE_DBC)) {
             SQLDisconnect(local_hdbc);
             SQLFreeHandle(SQL_HANDLE_DBC, local_hdbc);
@@ -522,13 +494,8 @@ void ClusterTopologyMonitor::NodeMonitoringThread::handle_reconnect(SQLTCHAR* co
     // Reallocate for new connection
     SQLAllocHandle(SQL_HANDLE_DBC, main_monitor_->henv_, &hdbc_);
     // Reconnect and try to query next interval
-    #ifdef UNICODE
-    SQLDriverConnectW(hdbc_, nullptr, conn_cstr, SQL_NTS,
-        nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-    #else
     SQLDriverConnect(hdbc_, nullptr, conn_cstr, SQL_NTS,
         nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-    #endif
 }
 
 void ClusterTopologyMonitor::NodeMonitoringThread::handle_writer_conn() {

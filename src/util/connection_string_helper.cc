@@ -16,54 +16,43 @@
 #include <regex>
 
 #include "connection_string_helper.h"
+#include "text_helper.h"
 
-void ConnectionStringHelper::ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map) {
-    std::regex pattern("([^;=]+)=([^;]+)");
-    std::cmatch match;
-    std::string conn_str = connection_string;
+#ifdef UNICODE
+typedef std::wsmatch    MyMatch;
+typedef wchar_t         MyChar;
+
+#define MyUpper(c)      std::towupper(c)
+#else
+typedef std::cmatch     MyMatch;
+typedef unsigned char   MyChar;
+
+#define MyUpper(c)      std::toupper(c)
+#endif
+
+void ConnectionStringHelper::ParseConnectionString(const MyStr &connection_string, std::map<MyStr, MyStr> &dest_map) {
+    MyRegex pattern(TEXT("([^;=]+)=([^;]+)"));
+    MyMatch match;
+    MyStr conn_str = connection_string;
 
     while (std::regex_search(conn_str.c_str(), match, pattern)) {
-        std::string key = match[1].str();
-        std::transform(key.begin(), key.end(), key.begin(), [](unsigned char c) {
-            return std::toupper(c);
+        MyStr key = match[1].str();
+        std::transform(key.begin(), key.end(), key.begin(), [](MyChar c) {
+            return MyUpper(c);
         });
-        std::string val = match[2].str();
+        MyStr val = match[2].str();
         dest_map[key] = val;
 
         conn_str = match.suffix().str();
     }
 }
 
-void ConnectionStringHelper::ParseConnectionStringW(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map) {
-    std::wregex pattern(L"([^;=]+)=([^;]+)");
-    std::wsmatch match;
-    std::wstring conn_str = connection_string;
-
-    while (std::regex_search(conn_str, match, pattern)) {
-        std::wstring key = match[1].str();
-        std::transform(key.begin(), key.end(), key.begin(), [](wchar_t c) {
-            return std::towupper(c);
-        });
-        std::wstring val = match[2].str();
-        dest_map[key] = val;
-
-        conn_str = match.suffix().str();
-    }
-}
-
-std::string ConnectionStringHelper::BuildConnectionString(std::map<std::string, std::string> &input_map) {
-    std::ostringstream conn_stream;
-    for (const auto& e : input_map) {
-        if (conn_stream.tellp() > 0) {
-            conn_stream << ";";
-        }
-        conn_stream << e.first << "=" << e.second;
-    }
-    return conn_stream.str();
-}
-
-std::wstring ConnectionStringHelper::BuildConnectionStringW(std::map<std::wstring, std::wstring> &input_map) {
+MyStr ConnectionStringHelper::BuildConnectionString(std::map<MyStr, MyStr> &input_map) {
+    #ifdef UNICODE
     std::wostringstream conn_stream;
+    #else
+    std::ostringstream conn_stream;
+    #endif
     for (const auto& e : input_map) {
         if (conn_stream.tellp() > 0) {
             conn_stream << ";";
