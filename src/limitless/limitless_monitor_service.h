@@ -28,9 +28,9 @@
 #include <sql.h>
 #include <sqlext.h>
 
+#include "../util/text_helper.h"
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
-#include "../util/text_helper.h"
 
 typedef struct LimitlessMonitor {
     ~LimitlessMonitor() {

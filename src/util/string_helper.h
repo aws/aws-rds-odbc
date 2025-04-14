@@ -24,8 +24,8 @@
 
 #include <cstring>
 #include <locale>
-#include <string>
 #include <regex>
+#include <string>
 
 #define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
 #define AS_CHAR(str) (reinterpret_cast<char*>(str))

@@ -27,7 +27,7 @@ public:
      * Parses the input connection string into the destination map as key-value pairs.
      * Returns -1 on error and the number of items in dest_map on success.
      */
-    static void ParseConnectionString(const MyStr &conn_str, std::map<MyStr, MyStr> &dest_map);
+    static void ParseConnectionString(const MyStr &connection_string, std::map<MyStr, MyStr> &dest_map);
 
     /**
      * Builds a connection string with the given map
