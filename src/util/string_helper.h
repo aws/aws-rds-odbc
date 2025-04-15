@@ -20,7 +20,6 @@
 #endif
 
 #include <sql.h>
-
 #include <string>
 
 #define AS_SQLTCHAR(str) (const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str)))
