@@ -14,6 +14,9 @@
 // limitations under the License.
 
 #include "html_util.h"
+
+#include <glog/logging.h>
+
 #include "../util/logger_wrapper.h"
 
 const std::unordered_map<std::string, char> HtmlUtil::HTML_DECODE_MAP = {

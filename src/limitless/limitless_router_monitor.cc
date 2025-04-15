@@ -19,6 +19,7 @@
     #include <cstring> // For strlen in ANSI mode
 #endif
 #include <regex>
+#include <sqlext.h>
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"

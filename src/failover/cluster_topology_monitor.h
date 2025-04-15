@@ -32,14 +32,11 @@
     #include <windows.h>
 #endif
 #include <sql.h>
-#include <sqlext.h>
 #include <sqltypes.h>
 
 #include "cluster_topology_query_helper.h"
 
 #include "../host_info.h"
-#include "../util/connection_string_helper.h"
-#include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"

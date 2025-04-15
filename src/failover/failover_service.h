@@ -18,21 +18,13 @@
 #ifdef __cplusplus
 
 #include <atomic>
-#include <iostream>
 #include <map>
-#include <memory>
 #include <string>
 
 #include "cluster_topology_monitor.h"
 
 #include "../dialect/dialect.h"
-#include "../dialect/dialect_aurora_postgres.h"
-#include "../host_selector/highest_weight_host_selector.h"
 #include "../host_selector/host_selector.h"
-#include "../host_selector/random_host_selector.h"
-#include "../host_selector/round_robin_host_selector.h"
-#include "../util/connection_string_helper.h"
-#include "../util/connection_string_keys.h"
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"
 

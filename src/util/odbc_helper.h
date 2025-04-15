@@ -19,13 +19,8 @@
     #include <windows.h>
 #endif
 
-#include <sql.h>
-#include <sqlext.h>
 #include <sqltypes.h>
 #include <string>
-
-#include "string_helper.h"
-#include "text_helper.h"
 
 class OdbcHelper {
 public:

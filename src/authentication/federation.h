@@ -19,7 +19,6 @@
 #include <aws/core/auth/AWSCredentials.h>
 #include <aws/core/http/HttpClient.h>
 #include <aws/sts/STSClient.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 
 class FederationCredentialProvider {
 public:

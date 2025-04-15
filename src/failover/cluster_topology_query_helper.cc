@@ -14,7 +14,9 @@
 
 #include "cluster_topology_query_helper.h"
 
-#include <cmath>
+#include <sql.h>
+#include <sqlext.h>
+
 
 ClusterTopologyQueryHelper::ClusterTopologyQueryHelper(int port, std::string endpoint_template, SQLSTR topology_query, SQLSTR writer_id_query,
                                                        SQLSTR node_id_query)

@@ -16,6 +16,10 @@
 
 #include <cmath>
 #include <string>
+#include <sql.h>
+#include <sqlext.h>
+
+#include <glog/logging.h>
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"

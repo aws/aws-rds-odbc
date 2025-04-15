@@ -14,6 +14,7 @@
 
 #include <cwctype>
 #include <regex>
+#include <sstream>
 
 #include "connection_string_helper.h"
 

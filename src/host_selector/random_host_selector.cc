@@ -15,7 +15,6 @@
 #include "random_host_selector.h"
 
 #include <algorithm>
-#include <iterator>
 #include <random>
 #include <stdexcept>
 

@@ -16,7 +16,6 @@
 #define LIMITLESSMONITORSERVICE_H_
 
 #ifdef __cplusplus
-#include <cstdio>
 #include <map>
 #include <mutex>
 #include <string>
@@ -24,9 +23,6 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-
-#include <sql.h>
-#include <sqlext.h>
 
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"

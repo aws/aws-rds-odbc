@@ -25,7 +25,6 @@
 #endif
 
 #include <sql.h>
-#include <sqlext.h>
 
 #include "../host_info.h"
 

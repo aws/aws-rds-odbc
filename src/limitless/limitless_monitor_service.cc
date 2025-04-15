@@ -15,6 +15,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <glog/logging.h>
+
 #include "../util/logger_wrapper.h"
 #include "connection_string_helper.h"
 #include "limitless_monitor_service.h"

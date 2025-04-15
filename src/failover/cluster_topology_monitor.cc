@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <glog/logging.h>
+
+#include "../util/connection_string_helper.h"
+#include "../util/connection_string_keys.h"
 #include "cluster_topology_monitor.h"
 #include "cluster_topology_info.h"
+#include "string_helper.h"
+#include <sqlext.h>
 
 ClusterTopologyMonitor::ClusterTopologyMonitor(
         const std::string& cluster_id,

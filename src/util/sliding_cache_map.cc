@@ -14,6 +14,7 @@
 
 #include "sliding_cache_map.h"
 
+#include "../host_selector/round_robin_host_selector.h"
 #include "failover/failover_service.h"
 #include "host_info.h"
 

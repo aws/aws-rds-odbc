@@ -17,6 +17,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <glog/logging.h>
+
 /**
   Initialize and return random number.
 

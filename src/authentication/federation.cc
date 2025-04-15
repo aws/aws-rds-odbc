@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
+
+#include <glog/logging.h>
+
 #include "federation.h"
 #include "../util/logger_wrapper.h"
 

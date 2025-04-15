@@ -19,9 +19,7 @@
 #include <windows.h>
 #endif
 
-#include <sql.h>
-#include <sqlext.h>
-
+#include <sqltypes.h>
 #include <vector>
 
 #include "../host_info.h"
