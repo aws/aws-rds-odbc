@@ -15,8 +15,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "string_to_number_converter.h"
 #include "../mock_objects.h"
+#include "string_to_number_converter.h"
 
 #include <authentication_provider.h>
 

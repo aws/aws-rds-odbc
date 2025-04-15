@@ -16,7 +16,10 @@
 
 #include <failover_service.h>
 
+#include "../dialect/dialect_aurora_postgres.h"
 #include "../mock_objects.h"
+#include "../util/connection_string_helper.h"
+#include "../util/connection_string_keys.h"
 
 using ::testing::Return;
 

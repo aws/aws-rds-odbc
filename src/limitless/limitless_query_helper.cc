@@ -15,9 +15,9 @@
 #include "limitless_query_helper.h"
 
 #include <cmath>
-#include <string>
 #include <sql.h>
 #include <sqlext.h>
+#include <string>
 
 #include <glog/logging.h>
 

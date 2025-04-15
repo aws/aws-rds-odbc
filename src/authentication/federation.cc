@@ -16,8 +16,8 @@
 
 #include <glog/logging.h>
 
-#include "federation.h"
 #include "../util/logger_wrapper.h"
+#include "federation.h"
 
 bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
     Aws::STS::Model::AssumeRoleWithSAMLRequest& saml_request,
