@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <chrono>
 #ifdef UNICODE
     #include <cwchar> // For wcslen in Unicode mode
