@@ -17,7 +17,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "text_helper.h"
+#include "string_helper.h"
 #include "../mock_objects.h"
 
 #include "connection_string_helper.h"
@@ -32,21 +32,21 @@ using testing::Invoke;
 static const SQLTCHAR *test_connection_string_lazy_c_str;
 static const SQLTCHAR *test_connection_string_immediate_c_str;
 const static int test_host_port = 5432;
-MyStr conn_str_lazy, conn_str_immediate;
+SQLSTR conn_str_lazy, conn_str_immediate;
 
 class LimitlessMonitorServiceTest : public testing::Test {
   protected:
     // Runs once per suite
     static void SetUpTestSuite() {
-        std::map<MyStr, MyStr> conn_str_map;
+        std::map<SQLSTR, SQLSTR> conn_str_map;
         conn_str_map[SERVER_HOST_KEY] = TEXT("limitless.shardgrp-1234.us-east-2.rds.amazonaws.com");
-        conn_str_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY] = StringHelper::ToMyStr(std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS));
+        conn_str_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY] = StringHelper::ToSQLSTR(std::to_string(TEST_LIMITLESS_MONITOR_INTERVAL_MS));
 
-        conn_str_map[LIMITLESS_MODE_KEY] = TEXT("lazy");
+        conn_str_map[LIMITLESS_MODE_KEY] = LIMITLESS_MODE_VALUE_LAZY;
         conn_str_lazy = ConnectionStringHelper::BuildConnectionString(conn_str_map);
         test_connection_string_lazy_c_str = AS_SQLTCHAR(conn_str_lazy.c_str());
 
-        conn_str_map[LIMITLESS_MODE_KEY] = TEXT("immediate");
+        conn_str_map[LIMITLESS_MODE_KEY] = LIMITLESS_MODE_VALUE_IMMEDIATE;
         conn_str_immediate = ConnectionStringHelper::BuildConnectionString(conn_str_map);
         test_connection_string_immediate_c_str = AS_SQLTCHAR(conn_str_immediate.c_str());
     }

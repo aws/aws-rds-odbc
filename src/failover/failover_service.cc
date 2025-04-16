@@ -84,7 +84,7 @@ static U parse_num(const T& num_to_parse, const U& default_num) {
 }
 
 FailoverService::FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
-                                 std::shared_ptr<std::map<MyStr, MyStr>> conn_info,
+                                 std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info,
                                  std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
                                  const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
                                  const std::shared_ptr<IOdbcHelper>& odbc_helper)
@@ -335,8 +335,8 @@ bool FailoverService::failover_writer(SQLHDBC hdbc) {
 
 bool FailoverService::connect_to_host(SQLHDBC hdbc, const std::string& host_string) {
     LOG(INFO) << "Attempting to connect to host: " << host_string;
-    conn_info_->insert_or_assign(SERVER_HOST_KEY, StringHelper::ToMyStr(host_string));
-    MyStr conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
+    conn_info_->insert_or_assign(SERVER_HOST_KEY, StringHelper::ToSQLSTR(host_string));
+    SQLSTR conn_str = ConnectionStringHelper::BuildConnectionString(*conn_info_);
 
     return odbc_helper_->ConnStrConnect(AS_SQLTCHAR(conn_str.c_str()), hdbc);
 }
@@ -414,15 +414,15 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
             return false;
     }
 
-    std::map<MyStr, MyStr> conn_info;
-    ConnectionStringHelper::ParseConnectionString(StringHelper::ToMyStr(conn_cstr), conn_info);
+    std::map<SQLSTR, SQLSTR> conn_info;
+    ConnectionStringHelper::ParseConnectionString(StringHelper::ToSQLSTR(conn_cstr), conn_info);
     // Simple wide to narrow conversion for endpoint template when unicode
     // RDS endpoints are alphanumeric only
     std::string endpoint_template = StringHelper::ToString(conn_info[ENDPOINT_TEMPLATE_KEY]);
     std::string host = StringHelper::ToString(conn_info[SERVER_HOST_KEY]);
-    std::shared_ptr<std::map<MyStr, MyStr>> conn_info_ptr = std::make_shared<std::map<MyStr, MyStr>>(conn_info);
+    std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info_ptr = std::make_shared<std::map<SQLSTR, SQLSTR>>(conn_info);
     conn_info[ENABLE_FAILOVER_KEY] = BOOL_FALSE;
-    MyStr updated_conn_str = ConnectionStringHelper::BuildConnectionString(conn_info);
+    SQLSTR updated_conn_str = ConnectionStringHelper::BuildConnectionString(conn_info);
 
     if (endpoint_template.empty()) {
         endpoint_template = RdsUtils::GetRdsInstanceHostPattern(host);
@@ -436,7 +436,7 @@ bool StartFailoverService(char* service_id_c_str, DatabaseDialect dialect, const
         } else {
             LOG(INFO) << "[Failover Service] Generated ClusterId: " << cluster_id << " from host: " << host;
         }
-        conn_info_ptr->insert_or_assign(CLUSTER_ID_KEY, StringHelper::ToMyStr(cluster_id));
+        conn_info_ptr->insert_or_assign(CLUSTER_ID_KEY, StringHelper::ToSQLSTR(cluster_id));
         // If the original input was empty, copy the generated ID back to caller
         strncpy(service_id_c_str, cluster_id.c_str(), MAX_CLUSTER_ID_LEN);
     }

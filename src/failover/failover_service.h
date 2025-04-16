@@ -146,7 +146,7 @@ public:
     static const uint32_t DEFAULT_FAILOVER_TIMEOUT_MS;
 
     FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
-        std::shared_ptr<std::map<MyStr, MyStr>> conn_info,
+        std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info,
         std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
         const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
         const std::shared_ptr<IOdbcHelper>& odbc_helper);
@@ -171,7 +171,7 @@ private:
     HostInfo curr_host_;
     std::string cluster_id_;
     std::shared_ptr<Dialect> dialect_;
-    std::shared_ptr<std::map<MyStr, MyStr>> conn_info_;
+    std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info_;
     std::shared_ptr<HostSelector> host_selector_;
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map_;
     std::shared_ptr<ClusterTopologyMonitor> topology_monitor_;

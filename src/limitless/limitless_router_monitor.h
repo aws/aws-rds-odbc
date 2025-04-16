@@ -49,7 +49,7 @@ public:
 
     virtual bool IsStopped();
 protected:
-    MyStr connection_string;
+    SQLSTR connection_string;
 
     std::atomic_bool stopped = false;
 

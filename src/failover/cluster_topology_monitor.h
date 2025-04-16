@@ -65,7 +65,7 @@ protected:
     void DelayMainThread(bool use_high_refresh_rate);
     std::vector<HostInfo> FetchTopologyUpdateCache(SQLHDBC hdbc);
     void UpdateTopologyCache(const std::vector<HostInfo>& hosts);
-    MyStr ConnForHost(const std::string& new_host);
+    SQLSTR ConnForHost(const std::string& new_host);
 
 private:
     class NodeMonitoringThread;
@@ -83,7 +83,7 @@ private:
 
     // Topology Tracking
     std::string cluster_id_;
-    MyStr conn_str_;
+    SQLSTR conn_str_;
 
     // SlidingCacheMap internally is thread safe
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map_;

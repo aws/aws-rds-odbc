@@ -25,7 +25,6 @@
 #include <string>
 
 #include "string_helper.h"
-#include "text_helper.h"
 
 class OdbcHelper {
 public:

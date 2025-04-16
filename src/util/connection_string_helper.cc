@@ -16,48 +16,31 @@
 #include <regex>
 
 #include "connection_string_helper.h"
-#include "text_helper.h"
 
-namespace {
-    #ifdef UNICODE
-    typedef std::wsmatch MyMatch;
-    typedef wchar_t MyChar;
-    typedef std::wostringstream MyStream;
-
-    #define MyUpper(c) std::towupper(c)
-    #else
-    typedef std::smatch MyMatch;
-    typedef unsigned char MyChar;
-    typedef std::ostringstream MyStream;
-
-    #define MyUpper(c) std::toupper(c)
-    #endif
-};
-
-void ConnectionStringHelper::ParseConnectionString(const MyStr &connection_string, std::map<MyStr, MyStr> &dest_map) {
-    MyRegex pattern(TEXT("([^;=]+)=([^;]+)"));
-    MyMatch match;
-    MyStr conn_str = connection_string;
+void ConnectionStringHelper::ParseConnectionString(const SQLSTR &connection_string, std::map<SQLSTR, SQLSTR> &dest_map) {
+    RDSREGEX pattern(TEXT("([^;=]+)=([^;]+)"));
+    RDSSTRMATCH match;
+    SQLSTR conn_str = connection_string;
 
     while (std::regex_search(conn_str, match, pattern)) {
-        MyStr key = match[1].str();
-        std::transform(key.begin(), key.end(), key.begin(), [](MyChar c) {
-            return MyUpper(c);
+        SQLSTR key = match[1].str();
+        std::transform(key.begin(), key.end(), key.begin(), [](RDSCHAR c) {
+            return StringHelper::ToUpper(c);
         });
-        MyStr val = match[2].str();
+        SQLSTR val = match[2].str();
         dest_map[key] = val;
 
         conn_str = match.suffix().str();
     }
 }
 
-MyStr ConnectionStringHelper::BuildConnectionString(std::map<MyStr, MyStr> &input_map) {
-    MyStream conn_stream;
+SQLSTR ConnectionStringHelper::BuildConnectionString(std::map<SQLSTR, SQLSTR> &input_map) {
+    RDSSTRSTREAM conn_stream;
     for (const auto& e : input_map) {
         if (conn_stream.tellp() > 0) {
-            conn_stream << ";";
+            conn_stream << TEXT(";");
         }
-        conn_stream << e.first << "=" << e.second;
+        conn_stream << e.first << TEXT("=") << e.second;
     }
     return conn_stream.str();
 }

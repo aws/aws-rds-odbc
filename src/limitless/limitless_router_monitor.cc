@@ -18,7 +18,6 @@
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
-#include "../util/text_helper.h"
 #include "limitless_query_helper.h"
 #include "limitless_router_monitor.h"
 
@@ -45,11 +44,11 @@ void LimitlessRouterMonitor::Open(
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
 
-    this->connection_string = StringHelper::ToMyStr(connection_string_c_str);
+    this->connection_string = StringHelper::ToSQLSTR(connection_string_c_str);
 
     // disable limitless for the monitor
-    MyRegex limitless_enabled_pattern(LIMITLESS_ENABLED_KEY TEXT("=1"));
-    MyStr limitless_disabled = LIMITLESS_ENABLED_KEY TEXT("=0");
+    RDSREGEX limitless_enabled_pattern(LIMITLESS_ENABLED_KEY TEXT("=") BOOL_TRUE);
+    SQLSTR limitless_disabled = LIMITLESS_ENABLED_KEY TEXT("=") BOOL_FALSE;
     this->connection_string = std::regex_replace(this->connection_string, limitless_enabled_pattern, limitless_disabled);
     SQLSMALLINT connection_string_len = this->connection_string.size();
 

@@ -28,7 +28,6 @@
 #include <sql.h>
 #include <sqlext.h>
 
-#include "../util/text_helper.h"
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
 
@@ -67,8 +66,6 @@ private:
 
     RoundRobinHostSelector round_robin;
 };
-
-#define LIMITLESS_MODE_VALUE_LAZY TEXT("lazy")
 
 extern "C" {
 #endif

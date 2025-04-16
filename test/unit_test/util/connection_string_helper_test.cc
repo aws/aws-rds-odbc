@@ -17,7 +17,6 @@
 #include "connection_string_helper.h"
 #include "logger_wrapper.h"
 #include "string_helper.h"
-#include "text_helper.h"
 
 class ConnectionStringHelperTest : public testing::Test {
 protected:
@@ -30,7 +29,7 @@ protected:
 };
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string) {
-    std::map<MyStr, MyStr> dest_map;
+    std::map<SQLSTR, SQLSTR> dest_map;
     ConnectionStringHelper::ParseConnectionString(TEXT("KEY1=value1;kEy2=value2;key3=value3;"), dest_map);
     EXPECT_EQ(dest_map.size(), 3);
     EXPECT_EQ(dest_map[TEXT("KEY1")], TEXT("value1"));
@@ -39,7 +38,7 @@ TEST_F(ConnectionStringHelperTest, parse_connection_string) {
 }
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_no_trailing_semicolon) {
-    std::map<MyStr, MyStr> dest_map;
+    std::map<SQLSTR, SQLSTR> dest_map;
     ConnectionStringHelper::ParseConnectionString(TEXT("KEY1=value1;kEy2=value2;key3=value3"), dest_map);
     EXPECT_EQ(dest_map.size(), 3);
     EXPECT_EQ(dest_map[TEXT("KEY1")], TEXT("value1"));
@@ -48,22 +47,22 @@ TEST_F(ConnectionStringHelperTest, parse_connection_string_no_trailing_semicolon
 }
 
 TEST_F(ConnectionStringHelperTest, parse_connection_string_nothing) {
-    std::map<MyStr, MyStr> dest_map;
+    std::map<SQLSTR, SQLSTR> dest_map;
     ConnectionStringHelper::ParseConnectionString(TEXT(""), dest_map);
     EXPECT_EQ(dest_map.size(), 0);
 }
 
 TEST_F(ConnectionStringHelperTest, build_connection_string) {
-    std::map<MyStr, MyStr> dest_map;
+    std::map<SQLSTR, SQLSTR> dest_map;
     dest_map[TEXT("KEY")] = TEXT("value");
-    MyStr res = ConnectionStringHelper::BuildConnectionString(dest_map);
+    SQLSTR res = ConnectionStringHelper::BuildConnectionString(dest_map);
     EXPECT_EQ(TEXT("KEY=value"), res);
 }
 
 TEST_F(ConnectionStringHelperTest, build_connection_string_long) {
-    std::map<MyStr, MyStr> dest_map;
+    std::map<SQLSTR, SQLSTR> dest_map;
     dest_map[TEXT("A")] = TEXT("1");
     dest_map[TEXT("B")] = TEXT("2");
-    MyStr res = ConnectionStringHelper::BuildConnectionString(dest_map);
+    SQLSTR res = ConnectionStringHelper::BuildConnectionString(dest_map);
     EXPECT_EQ(TEXT("A=1;B=2"), res);
 }

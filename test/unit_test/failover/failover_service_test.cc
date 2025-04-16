@@ -21,15 +21,12 @@
 using ::testing::Return;
 
 namespace {
-    MyStr conn_str = TEXT(
+    SQLSTR conn_str = TEXT(
         "SERVER=database-pg-name.cluster-ro-XYZ.us-east-2.rds.amazonaws.com;"  \
         "ENABLECLUSTERFAILOVER=1;"                                          \
         "FAILOVERMODE=READER_OR_WRITER;"                                    \
         "READERHOSTSELECTORSTRATEGY=ROUND_ROBIN;"                           \
         "FAILOVERTIMEOUT=10000;");
-    MyStr mode_strict_reader = TEXT("STRICT_READER");
-    MyStr mode_strict_writer = TEXT("STRICT_WRITER");
-    MyStr mode_reader_or_writer = TEXT("READER_OR_WRITER");
     const std::string server_host = "database-pg-name.cluster-ro-XYZ.us-east-2.rds.amazonaws.com";
     const std::string cluster_id = "clusterId";
     const std::shared_ptr<Dialect> driver_dialect = std::make_shared<DialectAuroraPostgres>();
@@ -58,9 +55,9 @@ protected:
         // Mock ODBC for Failover Service
         mock_odbc_helper = std::make_shared<MOCK_ODBC_HELPER>();
 
-        std::map<MyStr, MyStr> conn_info;
+        std::map<SQLSTR, SQLSTR> conn_info;
         ConnectionStringHelper::ParseConnectionString(conn_str, conn_info);
-        conn_info_ptr = std::make_shared<std::map<MyStr, MyStr>>(conn_info);
+        conn_info_ptr = std::make_shared<std::map<SQLSTR, SQLSTR>>(conn_info);
 
         // Using HENV to dummy allocate a HDBC to set to anything other than `0` / SQL_NULL_HDBC
         OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, hdbc, "");
@@ -71,7 +68,7 @@ protected:
 
     SQLHDBC hdbc = SQL_NULL_HANDLE;
 
-    std::shared_ptr<std::map<MyStr, MyStr>> conn_info_ptr;
+    std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info_ptr;
 
     std::shared_ptr<FailoverService> failover_service;
     std::vector<HostInfo> topology;
@@ -186,7 +183,7 @@ TEST_F(FailoverServiceTest, failover_reader_or_writer_success) {
 
 // TODO - Not testable, can't set internal return of `is_connected_to_reader()` for strict reader
 TEST_F(FailoverServiceTest, DISABLED_failover_strict_reader_success) {
-    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, mode_strict_reader);
+    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, FAILOVER_MODE_VALUE_STRICT_READER);
 
     HostInfo writer_host(endpoint_prefix + "-writer", port, UP, true, nullptr, host_weight);
     HostInfo reader_host(endpoint_prefix + "-reader", port, UP, false, nullptr, host_weight);
@@ -224,7 +221,7 @@ TEST_F(FailoverServiceTest, DISABLED_failover_strict_reader_success) {
 }
 
 TEST_F(FailoverServiceTest, failover_strict_writer_success) {
-    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, mode_strict_writer);
+    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, FAILOVER_MODE_VALUE_STRICT_WRITER);
 
     HostInfo writer_host(endpoint_prefix + "-writer", port, UP, true, nullptr, host_weight);
     HostInfo reader_host(endpoint_prefix + "-reader", port, UP, false, nullptr, host_weight);
@@ -285,7 +282,7 @@ TEST_F(FailoverServiceTest, failover_fail_no_hosts) {
 }
 
 TEST_F(FailoverServiceTest, failover_strict_reader_fail_no_reader) {
-    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, mode_strict_reader);
+    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, FAILOVER_MODE_VALUE_STRICT_READER);
     HostInfo writer_host(endpoint_prefix + "-writer", port, UP, true, nullptr, host_weight);
     topology.push_back(writer_host);
     topology_map->Put(cluster_id, topology);
@@ -321,7 +318,7 @@ TEST_F(FailoverServiceTest, failover_strict_reader_fail_no_reader) {
 }
 
 TEST_F(FailoverServiceTest, failover_strict_writer_fail_no_writer) {
-    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, mode_strict_writer);
+    conn_info_ptr->insert_or_assign(FAILOVER_MODE_KEY, FAILOVER_MODE_VALUE_STRICT_WRITER);
     HostInfo reader_host(endpoint_prefix + "-reader", port, UP, false, nullptr, host_weight);
     topology.push_back(reader_host);
     topology_map->Put(cluster_id, topology);

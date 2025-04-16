@@ -16,7 +16,17 @@
 #define STRING_HELPER_H_
 
 #ifdef WIN32
-    #include <windows.h>
+    #include <windows.h> // Required to include sql.h and sqlext.h below
+    #include <tchar.h>
+#else
+    // On non-Windows platforms:
+    #ifdef UNICODE
+        #define TEXT(x) L##x
+        #include <cwchar> // For wide string functions like wcslen, wcscpy
+    #else
+        #define TEXT(x) x
+        #include <cstring> // For narrow string functions like strlen, strcpy
+    #endif
 #endif
 
 #include <sql.h>
@@ -39,15 +49,19 @@
 #define CONSTRUCT_SQLSTR(s) CONCATENATE(L, s)
 typedef std::wstring SQLSTR;
 
-typedef std::wstring MyStr;
-typedef std::wregex MyRegex;
+typedef wchar_t RDSCHAR;
+typedef std::wostringstream RDSSTRSTREAM;
+typedef std::wregex RDSREGEX;
+typedef std::wsmatch RDSSTRMATCH;
 #else
 // No-op
 #define CONSTRUCT_SQLSTR(s) s
 typedef std::string SQLSTR;
 
-typedef std::string MyStr;
-typedef std::regex MyRegex;
+typedef char RDSCHAR;
+typedef std::ostringstream RDSSTRSTREAM;
+typedef std::regex RDSREGEX;
+typedef std::smatch RDSSTRMATCH;
 #endif
 
 #if defined(__APPLE__) || defined(__linux__)
@@ -58,8 +72,9 @@ typedef std::regex MyRegex;
 
 class StringHelper {
 public:
-    // StringHelper::ToString will take any string input and output a std::string
-
+    /**
+     * Converts an SQLTCHAR array to a std::string
+     */
     static std::string ToString(const SQLTCHAR *src) {
         #ifdef UNICODE
         std::wstring wstr = AS_CONST_WCHAR(src);
@@ -69,6 +84,9 @@ public:
         #endif
     }
 
+    /**
+     * Converts a std::wstring to a std::string
+     */
     static std::string ToString(const std::wstring& src) {
         if (src.empty()) {
             return std::string();
@@ -76,13 +94,17 @@ public:
         return std::string(src.begin(), src.end());
     }
 
+    /**
+     * Converts a std::string to a std::string (no-op)
+     */
     static std::string ToString(const std::string& src) {
         return src;
     }
 
-    // StringHelper::ToMyStr will take any string input and output a MyStr
-
-    static MyStr ToMyStr(const SQLTCHAR *src) {
+    /**
+     * Converts an SQLTCHAR array to a SQLSTR (std::string for ANSI, std::wstring for Unicode)
+     */
+    static SQLSTR ToSQLSTR(const SQLTCHAR *src) {
         #ifdef UNICODE
         return std::wstring(AS_CONST_WCHAR(src));
         #else
@@ -90,7 +112,10 @@ public:
         #endif
     }
 
-    static MyStr ToMyStr(const std::string &src) {
+    /**
+     * Converts a std::string to a SQLSTR (std::string for ANSI, std::wstring for Unicode)
+     */
+    static SQLSTR ToSQLSTR(const std::string &src) {
         #ifdef UNICODE
         if (src.empty()) {
             return std::wstring();
@@ -101,7 +126,10 @@ public:
         #endif
     }
 
-    static MyStr ToMyStr(const std::wstring &src) {
+    /**
+     * Converts a std::wstring to a SQLSTR (std::string for ANSI, std::wstring for Unicode)
+     */
+    static SQLSTR ToSQLSTR(const std::wstring &src) {
         #ifdef UNICODE
         return src;
         #else
@@ -110,6 +138,20 @@ public:
         }
         return std::string(src.begin(), src.end());
         #endif
+    }
+
+    /**
+     * Returns the upper-case wide character for a given wide character, if one exists
+     */
+    static wchar_t ToUpper(wchar_t c) {
+        return std::towupper(c);
+    }
+
+    /**
+     * Returns the upper-case ASCII character for a given ASCII character, if one exists
+     */
+    static char ToUpper(char c) {
+        return std::toupper(c);
     }
 };
 

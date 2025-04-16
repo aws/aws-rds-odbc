@@ -37,7 +37,7 @@ ClusterTopologyMonitor::ClusterTopologyMonitor(
             henv_, SQL_HANDLE_ENV)) {
         throw std::runtime_error(std::string("Cluster Topology Monitor unable to allocate HENV for ClusterId: ") + cluster_id);
     }
-    conn_str_ = StringHelper::ToMyStr(conn_cstr);
+    conn_str_ = StringHelper::ToSQLSTR(conn_cstr);
 }
 
 ClusterTopologyMonitor::~ClusterTopologyMonitor() {
@@ -218,13 +218,13 @@ void ClusterTopologyMonitor::UpdateTopologyCache(const std::vector<HostInfo>& ho
     request_update_topology_cv_.notify_one();
 }
 
-MyStr ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
-    MyStr new_host_w = StringHelper::ToMyStr(new_host);
-    std::map<MyStr, MyStr> conn_map;
+SQLSTR ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
+    SQLSTR new_host_str = StringHelper::ToSQLSTR(new_host);
+    std::map<SQLSTR, SQLSTR> conn_map;
     ConnectionStringHelper::ParseConnectionString(conn_str_, conn_map);
 
     if (conn_map.find(SERVER_HOST_KEY) != conn_map.end()) {
-        conn_map[SERVER_HOST_KEY] = new_host_w;
+        conn_map[SERVER_HOST_KEY] = new_host_str;
     }
     if (conn_map.find(ENABLE_FAILOVER_KEY) != conn_map.end()) {
         conn_map[ENABLE_FAILOVER_KEY] = BOOL_FALSE;

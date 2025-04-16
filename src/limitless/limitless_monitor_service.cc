@@ -51,8 +51,8 @@ bool LimitlessMonitorService::NewService(
     std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
 
     // parse the connection string to extract useful limitless information
-    std::map<MyStr, MyStr> connection_string_map;
-    MyStr conn_str = StringHelper::ToMyStr(connection_string_c_str);
+    std::map<SQLSTR, SQLSTR> connection_string_map;
+    SQLSTR conn_str = StringHelper::ToSQLSTR(connection_string_c_str);
     ConnectionStringHelper::ParseConnectionString(conn_str, connection_string_map);
 
     if (service_id.empty()) {
@@ -77,7 +77,7 @@ bool LimitlessMonitorService::NewService(
 
     auto it = connection_string_map.find(LIMITLESS_MODE_KEY);
     if (it != connection_string_map.end()) {
-        MyStr value = connection_string_map[LIMITLESS_MODE_KEY];
+        SQLSTR value = connection_string_map[LIMITLESS_MODE_KEY];
         if (value == LIMITLESS_MODE_VALUE_LAZY) {
             block_and_query_immediately = false;
         }
@@ -87,7 +87,7 @@ bool LimitlessMonitorService::NewService(
 
     it = connection_string_map.find(LIMITLESS_MONITOR_INTERVAL_MS_KEY);
     if (it != connection_string_map.end()) {
-        MyStr value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
+        SQLSTR value = connection_string_map[LIMITLESS_MONITOR_INTERVAL_MS_KEY];
         limitless_monitor_interval_ms = std::stoi(value);
     }
 

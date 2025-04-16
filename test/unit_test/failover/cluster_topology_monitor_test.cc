@@ -16,7 +16,7 @@
 #include <cluster_topology_monitor.h>
 
 #include "../mock_objects.h"
-#include "text_helper.h"
+#include "string_helper.h"
 
 using ::testing::Return;
 
