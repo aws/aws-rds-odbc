@@ -17,7 +17,6 @@
 
 #ifdef __cplusplus
 #include <map>
-#include <mutex>
 #include <string>
 
 #include "limitless_router_monitor.h"

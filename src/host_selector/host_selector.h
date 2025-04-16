@@ -15,11 +15,11 @@
 #ifndef HOST_SELECTOR_H_
 #define HOST_SELECTOR_H_
 
-#include "../host_info.h"
-
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "../host_info.h"
 
 class HostSelector {
 public:

@@ -17,6 +17,7 @@
 #include <sql.h>
 #include <sqlext.h>
 
+#include "../util/odbc_helper.h"
 
 ClusterTopologyQueryHelper::ClusterTopologyQueryHelper(int port, std::string endpoint_template, SQLSTR topology_query, SQLSTR writer_id_query,
                                                        SQLSTR node_id_query)

@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "connection_string_helper.h"
+
 #include <gtest/gtest.h>
 
-#include "connection_string_helper.h"
 #include "logger_wrapper.h"
 #include "text_helper.h"
 

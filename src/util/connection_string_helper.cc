@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "connection_string_helper.h"
+
 #include <cwctype>
 #include <regex>
 #include <sstream>
-
-#include "connection_string_helper.h"
 
 void ConnectionStringHelper::ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map) {
     std::regex pattern("([^;=]+)=([^;]+)");

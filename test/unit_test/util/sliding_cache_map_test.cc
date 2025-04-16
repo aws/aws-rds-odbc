@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
-#include <sliding_cache_map.h>
+#include "sliding_cache_map.h"
 
 #include <string>
 #include <thread>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace {
     const std::string cache_key_a("key_a");

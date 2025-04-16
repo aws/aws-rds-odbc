@@ -20,6 +20,7 @@
 #endif
 
 #include <sqltypes.h>
+
 #include <vector>
 
 #include "../host_info.h"

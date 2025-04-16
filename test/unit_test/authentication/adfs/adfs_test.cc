@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "adfs/adfs.h"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "../../mock_objects.h"
-
-#include <adfs/adfs.h>
 
 namespace {
     const char* idp_endpoint("endpoint.com");

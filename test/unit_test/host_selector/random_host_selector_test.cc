@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "random_host_selector.h"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <random_host_selector.h>
 
 namespace {
     constexpr int base_port = 1234;

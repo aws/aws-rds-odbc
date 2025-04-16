@@ -16,7 +16,6 @@
 #define LIMITLESSROUTERMONITOR_H_
 
 #include <atomic>
-#include <mutex>
 #include <thread>
 #include <vector>
 

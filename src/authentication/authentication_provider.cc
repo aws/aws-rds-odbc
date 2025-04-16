@@ -23,7 +23,6 @@
 #include <aws/core/http/HttpClient.h>
 #include <aws/rds/RDSClient.h>
 #include <aws/sts/STSClient.h>
-
 #include <glog/logging.h>
 
 #include <algorithm>

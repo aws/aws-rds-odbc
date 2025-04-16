@@ -24,7 +24,6 @@
 
 #include "../host_info.h"
 #include "../util/logger_wrapper.h"
-#include "../util/odbc_helper.h"
 #include "string_helper.h"
 
 class ClusterTopologyQueryHelper {

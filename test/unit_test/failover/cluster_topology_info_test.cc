@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "cluster_topology_info.h"
+
 #include <gtest/gtest.h>
-#include <cluster_topology_info.h>
-#include <host_info.h>
-#include <simple_host_availability_strategy.h>
 
 #include "../mock_objects.h"
+#include "host_info.h"
+#include "simple_host_availability_strategy.h"
 
 using ::testing::Return;
 

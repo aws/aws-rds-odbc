@@ -21,12 +21,11 @@
 #include <map>
 #include <string>
 
-#include "cluster_topology_monitor.h"
-
 #include "../dialect/dialect.h"
 #include "../host_selector/host_selector.h"
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"
+#include "cluster_topology_monitor.h"
 
 #define BUFFER_SIZE 1024
 #define MAX_CLUSTER_ID_LEN 1024

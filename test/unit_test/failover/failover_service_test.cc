@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
+#include "failover_service.h"
 
-#include <failover_service.h>
+#include <gtest/gtest.h>
 
 #include "../dialect/dialect_aurora_postgres.h"
 #include "../mock_objects.h"

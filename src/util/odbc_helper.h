@@ -20,6 +20,7 @@
 #endif
 
 #include <sqltypes.h>
+
 #include <string>
 
 class OdbcHelper {

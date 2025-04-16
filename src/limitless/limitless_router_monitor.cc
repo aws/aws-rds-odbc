@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "limitless_router_monitor.h"
+
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#include <sqlext.h>
 
 #include <chrono>
 #ifdef UNICODE
@@ -23,12 +27,10 @@
     #include <cstring> // For strlen in ANSI mode
 #endif
 #include <regex>
-#include <sqlext.h>
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 #include "limitless_query_helper.h"
-#include "limitless_router_monitor.h"
 
 LimitlessRouterMonitor::LimitlessRouterMonitor() = default;
 

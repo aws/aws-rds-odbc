@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
-
 #include <glog/logging.h>
 
 #include "../util/logger_wrapper.h"
