@@ -16,6 +16,8 @@
 #include <windows.h>
 #endif
 
+#include <cstring>
+
 #include "rds_utils.h"
 #include "string_helper.h"
 
