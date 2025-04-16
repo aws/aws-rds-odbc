@@ -25,7 +25,6 @@ int main(int argc, char* argv[]) {
     SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
     SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
-
     const char* conn_str = "DSN=sample_DSN;SERVER=sample_Server;PORT=3306;UID=sample_User;PWD=sample_Pwd;DATABASE=sample_Db;";
     int server_port = 5432;
     // Set a custom service ID such that all routers can map to the same cluster
