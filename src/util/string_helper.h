@@ -73,6 +73,16 @@ typedef std::smatch RDSSTRMATCH;
 class StringHelper {
 public:
     /**
+     * Converts a std::string to a std::wstring
+     */
+    static std::wstring ToWstring(const std::string& src) {
+        if (src.empty()) {
+            return std::wstring();
+        }
+        return std::wstring(src.begin(), src.end());
+    }
+
+    /**
      * Converts an SQLTCHAR array to a std::string
      */
     static std::string ToString(const SQLTCHAR *src) {
