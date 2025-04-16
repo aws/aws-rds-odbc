@@ -24,6 +24,9 @@
 #include <glog/logging.h>
 
 #include "../util/logger_wrapper.h"
+#ifdef UNICODE
+#include "../util/string_helper.h"
+#endif
 #include "connection_string_helper.h"
 #include "limitless_query_helper.h"
 #include "rds_utils.h"
