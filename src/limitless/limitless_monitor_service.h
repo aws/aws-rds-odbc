@@ -16,7 +16,9 @@
 #define LIMITLESSMONITORSERVICE_H_
 
 #ifdef __cplusplus
+#include <cstdio>
 #include <map>
+#include <mutex>
 #include <string>
 
 #include "limitless_router_monitor.h"

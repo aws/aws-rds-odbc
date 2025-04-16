@@ -15,7 +15,12 @@
 #ifndef LIMITLESSROUTERMONITOR_H_
 #define LIMITLESSROUTERMONITOR_H_
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <atomic>
+#include <mutex>
 #include <thread>
 #include <vector>
 
