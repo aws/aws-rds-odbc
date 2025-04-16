@@ -18,13 +18,20 @@
 #define MAX_SERVER_HOST_SIZE 1024
 
 int main(int argc, char* argv[]) {
+    SQLHENV henv;
+    SQLHDBC hdbc;
+
+    SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);
+    SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+    SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+
     const char* conn_str = "DSN=sample_DSN;SERVER=sample_Server;PORT=3306;UID=sample_User;PWD=sample_Pwd;DATABASE=sample_Db;";
     int server_port = 5432;
     // Set a custom service ID such that all routers can map to the same cluster
-    const char* service_id = "custom_id";
+    char* service_id = "custom_id";
 
     // Check if a connection is a Limitless Cluster or not
-    bool is_conn_limitless = CheckLimitlessCluster();
+    bool is_conn_limitless = CheckLimitlessCluster(hdbc);
     if (is_conn_limitless) {
         // Allocate space to get a server host
         LimitlessInstance limitless_info;
@@ -33,7 +40,7 @@ int main(int argc, char* argv[]) {
 
         // Call to get a Limitless router and based off of the service ID to periodically update the list of live routers
         // Each call will increment the reference count, and will be joined when reference counts reaches 0
-        bool has_limitless_instance = GetLimitlessInstance(conn_str, server_port, service_id, &limitless_info);
+        bool has_limitless_instance = GetLimitlessInstance((SQLTCHAR *) conn_str, server_port, service_id, MAX_SERVER_HOST_SIZE, &limitless_info);
 
         // ... do things with new server host...
 
