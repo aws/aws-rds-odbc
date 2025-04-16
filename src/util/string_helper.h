@@ -22,17 +22,17 @@
     // On non-Windows platforms:
     #ifdef UNICODE
         #define TEXT(x) L##x
-        #include <cwchar> // For wide string functions like wcslen, wcscpy
     #else
         #define TEXT(x) x
-        #include <cstring> // For narrow string functions like strlen, strcpy
     #endif
 #endif
 
 #include <sql.h>
 #include <sqlext.h>
 
-#include <cstring>
+#include <cstring> // For narrow string functions like strlen, strcpy
+#include <cwchar> // For wide string functions like wcslen, wcscpy
+#include <cwctype> // For wide character functions like towupper
 #include <locale>
 #include <regex>
 #include <string>
