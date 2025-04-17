@@ -137,7 +137,7 @@ HostInfo ClusterTopologyQueryHelper::CreateHost(SQLTCHAR* node_id, bool is_write
 }
 
 std::string ClusterTopologyQueryHelper::GetEndpoint(SQLTCHAR* node_id) {
-std::string res(endpoint_template_);
+    std::string res(endpoint_template_);
     std::string node_id_str = StringHelper::ToString(node_id);
 
     int pos = res.find(REPLACE_CHAR);

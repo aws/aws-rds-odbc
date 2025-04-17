@@ -50,7 +50,6 @@ void LimitlessRouterMonitor::Open(
     RDSREGEX limitless_enabled_pattern(LIMITLESS_ENABLED_KEY TEXT("=") BOOL_TRUE);
     SQLSTR limitless_disabled = LIMITLESS_ENABLED_KEY TEXT("=") BOOL_FALSE;
     this->connection_string = std::regex_replace(this->connection_string, limitless_enabled_pattern, limitless_disabled);
-    SQLSMALLINT connection_string_len = this->connection_string.size();
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
     if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", henv, SQL_HANDLE_ENV)) {
@@ -66,7 +65,7 @@ void LimitlessRouterMonitor::Open(
             return; // fatal error; don't open thread
         }
 
-        rc = SQLDriverConnect(conn, nullptr, AS_SQLTCHAR(this->connection_string.c_str()), connection_string_len, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+        rc = SQLDriverConnect(conn, nullptr, AS_SQLTCHAR(this->connection_string.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
         if (SQL_SUCCEEDED(rc)) {
             // initial connection was successful, immediately populate caller's limitless routers
             *limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
@@ -77,7 +76,7 @@ void LimitlessRouterMonitor::Open(
     }
 
     // start monitoring thread; if block_and_query_immediately is false, then conn is SQL_NULL_HANDLE, and the thread will connect after the monitor interval has passed
-    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::Run, this, henv, conn, reinterpret_cast<SQLTCHAR *>(this->connection_string.data()), connection_string_len, host_port);
+    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::Run, this, henv, conn, reinterpret_cast<SQLTCHAR *>(this->connection_string.data()), SQL_NTS, host_port);
 }
 
 bool LimitlessRouterMonitor::IsStopped() {

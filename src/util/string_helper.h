@@ -45,23 +45,23 @@
 #define CONCATENATE(e1, e2) e1 ## e2
 
 #ifdef UNICODE
-// Return L"s"
-#define CONSTRUCT_SQLSTR(s) CONCATENATE(L, s)
-typedef std::wstring SQLSTR;
+    // Return L"s"
+    #define CONSTRUCT_SQLSTR(s) CONCATENATE(L, s)
+    typedef std::wstring SQLSTR;
 
-typedef wchar_t RDSCHAR;
-typedef std::wostringstream RDSSTRSTREAM;
-typedef std::wregex RDSREGEX;
-typedef std::wsmatch RDSSTRMATCH;
+    typedef wchar_t RDSCHAR;
+    typedef std::wostringstream RDSSTRSTREAM;
+    typedef std::wregex RDSREGEX;
+    typedef std::wsmatch RDSSTRMATCH;
 #else
-// No-op
-#define CONSTRUCT_SQLSTR(s) s
-typedef std::string SQLSTR;
+    // No-op
+    #define CONSTRUCT_SQLSTR(s) s
+    typedef std::string SQLSTR;
 
-typedef char RDSCHAR;
-typedef std::ostringstream RDSSTRSTREAM;
-typedef std::regex RDSREGEX;
-typedef std::smatch RDSSTRMATCH;
+    typedef char RDSCHAR;
+    typedef std::ostringstream RDSSTRSTREAM;
+    typedef std::regex RDSREGEX;
+    typedef std::smatch RDSSTRMATCH;
 #endif
 
 #if defined(__APPLE__) || defined(__linux__)
@@ -87,10 +87,10 @@ public:
      */
     static std::string ToString(const SQLTCHAR *src) {
         #ifdef UNICODE
-        std::wstring wstr = AS_CONST_WCHAR(src);
-        return std::string(wstr.begin(), wstr.end());
+            std::wstring wstr = AS_CONST_WCHAR(src);
+            return std::string(wstr.begin(), wstr.end());
         #else
-        return std::string(AS_CONST_CHAR(src));
+            return std::string(AS_CONST_CHAR(src));
         #endif
     }
 
@@ -116,9 +116,9 @@ public:
      */
     static SQLSTR ToSQLSTR(const SQLTCHAR *src) {
         #ifdef UNICODE
-        return std::wstring(AS_CONST_WCHAR(src));
+            return std::wstring(AS_CONST_WCHAR(src));
         #else
-        return std::string(AS_CONST_CHAR(src));
+            return std::string(AS_CONST_CHAR(src));
         #endif
     }
 
@@ -127,12 +127,12 @@ public:
      */
     static SQLSTR ToSQLSTR(const std::string &src) {
         #ifdef UNICODE
-        if (src.empty()) {
-            return std::wstring();
-        }
-        return std::wstring(src.begin(), src.end());
+            if (src.empty()) {
+                return std::wstring();
+            }
+            return std::wstring(src.begin(), src.end());
         #else
-        return src;
+            return src;
         #endif
     }
 
@@ -141,12 +141,12 @@ public:
      */
     static SQLSTR ToSQLSTR(const std::wstring &src) {
         #ifdef UNICODE
-        return src;
+            return src;
         #else
-        if (src.empty()) {
-            return std::string();
-        }
-        return std::string(src.begin(), src.end());
+            if (src.empty()) {
+                return std::string();
+            }
+            return std::string(src.begin(), src.end());
         #endif
     }
 
