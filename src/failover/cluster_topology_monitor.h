@@ -43,6 +43,7 @@
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"
+#include "../util/string_helper.h"
 
 class ClusterTopologyMonitor {
 public:
@@ -64,11 +65,7 @@ protected:
     void DelayMainThread(bool use_high_refresh_rate);
     std::vector<HostInfo> FetchTopologyUpdateCache(SQLHDBC hdbc);
     void UpdateTopologyCache(const std::vector<HostInfo>& hosts);
-    #ifdef UNICODE
-    std::wstring ConnForHost(const std::string& new_host);
-    #else
-    std::string ConnForHost(const std::string& new_host);
-    #endif
+    SQLSTR ConnForHost(const std::string& new_host);
 
 private:
     class NodeMonitoringThread;
@@ -86,11 +83,7 @@ private:
 
     // Topology Tracking
     std::string cluster_id_;
-    #ifdef UNICODE
-        std::wstring conn_str_;
-    #else
-        std::string conn_str_;
-    #endif
+    SQLSTR conn_str_;
 
     // SlidingCacheMap internally is thread safe
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map_;

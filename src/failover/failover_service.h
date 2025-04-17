@@ -35,6 +35,7 @@
 #include "../util/connection_string_keys.h"
 #include "../util/odbc_helper.h"
 #include "../util/sliding_cache_map.h"
+#include "../util/string_helper.h"
 
 #define BUFFER_SIZE 1024
 #define MAX_CLUSTER_ID_LEN 1024
@@ -144,19 +145,11 @@ public:
     static const uint32_t DEFAULT_REFRESH_RATE_MS;
     static const uint32_t DEFAULT_FAILOVER_TIMEOUT_MS;
 
-#ifdef UNICODE
     FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
-        std::shared_ptr<std::map<std::wstring, std::wstring>> conn_info,
+        std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info,
         std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
         const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
         const std::shared_ptr<IOdbcHelper>& odbc_helper);
-#else
-    FailoverService(const std::string& host, const std::string& cluster_id, std::shared_ptr<Dialect> dialect,
-        std::shared_ptr<std::map<std::string, std::string>> conn_info,
-        std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map,
-        const std::shared_ptr<ClusterTopologyMonitor>& topology_monitor,
-        const std::shared_ptr<IOdbcHelper>& odbc_helper);
-#endif
     ~FailoverService();
 
     FailoverStatus Failover(SQLHDBC hdbc, const char* sql_state);
@@ -178,11 +171,7 @@ private:
     HostInfo curr_host_;
     std::string cluster_id_;
     std::shared_ptr<Dialect> dialect_;
-    #ifdef UNICODE
-    std::shared_ptr<std::map<std::wstring, std::wstring>> conn_info_;
-    #else
-    std::shared_ptr<std::map<std::string, std::string>> conn_info_;
-    #endif
+    std::shared_ptr<std::map<SQLSTR, SQLSTR>> conn_info_;
     std::shared_ptr<HostSelector> host_selector_;
     std::shared_ptr<SlidingCacheMap<std::string, std::vector<HostInfo>>> topology_map_;
     std::shared_ptr<ClusterTopologyMonitor> topology_monitor_;

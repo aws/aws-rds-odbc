@@ -19,7 +19,7 @@
 
 #include <cluster_topology_query_helper.h>
 
-#include "text_helper.h"
+#include "string_helper.h"
 #include "../mock_objects.h"
 
 using ::testing::Return;
@@ -46,13 +46,7 @@ TEST_F(ClusterTopologyQueryHelperTest, CreateHost) {
         std::make_shared<ClusterTopologyQueryHelper>(port, "?", TEXT(""), TEXT(""), TEXT(""));
 
     HostInfo host = query_helper->CreateHost(node_id, false, cpu_usage, replica_lag);
-    std::string expected;
-#ifdef UNICODE
-    std::wstring node_id_wstr(node_id);
-    expected = std::string(node_id_wstr.begin(), node_id_wstr.end());
-#else
-    expected = std::string(AS_CHAR(node_id));
-#endif
+    std::string expected = StringHelper::ToString(node_id);
     EXPECT_EQ(expected, host.GetHost());
     EXPECT_EQ(port, host.GetPort());
     EXPECT_EQ(weight, host.GetWeight());
@@ -63,13 +57,7 @@ TEST_F(ClusterTopologyQueryHelperTest, GetEndpoint) {
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
         std::make_shared<ClusterTopologyQueryHelper>(1234, "?", TEXT(""), TEXT(""), TEXT(""));
     SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node-id"));
-    std::string expected;
-#ifdef UNICODE
-    std::wstring node_id_wstr(node_id);
-    expected = std::string(node_id_wstr.begin(), node_id_wstr.end());
-#else
-    expected = std::string(AS_CHAR(node_id));
-#endif
+    std::string expected = StringHelper::ToString(node_id);
     EXPECT_EQ(expected, query_helper->GetEndpoint(node_id));
 }
 
@@ -78,13 +66,7 @@ TEST_F(ClusterTopologyQueryHelperTest, GetEndpoint_extra_values) {
     std::shared_ptr<ClusterTopologyQueryHelper> query_helper =
         std::make_shared<ClusterTopologyQueryHelper>(1234, endpoint_template, TEXT(""), TEXT(""), TEXT(""));
     SQLTCHAR* node_id = AS_SQLTCHAR(TEXT("node-id"));
-    std::string expected;
-#ifdef UNICODE
-    std::wstring node_id_wstr(node_id);
-    std::string narrow_id = std::string(node_id_wstr.begin(), node_id_wstr.end());
-    expected = std::string(endpoint_template).replace(endpoint_template.find("?"), 1, narrow_id.c_str());
-#else
-    expected = std::string(endpoint_template).replace(endpoint_template.find("?"), 1, AS_CHAR(node_id));
-#endif
+    std::string narrow_id = StringHelper::ToString(node_id);
+    std::string expected = std::string(endpoint_template).replace(endpoint_template.find("?"), 1, narrow_id.c_str());
     EXPECT_EQ(expected, query_helper->GetEndpoint(node_id));
 }

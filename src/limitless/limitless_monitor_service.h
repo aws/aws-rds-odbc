@@ -67,19 +67,6 @@ private:
     RoundRobinHostSelector round_robin;
 };
 
-// move to connection_string_keys.h when created
-#ifdef UNICODE
-#define SERVER_KEY                          L"SERVER"
-#define LIMITLESS_MODE_KEY                  L"LIMITLESSMODE"
-#define LIMITLESS_MONITOR_INTERVAL_MS_KEY   L"LIMITLESSMONITORINTERVALMS"
-#define LIMITLESS_MODE_VALUE_LAZY           L"lazy"
-#else
-#define SERVER_KEY                          "SERVER"
-#define LIMITLESS_MODE_KEY                  "LIMITLESSMODE"
-#define LIMITLESS_MONITOR_INTERVAL_MS_KEY   "LIMITLESSMONITORINTERVALMS"
-#define LIMITLESS_MODE_VALUE_LAZY           "lazy"
-#endif
-
 extern "C" {
 #endif
 
