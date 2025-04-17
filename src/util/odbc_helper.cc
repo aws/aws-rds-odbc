@@ -30,11 +30,7 @@ bool OdbcHelper::ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn) {
     }
 
     SQLRETURN rc = 0;
-#ifdef UNICODE
-    rc = SQLDriverConnectW(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-#else
     rc = SQLDriverConnect(out_conn, nullptr, conn_str, SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-#endif
 
     return CheckResult(rc, "Failed to connect to host.", out_conn, SQL_HANDLE_DBC);
 }
@@ -182,12 +178,8 @@ void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, in
         if (ret == SQL_INVALID_HANDLE) {
             LOG(ERROR) << "Invalid handle";
         } else if (SQL_SUCCEEDED(ret)) {
-            #ifdef UNICODE
-            LOG(ERROR) << StringHelper::ToString(AS_WCHAR(sqlstate)) << ": "
-                       << StringHelper::ToString(AS_WCHAR(message));
-            #else
-            LOG(ERROR) << sqlstate << ": " << message;
-            #endif
+            LOG(ERROR) << StringHelper::ToString(sqlstate) << ": "
+                       << StringHelper::ToString(message);
         }
 
     } while (ret == SQL_SUCCESS);

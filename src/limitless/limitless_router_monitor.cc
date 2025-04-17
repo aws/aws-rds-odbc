@@ -21,13 +21,9 @@
 #include <sqlext.h>
 
 #include <chrono>
-#ifdef UNICODE
-    #include <cwchar> // For wcslen in Unicode mode
-#else
-    #include <cstring> // For strlen in ANSI mode
-#endif
 #include <regex>
 
+#include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
 #include "limitless_query_helper.h"
@@ -55,26 +51,12 @@ void LimitlessRouterMonitor::Open(
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC conn = SQL_NULL_HANDLE;
 
-#ifdef UNICODE
-    this->connection_string = reinterpret_cast<const wchar_t *>(connection_string_c_str);
+    this->connection_string = StringHelper::ToSQLSTR(connection_string_c_str);
 
     // disable limitless for the monitor
-    std::wregex limitless_enabled_pattern(LIMITLESS_ENABLED_KEY L"=1");
-    std::wstring limitless_disabled = LIMITLESS_ENABLED_KEY L"=0";
+    RDSREGEX limitless_enabled_pattern(LIMITLESS_ENABLED_KEY TEXT("=") BOOL_TRUE);
+    SQLSTR limitless_disabled = LIMITLESS_ENABLED_KEY TEXT("=") BOOL_FALSE;
     this->connection_string = std::regex_replace(this->connection_string, limitless_enabled_pattern, limitless_disabled);
-
-    SQLSMALLINT connection_string_len = std::wcslen(this->connection_string.c_str());
-#else
-    this->connection_string = reinterpret_cast<const char *>(connection_string_c_str);
-
-    // disable limitless for the monitor
-    std::regex limitless_enabled_pattern(LIMITLESS_ENABLED_KEY "=1");
-    std::string limitless_disabled = LIMITLESS_ENABLED_KEY "=0";
-    this->connection_string = std::regex_replace(this->connection_string, limitless_enabled_pattern, limitless_disabled);
-
-    SQLSMALLINT connection_string_len = std::strlen(this->connection_string.c_str());
-#endif
-    SQLSMALLINT out_connection_string_len; // unused
 
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
     if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", henv, SQL_HANDLE_ENV)) {
@@ -90,11 +72,7 @@ void LimitlessRouterMonitor::Open(
             return; // fatal error; don't open thread
         }
 
-#ifdef UNICODE
-        rc = SQLDriverConnectW(conn, nullptr, reinterpret_cast<SQLWCHAR *>(this->connection_string.data()), connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-#else
-        rc = SQLDriverConnect(conn, nullptr, reinterpret_cast<SQLCHAR *>(this->connection_string.data()), connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-#endif
+        rc = SQLDriverConnect(conn, nullptr, AS_SQLTCHAR(this->connection_string.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
         if (SQL_SUCCEEDED(rc)) {
             // initial connection was successful, immediately populate caller's limitless routers
             *limitless_routers = LimitlessQueryHelper::QueryForLimitlessRouters(conn, host_port);
@@ -105,7 +83,7 @@ void LimitlessRouterMonitor::Open(
     }
 
     // start monitoring thread; if block_and_query_immediately is false, then conn is SQL_NULL_HANDLE, and the thread will connect after the monitor interval has passed
-    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::Run, this, henv, conn, reinterpret_cast<SQLTCHAR *>(this->connection_string.data()), connection_string_len, host_port);
+    this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::Run, this, henv, conn, reinterpret_cast<SQLTCHAR *>(this->connection_string.data()), SQL_NTS, host_port);
 }
 
 bool LimitlessRouterMonitor::IsStopped() {
@@ -143,11 +121,7 @@ void LimitlessRouterMonitor::Run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connectio
                 break; // this is a fatal error; stop monitoring
             }
 
-#ifdef UNICODE
-            rc = SQLDriverConnectW(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-#else
             rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
-#endif
             if (!SQL_SUCCEEDED(rc)) {
                 SQLFreeHandle(SQL_HANDLE_DBC, conn);
                 conn = SQL_NULL_HANDLE; // next loop can re-attempt connection

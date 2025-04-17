@@ -48,11 +48,7 @@ private:
     // SELECT aurora_db_instance_identifier()
     SQLSTR node_id_query_;
 
-#ifdef UNICODE
-    static constexpr wchar_t REPLACE_CHAR = L'?';
-#else 
     static constexpr char REPLACE_CHAR = '?';
-#endif
 
     static constexpr int BUFFER_SIZE = 1024;;
     static constexpr uint64_t SCALE_TO_PERCENT = 100L;

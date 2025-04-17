@@ -18,20 +18,20 @@
 #include <map>
 #include <string>
 
+#include "string_helper.h"
+
 class ConnectionStringHelper {
 public:
     /**
      * Parses the input connection string into the destination map as key-value pairs.
      * Returns -1 on error and the number of items in dest_map on success.
      */
-    static void ParseConnectionString(const char *connection_string, std::map<std::string, std::string> &dest_map);
-    static void ParseConnectionStringW(const wchar_t *connection_string, std::map<std::wstring, std::wstring> &dest_map);
+    static void ParseConnectionString(const SQLSTR &connection_string, std::map<SQLSTR, SQLSTR> &dest_map);
 
     /**
      * Builds a connection string with the given map
      */
-    static std::string BuildConnectionString(std::map<std::string, std::string> &input_map);
-    static std::wstring BuildConnectionStringW(std::map<std::wstring, std::wstring> &input_map);
+    static SQLSTR BuildConnectionString(std::map<SQLSTR, SQLSTR> &input_map);
 };
 
 #endif

@@ -27,6 +27,7 @@
 #include <sql.h>
 
 #include "../host_info.h"
+#include "../util/string_helper.h"
 
 class LimitlessRouterMonitor {
 public:
@@ -47,12 +48,8 @@ public:
 
     virtual bool IsStopped();
 protected:
-#ifdef UNICODE
-    std::wstring connection_string;
-#else
-    std::string connection_string;
-#endif
-    
+    SQLSTR connection_string;
+
     std::atomic_bool stopped = false;
 
     unsigned int interval_ms;
@@ -65,11 +62,5 @@ protected:
 
     void Run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connection_string, SQLSMALLINT connection_string_len, int host_port);
 };
-
-#ifdef UNICODE
-#define LIMITLESS_ENABLED_KEY   L"LIMITLESSENABLED"
-#else
-#define LIMITLESS_ENABLED_KEY   "LIMITLESSENABLED"
-#endif
 
 #endif // LIMITLESSROUTERMONITOR_H_

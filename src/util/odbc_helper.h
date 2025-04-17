@@ -21,7 +21,8 @@
 
 #include <sqltypes.h>
 
-#include <string>
+
+#include "string_helper.h"
 
 class OdbcHelper {
 public:
