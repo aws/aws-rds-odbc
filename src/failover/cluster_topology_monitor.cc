@@ -18,9 +18,9 @@
 
 #include <glog/logging.h>
 
+#include "../util/cluster_topology_helper.h"
 #include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
-#include "../util/cluster_topology_helper.h"
 #include "string_helper.h"
 
 ClusterTopologyMonitor::ClusterTopologyMonitor(

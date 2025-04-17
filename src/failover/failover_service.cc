@@ -22,9 +22,9 @@
 #include "../host_selector/highest_weight_host_selector.h"
 #include "../host_selector/random_host_selector.h"
 #include "../host_selector/round_robin_host_selector.h"
+#include "../util/cluster_topology_helper.h"
 #include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
-#include "../util/cluster_topology_helper.h"
 #include "../util/rds_utils.h"
 #include "../util/string_helper.h"
 
