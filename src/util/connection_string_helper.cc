@@ -15,6 +15,7 @@
 #include "connection_string_helper.h"
 
 #include <regex>
+#include <sstream>
 
 void ConnectionStringHelper::ParseConnectionString(const SQLSTR &connection_string, std::map<SQLSTR, SQLSTR> &dest_map) {
     RDSREGEX pattern(TEXT("([^;=]+)=([^;]+)"));

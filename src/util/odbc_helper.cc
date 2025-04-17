@@ -19,7 +19,6 @@
 #include <glog/logging.h>
 
 #include "string_helper.h"
-#include "text_helper.h"
 
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));
 

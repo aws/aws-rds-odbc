@@ -33,7 +33,6 @@
 #include "limitless_monitor_service.h"
 
 #include "util/odbc_helper.h"
-#include "util/text_helper.h"
 
 #define TEST_LIMITLESS_MONITOR_INTERVAL_MS 250
 

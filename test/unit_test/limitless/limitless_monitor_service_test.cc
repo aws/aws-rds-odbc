@@ -21,6 +21,7 @@
 
 #include "../mock_objects.h"
 #include "connection_string_helper.h"
+#include "connection_string_keys.h"
 #include "string_helper.h"
 
 using testing::Property;

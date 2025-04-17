@@ -14,6 +14,7 @@
 
 #include "string_to_number_converter.h"
 
+#include <cmath>
 #include <string>
 
 #include <gtest/gtest.h>

@@ -27,7 +27,6 @@
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/string_helper.h"
-#include "limitless_monitor_service.h"
 #include "limitless_query_helper.h"
 #include "rds_utils.h"
 
