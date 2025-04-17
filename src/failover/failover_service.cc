@@ -22,11 +22,11 @@
 #include "../host_selector/highest_weight_host_selector.h"
 #include "../host_selector/random_host_selector.h"
 #include "../host_selector/round_robin_host_selector.h"
+#include "../util/cluster_topology_helper.h"
 #include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
 #include "../util/rds_utils.h"
 #include "../util/string_helper.h"
-#include "cluster_topology_info.h"
 
 std::unordered_map<std::string, std::shared_ptr<FailoverServiceTracker>> FailoverServiceTrackerHandler::global_failover_services;
 std::mutex FailoverServiceTrackerHandler::map_mutex;
@@ -231,7 +231,7 @@ bool FailoverService::failover_reader(SQLHDBC hdbc) {
     do {
         std::vector<HostInfo> remaining_readers(reader_candidates);
         while (!remaining_readers.empty() && (curr_time = get_current()) < end) {
-            LOG(INFO) << "Failover for ClusterId: " << cluster_id_ << ". Remaining Hosts: " << ClusterTopologyInfo::LogTopology(remaining_readers);
+            LOG(INFO) << "Failover for ClusterId: " << cluster_id_ << ". Remaining Hosts: " << ClusterTopologyHelper::LogTopology(remaining_readers);
             HostInfo host;
             try {
                 host = host_selector_->GetHost(remaining_readers, false, properties);

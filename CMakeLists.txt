@@ -63,7 +63,6 @@ set(SRC
   src/authentication/okta/okta.cc
   src/authentication/secrets_manager_helper.cc
 
-  src/failover/cluster_topology_info.cc
   src/failover/cluster_topology_monitor.cc
   src/failover/cluster_topology_query_helper.cc
   src/failover/failover_service.cc
@@ -77,6 +76,7 @@ set(SRC
   src/limitless/limitless_query_helper.cc
   src/limitless/limitless_router_monitor.cc
 
+  src/util/cluster_topology_helper.cc
   src/util/connection_string_helper.cc
   src/util/sliding_cache_map.cc
   src/util/logger_wrapper.cc
@@ -99,7 +99,6 @@ set(INC
   src/dialect/dialect_aurora_postgres.h
   src/dialect/dialect.h
 
-  src/failover/cluster_topology_info.h
   src/failover/cluster_topology_monitor.h
   src/failover/cluster_topology_query_helper.h
   src/failover/failover_service.h
@@ -114,6 +113,7 @@ set(INC
   src/limitless/limitless_query_helper.h
   src/limitless/limitless_router_monitor.h
 
+  src/util/cluster_topology_helper.h
   src/util/connection_string_helper.h
   src/util/sliding_cache_map.h
   src/util/logger_wrapper.h
