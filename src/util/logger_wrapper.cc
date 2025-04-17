@@ -18,6 +18,8 @@
     #include <iconv.h>
 #endif
 
+#include <glog/logging.h>
+
 #include "logger_wrapper.h"
 
 static LoggerWrapper instance;

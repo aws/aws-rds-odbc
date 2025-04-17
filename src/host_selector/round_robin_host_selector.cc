@@ -15,7 +15,6 @@
 #include "round_robin_host_selector.h"
 
 #include <algorithm>
-#include <iterator>
 #include <sstream>
 #include <stdexcept>
 

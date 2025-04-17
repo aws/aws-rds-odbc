@@ -16,7 +16,6 @@
 #define CONNECTION_STRING_HELPER_H_
 
 #include <map>
-#include <sstream>
 #include <string>
 
 #include "string_helper.h"

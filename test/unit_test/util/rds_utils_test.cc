@@ -13,12 +13,13 @@
 // limitations under the License.
 
 #include "rds_utils.h"
-#include "string_helper.h"
+
+#include <string>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <string>
+#include "string_helper.h"
 
 namespace {
     const std::string US_EAST_REGION_CLUSTER = "database-test-name.cluster-XYZ.us-east-2.rds.amazonaws.com";

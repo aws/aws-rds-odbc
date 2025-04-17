@@ -17,6 +17,8 @@
 #include <regex>
 #include <unordered_set>
 
+#include <glog/logging.h>
+
 #include "../html_util.h"
 #include "../util/logger_wrapper.h"
 

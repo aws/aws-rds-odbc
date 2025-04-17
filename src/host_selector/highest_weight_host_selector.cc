@@ -15,7 +15,6 @@
 #include "highest_weight_host_selector.h"
 
 #include <algorithm>
-#include <iterator>
 #include <stdexcept>
 
 HostInfo HighestWeightHostSelector::GetHost(std::vector<HostInfo> hosts, bool is_writer, std::unordered_map<std::string, std::string>) {

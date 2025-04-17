@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <aws/core/Aws.h>
+#include <aws/secretsmanager/SecretsManagerClient.h>
+#include <aws/secretsmanager/model/GetSecretValueRequest.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "../mock_objects.h"
-
-#include <aws/core/Aws.h>
-#include <aws/secretsmanager/SecretsManagerClient.h>
-#include <aws/secretsmanager/model/GetSecretValueRequest.h>
-
 #include "secrets_manager_helper.h"
 #include "logger_wrapper.h"
 

@@ -16,9 +16,7 @@
 #define SLIDING_CACHE_MAP_H_
 
 #include <chrono>
-#include <iostream>
 #include <mutex>
-#include <string>
 #include <unordered_map>
 
 template <typename K, typename V>

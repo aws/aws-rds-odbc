@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "federation.h"
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
+#include <glog/logging.h>
+
 #include "../util/logger_wrapper.h"
+#include "federation.h"
 
 bool FederationCredentialProvider::FetchCredentialsWithSAMLAssertion(
     Aws::STS::Model::AssumeRoleWithSAMLRequest& saml_request,

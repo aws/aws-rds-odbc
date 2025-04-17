@@ -23,12 +23,10 @@
 #include <aws/core/http/HttpClient.h>
 #include <aws/rds/RDSClient.h>
 #include <aws/sts/STSClient.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
+#include <glog/logging.h>
 
 #include <algorithm>
 #include <atomic>
-#include <chrono>
-#include <mutex>
 #include <string>
 #include <unordered_map>
 

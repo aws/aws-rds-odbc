@@ -14,8 +14,13 @@
 
 #include "limitless_query_helper.h"
 
+#include <sql.h>
+#include <sqlext.h>
+
 #include <cmath>
 #include <string>
+
+#include <glog/logging.h>
 
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"

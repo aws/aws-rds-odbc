@@ -14,6 +14,16 @@
 
 #include "failover_service.h"
 
+#include <sqlext.h>
+
+#include <glog/logging.h>
+
+#include "../dialect/dialect_aurora_postgres.h"
+#include "../host_selector/highest_weight_host_selector.h"
+#include "../host_selector/random_host_selector.h"
+#include "../host_selector/round_robin_host_selector.h"
+#include "../util/connection_string_helper.h"
+#include "../util/connection_string_keys.h"
 #include "../util/rds_utils.h"
 #include "../util/string_helper.h"
 #include "cluster_topology_info.h"

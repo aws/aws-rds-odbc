@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "cluster_topology_monitor.h"
+
 #include <gtest/gtest.h>
-#include <cluster_topology_monitor.h>
 
 #include "../mock_objects.h"
 #include "string_helper.h"

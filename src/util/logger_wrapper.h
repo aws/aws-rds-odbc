@@ -22,7 +22,6 @@
 #endif /* XCODE_BUILD */
 
 #include <filesystem>
-#include <glog/logging.h>
 
 namespace logger_config {
     const std::string PROGRAM_NAME = "aws-rds-odbc";

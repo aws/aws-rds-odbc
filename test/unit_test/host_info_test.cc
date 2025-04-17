@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "host_info.h"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <host_info.h>
-#include <simple_host_availability_strategy.h>
+#include "simple_host_availability_strategy.h"
 
 namespace {
   const std::string host = "hostName";

@@ -16,6 +16,7 @@
 
 #include <cerrno>
 #include <cstdlib>
+
 #include <glog/logging.h>
 
 int StringToNumberConverter::toInt(const char* str) {

@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "limitless_monitor_service.h"
+
 #include <cstdio>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "string_helper.h"
 #include "../mock_objects.h"
-
 #include "connection_string_helper.h"
 #include "connection_string_keys.h"
-#include "limitless_monitor_service.h"
+#include "string_helper.h"
 
 using testing::Property;
 using testing::Return;

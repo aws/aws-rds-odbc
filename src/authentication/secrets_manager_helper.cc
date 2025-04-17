@@ -22,6 +22,7 @@
 #include <aws/core/utils/json/JsonSerializer.h>
 #include <aws/secretsmanager/SecretsManagerServiceClientModel.h>
 #include <aws/secretsmanager/model/GetSecretValueRequest.h>
+#include <glog/logging.h>
 
 #include "../util/logger_wrapper.h"
 #include "authentication_provider.h"

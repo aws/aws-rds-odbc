@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "round_robin_host_selector.h"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <round_robin_host_selector.h>
-#include <simple_host_availability_strategy.h>
+#include "simple_host_availability_strategy.h"
 
 namespace {
     const int base_port = 1234;

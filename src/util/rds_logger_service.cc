@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "rds_logger_service.h"
+
 #include "logger_wrapper.h"
 
 void InitializeRdsLogger(const char* log_dir, int threshold) {

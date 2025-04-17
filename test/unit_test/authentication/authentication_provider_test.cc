@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "authentication_provider.h"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "string_to_number_converter.h"
 #include "../mock_objects.h"
-
-#include <authentication_provider.h>
+#include "string_to_number_converter.h"
 
 namespace {
   const char* hostname = "hostName";

@@ -15,7 +15,6 @@
 #ifndef OKTA_H_
 #define OKTA_H_
 
-#include <map>
 #include <string>
 
 #include "../authentication_provider.h"

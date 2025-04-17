@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "limitless_monitor_service.h"
+
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <cstdio>
 #include <cstring>
+
+#include <glog/logging.h>
 
 #include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/string_helper.h"
-#include "limitless_monitor_service.h"
-
 #include "limitless_query_helper.h"
-#include "odbc_helper.h"
 #include "rds_utils.h"
-#include "string_helper.h"
 
 static LimitlessMonitorService limitless_monitor_service;
 

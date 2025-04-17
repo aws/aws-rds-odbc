@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
+#include "cluster_topology_query_helper.h"
 
 #include <algorithm>
 #include <string>
 
-#include <cluster_topology_query_helper.h>
+#include <gtest/gtest.h>
 
-#include "string_helper.h"
 #include "../mock_objects.h"
+#include "string_helper.h"
 
 using ::testing::Return;
 

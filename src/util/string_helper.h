@@ -26,9 +26,7 @@
         #define TEXT(x) x
     #endif
 #endif
-
 #include <sql.h>
-#include <sqlext.h>
 
 #include <cstring> // For narrow string functions like strlen, strcpy
 #include <cwchar> // For wide string functions like wcslen, wcscpy
