@@ -165,6 +165,40 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
     return true;
 }
 
+std::string OdbcHelper::MergeDiagRecs(HDBC hdbc, const std::string &custom_errmsg) {
+	std::string errmsg = "";
+
+	SQLTCHAR    sqlstate[6];
+	SQLTCHAR    message[OdbcHelper::MAX_MSG_LENGTH];
+	SQLINTEGER  nativeerror;
+	SQLSMALLINT textlen;
+	SQLRETURN   ret;
+	SQLSMALLINT recno = 0;
+
+	// merge all error messages for the failed dbc
+	do {
+		recno++;
+		message[0] = '\0';
+		ret = SQLGetDiagRec(SQL_HANDLE_DBC, hdbc, recno, sqlstate, &nativeerror, message, sizeof(message), &textlen);
+		if (SQL_SUCCEEDED(ret)) {
+            std::string newmsg = StringHelper::ToString(message);
+
+            if (errmsg.empty()) {
+                errmsg = newmsg;
+            } else {
+                // separate each message with a new line
+                errmsg = errmsg + '\n' + newmsg;
+            }
+		}
+	} while (ret == SQL_SUCCESS);
+
+    if (custom_errmsg.empty()) {
+        return errmsg;
+    }
+
+    return errmsg + '\n' + custom_errmsg;
+}
+
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
     SQLTCHAR     sqlstate[MAX_STATE_LENGTH];
     SQLTCHAR     message[MAX_MSG_LENGTH];

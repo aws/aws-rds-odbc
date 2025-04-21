@@ -19,6 +19,7 @@
 #endif
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #include <glog/logging.h>
@@ -26,6 +27,7 @@
 #include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
+#include "../util/odbc_helper.h"
 #include "../util/string_helper.h"
 #include "limitless_query_helper.h"
 #include "rds_utils.h"
@@ -174,7 +176,7 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     return host;
 }
 
-bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str) {
+bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, char *errmsg_out_c_str, size_t errmsg_out_size, char *custom_errmsg_c_str) {
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC hdbc = SQL_NULL_HANDLE;
 
@@ -190,8 +192,18 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str) {
     }
 
     if (!OdbcHelper::ConnStrConnect(const_cast<SQLTCHAR*>(connection_string_c_str), hdbc)) {
+        if (errmsg_out_c_str != nullptr) {
+            std::string custom_errmsg = custom_errmsg_c_str == nullptr ? "" : custom_errmsg_c_str;
+            std::string errmsg = OdbcHelper::MergeDiagRecs(hdbc, custom_errmsg);
+            strncpy(errmsg_out_c_str, errmsg.c_str(), errmsg_out_size);
+        }
+
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
+    }
+
+    if (errmsg_out_c_str != nullptr) {
+        errmsg_out_c_str[0] = '\0';
     }
 
     bool is_limitess_cluster = LimitlessQueryHelper::CheckLimitlessCluster(hdbc);

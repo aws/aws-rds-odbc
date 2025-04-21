@@ -39,6 +39,7 @@ public:
     static bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message);
     static bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message);
     static bool FetchResults(SQLHSTMT stmt, const std::string& log_message);
+    static std::string MergeDiagRecs(HDBC hdbc, const std::string &custom_errmsg);
 
 private:
     static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
