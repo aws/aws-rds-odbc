@@ -33,6 +33,7 @@
 #include "rds_utils.h"
 
 static LimitlessMonitorService limitless_monitor_service;
+static std::string limitless_errmsg; // used to store the error message returned by CheckLimitlessCluster
 
 LimitlessMonitorService::LimitlessMonitorService() {
     this->services_mutex = std::make_shared<std::mutex>();
@@ -176,35 +177,38 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     return host;
 }
 
-bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, char *errmsg_out_c_str, size_t errmsg_out_size, char *custom_errmsg_c_str) {
+bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *custom_errmsg_c_str, const char **errmsg_ptr) {
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC hdbc = SQL_NULL_HANDLE;
 
+    std::string custom_errmsg = custom_errmsg_c_str == nullptr ? "" : custom_errmsg_c_str;
+
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, nullptr, henv, "Could not allocate environment handle during limitless check") ||
         !OdbcHelper::SetHenvToOdbc3(henv, "Could not set henv to odbc3 during limitless check")) {
+        // Set error message and clean up
+        limitless_errmsg = StringHelper::MergeStrings(std::string("Could not allocate environment handle."), custom_errmsg);
+        *errmsg_ptr = limitless_errmsg.c_str();
         OdbcHelper::Cleanup(henv, SQL_NULL_HANDLE, SQL_NULL_HANDLE);
         return false;
     }
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_DBC, henv, hdbc, "ERROR: could not allocate connection handle during limitless check")) {
+        // Set error message and clean up
+        limitless_errmsg = StringHelper::MergeStrings(std::string("Could not allocate connection handle."), custom_errmsg);
+        *errmsg_ptr = limitless_errmsg.c_str();
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
     }
 
     if (!OdbcHelper::ConnStrConnect(const_cast<SQLTCHAR*>(connection_string_c_str), hdbc)) {
-        if (errmsg_out_c_str != nullptr) {
-            std::string custom_errmsg = custom_errmsg_c_str == nullptr ? "" : custom_errmsg_c_str;
-            std::string errmsg = OdbcHelper::MergeDiagRecs(hdbc, custom_errmsg);
-            strncpy(errmsg_out_c_str, errmsg.c_str(), errmsg_out_size);
-        }
-
+        // Set error message and clean up
+        limitless_errmsg = OdbcHelper::MergeDiagRecs(hdbc, custom_errmsg);
+        *errmsg_ptr = limitless_errmsg.c_str();
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
     }
 
-    if (errmsg_out_c_str != nullptr) {
-        errmsg_out_c_str[0] = '\0';
-    }
+    *errmsg_ptr = nullptr;
 
     bool is_limitess_cluster = LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
     OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);

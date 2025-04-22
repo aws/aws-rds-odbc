@@ -161,6 +161,22 @@ public:
     static char ToUpper(char c) {
         return std::toupper(c);
     }
+
+    static std::string MergeStrings(const std::string &a, const std::string &b) {
+        if (a.empty() && b.empty()) {
+            return "";
+        }
+
+        if (a.empty() && !b.empty()) {
+            return b;
+        }
+
+        if (!a.empty() && b.empty()) {
+            return a;
+        }
+
+        return a + '\n' + b;
+    }
 };
 
 #endif  // STRING_HELPER_H_
