@@ -68,7 +68,7 @@ void LimitlessRouterMonitor::Open(
     if (block_and_query_immediately) {
         rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
         if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
-            SQLFreeHandle(SQL_HANDLE_ENV, henv);
+            OdbcHelper::Cleanup(henv, conn, SQL_NULL_HSTMT);
             return; // fatal error; don't open thread
         }
 
@@ -111,10 +111,7 @@ void LimitlessRouterMonitor::Run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connectio
 
         if (conn == SQL_NULL_HANDLE || !OdbcHelper::CheckConnection(conn)) {
             // OdbcHelper::CheckConnection failed on a pre-existing handle, so free it
-            if (conn != SQL_NULL_HANDLE) {
-                SQLFreeHandle(SQL_HANDLE_DBC, conn);
-                conn = SQL_NULL_HANDLE;
-            }
+            OdbcHelper::Cleanup(SQL_NULL_HENV, conn, SQL_NULL_HSTMT);
 
             SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
             if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed", conn, SQL_HANDLE_DBC)) {
@@ -123,8 +120,7 @@ void LimitlessRouterMonitor::Run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connectio
 
             rc = SQLDriverConnect(conn, nullptr, connection_string, connection_string_len, nullptr, 0, &out_connection_string_len, SQL_DRIVER_NOPROMPT);
             if (!SQL_SUCCEEDED(rc)) {
-                SQLFreeHandle(SQL_HANDLE_DBC, conn);
-                conn = SQL_NULL_HANDLE; // next loop can re-attempt connection
+                OdbcHelper::Cleanup(SQL_NULL_HENV, conn, SQL_NULL_HSTMT);
 
                 // wait the full interval and then try to reconnect
                 continue;
@@ -141,11 +137,5 @@ void LimitlessRouterMonitor::Run(SQLHENV henv, SQLHDBC conn, SQLTCHAR *connectio
         }
     }
 
-    if (conn != SQL_NULL_HANDLE) {
-        SQLFreeHandle(SQL_HANDLE_DBC, conn);
-        conn = SQL_NULL_HANDLE;
-    }
-
-    SQLFreeHandle(SQL_HANDLE_ENV, henv);
-    henv = SQL_NULL_HANDLE;
+    OdbcHelper::Cleanup(henv, conn, SQL_NULL_HSTMT);
 }
