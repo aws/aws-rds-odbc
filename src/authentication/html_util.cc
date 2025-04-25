@@ -42,7 +42,7 @@ std::string HtmlUtil::EscapeHtmlEntity(const std::string& html) {
             continue;
         }
 
-        int semicolon_idx = html.find(';', i);
+        size_t semicolon_idx = html.find(';', i);
         if (semicolon_idx != std::string::npos) {
             std::string html_code = html.substr(i, semicolon_idx - i + 1);
             if (auto itr = HtmlUtil::HTML_DECODE_MAP.find(html_code); itr != HtmlUtil::HTML_DECODE_MAP.end()) {

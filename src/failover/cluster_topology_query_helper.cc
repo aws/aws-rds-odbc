@@ -145,7 +145,7 @@ std::string ClusterTopologyQueryHelper::GetEndpoint(SQLTCHAR* node_id) {
     std::string res(endpoint_template_);
     std::string node_id_str = StringHelper::ToString(node_id);
 
-    int pos = res.find(REPLACE_CHAR);
+    size_t pos = res.find(REPLACE_CHAR);
     if (pos != std::string::npos) {
         res.replace(pos, 1, node_id_str);
     }

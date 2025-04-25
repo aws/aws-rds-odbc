@@ -231,10 +231,10 @@ SQLSTR ClusterTopologyMonitor::ConnForHost(const std::string& new_host) {
     std::map<SQLSTR, SQLSTR> conn_map;
     ConnectionStringHelper::ParseConnectionString(conn_str_, conn_map);
 
-    if (conn_map.find(SERVER_HOST_KEY) != conn_map.end()) {
+    if (conn_map.contains(SERVER_HOST_KEY)) {
         conn_map[SERVER_HOST_KEY] = new_host_str;
     }
-    if (conn_map.find(ENABLE_FAILOVER_KEY) != conn_map.end()) {
+    if (conn_map.contains(ENABLE_FAILOVER_KEY)) {
         conn_map[ENABLE_FAILOVER_KEY] = BOOL_FALSE;
     }
 
