@@ -123,7 +123,7 @@ int RoundRobinHostSelector::convert_to_int(const std::string& str) {
 bool RoundRobinHostSelector::check_prop_change(const std::string& value, const std::string& prop_name,
     const std::unordered_map<std::string, std::string>& props) {
 
-    if (props.find(prop_name) == props.end()) {
+    if (!props.contains(prop_name)) {
         return false;
     }
     const std::string& prop_value = props.at(prop_name);

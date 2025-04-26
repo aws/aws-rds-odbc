@@ -26,8 +26,7 @@
 #include "../util/odbc_helper.h"
 #include "../util/string_to_number_converter.h"
 
-SQLTCHAR* LimitlessQueryHelper::check_limitless_cluster_query =
-const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(TEXT(\
+SQLTCHAR* LimitlessQueryHelper::check_limitless_cluster_query = AS_SQLTCHAR(TEXT(\
     "SELECT EXISTS ("\
     "   SELECT 1"\
     "   FROM pg_catalog.pg_class c"\
@@ -35,10 +34,10 @@ const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(TEXT(\
     "   WHERE c.relname = 'limitless_subclusters'"\
     "   AND n.nspname = 'rds_aurora'"\
     ");"\
-)));
+));
 
 SQLTCHAR* LimitlessQueryHelper::limitless_router_endpoint_query = \
-    const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()")));
+    AS_SQLTCHAR(TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()"));
 
 bool LimitlessQueryHelper::CheckLimitlessCluster(SQLHDBC conn) {
     HSTMT hstmt = SQL_NULL_HSTMT;
@@ -48,29 +47,26 @@ bool LimitlessQueryHelper::CheckLimitlessCluster(SQLHDBC conn) {
     }
 
     rc = SQLExecDirect(hstmt, check_limitless_cluster_query, SQL_NTS);
-    if (!SQL_SUCCEEDED(rc)) {
-        OdbcHelper::CheckResult(rc, "SQLExecDirect failed", hstmt, SQL_HANDLE_STMT);
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+    if (!OdbcHelper::CheckResult(rc, "CheckLimitlessCluster - SQLExecDirect failed", hstmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
         return false;
     }
 
     rc = SQLFetch(hstmt);
-    if (!SQL_SUCCEEDED(rc)) {
-        OdbcHelper::CheckResult(rc, "SQLFetch failed", hstmt, SQL_HANDLE_STMT);
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+    if (!OdbcHelper::CheckResult(rc, "CheckLimitlessCluster - SQLFetch failed", hstmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
         return false;
     }
 
     SQLCHAR result[2];
     SQLLEN result_len = 0;
     rc = SQLGetData(hstmt, 1, SQL_C_CHAR, &result, sizeof(result), &result_len);
-    if (SQL_SUCCEEDED(rc)) {
-        OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+    if (OdbcHelper::CheckResult(rc, "CheckLimitlessCluster - SQLGetData failed", hstmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
         return result[0] == '1';
     }
 
-    OdbcHelper::CheckResult(rc, "SQLGetData failed", hstmt, SQL_HANDLE_STMT);
-    OdbcHelper::Cleanup(SQL_NULL_HANDLE, SQL_NULL_HANDLE, hstmt);
+    OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
     return false;
 }
 
@@ -92,17 +88,20 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
     SQLRETURN rc2 = SQLBindCol(hstmt, 2, SQL_C_CHAR, &load_value, sizeof(load_value), &ind_load_value);
     if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLBindCol for router endpoint failed", hstmt, SQL_HANDLE_STMT) ||
         !OdbcHelper::CheckResult(rc2, "LimitlessQueryHelper: SQLBindCol for load value failed", hstmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
         return std::vector<HostInfo>();
     }
 
     rc = SQLExecDirect(hstmt, limitless_router_endpoint_query, SQL_NTS);
     if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLExecDirect failed", hstmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
         return std::vector<HostInfo>();
     }
 
     SQLLEN row_count = 0;
     rc = SQLRowCount(hstmt, &row_count);
     if (!OdbcHelper::CheckResult(rc, "LimitlessQueryHelper: SQLRowCount failed", hstmt, SQL_HANDLE_STMT)) {
+        OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
         return std::vector<HostInfo>();
     }
     std::vector<HostInfo> limitless_routers;
@@ -111,7 +110,7 @@ std::vector<HostInfo> LimitlessQueryHelper::QueryForLimitlessRouters(SQLHDBC con
         limitless_routers.push_back(create_host(load_value, router_endpoint_value, host_port_to_map));
     }
 
-    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+    OdbcHelper::Cleanup(SQL_NULL_HENV, SQL_NULL_HDBC, hstmt);
 
     return limitless_routers;
 }

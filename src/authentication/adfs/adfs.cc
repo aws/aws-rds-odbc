@@ -113,7 +113,7 @@ std::vector<std::string> AdfsCredentialsProvider::get_input_tags_from_html(const
         std::transform(tag_name.begin(), tag_name.end(), tag_name.begin(), [](unsigned char c) {
             return std::tolower(c);
         });
-        if (!tag_name.empty() && hash_set.find(tag_name) == hash_set.end()) {
+        if (!tag_name.empty() && !hash_set.contains(tag_name)) {
             hash_set.insert(tag_name);
             retval.push_back(tag);
             DLOG(INFO) << "Saved input_tag: " << tag;

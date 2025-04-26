@@ -106,7 +106,7 @@ FailoverService::FailoverService(const std::string& host, const std::string& clu
       odbc_helper_{ std::move(odbc_helper) } {
     this->init_failover_mode(host);
     this->host_selector_ = get_reader_host_selector();
-    failover_timeout_ = parse_num(conn_info_->find(FAILOVER_TIMEOUT_KEY) != conn_info_->end() ?
+    failover_timeout_ = parse_num(conn_info_->contains(FAILOVER_TIMEOUT_KEY) ?
         conn_info_->at(FAILOVER_TIMEOUT_KEY) : TEXT(""), DEFAULT_FAILOVER_TIMEOUT_MS);
     topology_monitor_->StartMonitor();
     curr_host_ = HostInfo(host, dialect_->GetDefaultPort(), UP, false, nullptr, 0);
@@ -119,7 +119,7 @@ FailoverService::~FailoverService() {
 }
 
 void FailoverService::init_failover_mode(const std::string& host) {
-    if (this->conn_info_->find(FAILOVER_MODE_KEY) != this->conn_info_->end()) {
+    if (this->conn_info_->contains(FAILOVER_MODE_KEY)) {
         std::string mode = StringHelper::ToString(this->conn_info_->at(FAILOVER_MODE_KEY));
 
         for (auto failover_mode_mapping : FAILOVER_MODE_MAPPING) {
@@ -137,7 +137,7 @@ void FailoverService::init_failover_mode(const std::string& host) {
 
 std::shared_ptr<HostSelector> FailoverService::get_reader_host_selector() const {
     ReaderHostSelectorStrategy selector_strategy = RANDOM;
-    if (this->conn_info_->find(READER_HOST_SELECTOR_STRATEGY_KEY) != this->conn_info_->end()) {
+    if (this->conn_info_->contains(READER_HOST_SELECTOR_STRATEGY_KEY)) {
         std::string strategy = StringHelper::ToString(this->conn_info_->at(READER_HOST_SELECTOR_STRATEGY_KEY));
 
         for (auto reader_host_selector_strategies_mapping : READER_HOST_SELECTOR_STRATEGIES_MAPPING) {
