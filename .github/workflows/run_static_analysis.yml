@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cppcheck llvm unixodbc
+          brew install cppcheck llvm unixodbc gflags
           python3 -m venv ./venv
           source ./venv/bin/activate
           python3 -m pip install codechecker==6.24.4
