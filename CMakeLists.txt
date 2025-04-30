@@ -234,7 +234,7 @@ message(STATUS "AWS_SDK_LIBRARIES_EXPANDED: ${AWS_SDK_LIBRARIES_EXPANDED}")
 if (APPLE)
   find_package(gflags REQUIRED)
   set(WITH_GFLAGS ON)
-  target_link_libraries(${LIBRARY_NAME} gflags::gflags)
+  target_link_libraries(${LIBRARY_NAME} gflags)
 endif()
 
 set("BUILD_TESTING" OFF CACHE INTERNAL "Skip GLOG Tests")
