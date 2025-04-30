@@ -93,7 +93,7 @@ jobs:
 
       - name: Install prerequisites
         run: |
-          brew install unixodbc
+          brew install unixodbc gflags
 
       - name: Checkout source code
         uses: actions/checkout@v4

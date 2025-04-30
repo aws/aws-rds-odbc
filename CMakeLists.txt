@@ -230,6 +230,13 @@ message(STATUS "AWS_SDK_LIBRARIES_EXPANDED: ${AWS_SDK_LIBRARIES_EXPANDED}")
 #-----------------------------------------------------
 # Google logging library
 
+# use gflags for MacOS builds - prevents linking errors for MacOS integration tests
+if (APPLE)
+  find_package(gflags REQUIRED)
+  set(WITH_GFLAGS ON)
+  target_link_libraries(${LIBRARY_NAME} gflags::gflags)
+endif()
+
 set("BUILD_TESTING" OFF CACHE INTERNAL "Skip GLOG Tests")
 FetchContent_Declare(
     glog
@@ -240,6 +247,9 @@ set(GLOG_BUILD_TESTS OFF) # Don't build tests
 set(GLOG_BUILD_BENCHMARKS OFF) # Don't build benchmarks
 set(GLOG_USE_CMAKE_INSTALL OFF) # Don't install glog
 set(BUILD_SHARED_LIBS OFF) # Force static linking.  Crucial for static glog
+if(WIN32)
+  set(WITH_SYMBOLIZE OFF) # prevents linking errors for Windows integration tests
+endif()
 FetchContent_MakeAvailable(glog)
 include_directories(${glog_SOURCE_DIR})
 target_link_libraries(${LIBRARY_NAME} glog::glog)
