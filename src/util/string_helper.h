@@ -28,7 +28,7 @@
 #endif
 #include <sql.h>
 
-#include <cstring> // For narrow string functions like strlen, strcpy
+#include <cstring> // For narrow string functions like strlen, strncpy
 #include <cwchar> // For wide string functions like wcslen, wcscpy
 #include <cwctype> // For wide character functions like towupper
 #include <locale>
@@ -162,6 +162,9 @@ public:
         return std::toupper(c);
     }
 
+    /**
+     * Merges two strings together, separated by a comma, if both aren't empty. Otherwise, returns the non-empty string, or an empty string if both are empty.
+     */
     static std::string MergeStrings(std::string a, std::string b) {
         if (a.empty()) return b;
         if (b.empty()) return a;

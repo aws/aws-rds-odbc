@@ -177,7 +177,7 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     return host;
 }
 
-bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *custom_errmsg_c_str, const char **errmsg_ptr) {
+bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *custom_errmsg_c_str, char *final_errmsg_c_str, size_t final_errmsg_size) {
     SQLHENV henv = SQL_NULL_HANDLE;
     SQLHDBC hdbc = SQL_NULL_HANDLE;
 
@@ -185,27 +185,53 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, nullptr, henv, "Could not allocate environment handle during limitless check") ||
         !OdbcHelper::SetHenvToOdbc3(henv, "Could not set henv to odbc3 during limitless check")) {
-        // Set error message and clean up
-        limitless_errmsg = StringHelper::MergeStrings("Could not allocate environment handle.", custom_errmsg);
-        *errmsg_ptr = limitless_errmsg.c_str();
+        std::string errmsg = StringHelper::MergeStrings("Could not allocate environment handle.", custom_errmsg);
+
+        if (errmsg.size() >= final_errmsg_size) {
+            errmsg = StringHelper::MergeStrings("Warning: error string is truncated.", errmsg);
+        }
+
+        if (final_errmsg_c_str != nullptr) {
+            strncpy(final_errmsg_c_str, errmsg.c_str(), final_errmsg_size);
+        }
+
         OdbcHelper::Cleanup(henv, SQL_NULL_HANDLE, SQL_NULL_HANDLE);
         return false;
     }
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_DBC, henv, hdbc, "ERROR: could not allocate connection handle during limitless check")) {
-        // Set error message and clean up
-        limitless_errmsg = StringHelper::MergeStrings("Could not allocate connection handle.", custom_errmsg);
-        *errmsg_ptr = limitless_errmsg.c_str();
+        std::string errmsg = StringHelper::MergeStrings("Could not allocate connection handle.", custom_errmsg);
+
+        if (errmsg.size() >= final_errmsg_size) {
+            errmsg = StringHelper::MergeStrings("Warning: error string is truncated.", errmsg);
+        }
+
+        if (final_errmsg_c_str != nullptr) {
+            strncpy(final_errmsg_c_str, errmsg.c_str(), final_errmsg_size);
+        }
+
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
     }
 
     if (!OdbcHelper::ConnStrConnect(const_cast<SQLTCHAR*>(connection_string_c_str), hdbc)) {
-        // Set error message and clean up
-        limitless_errmsg = OdbcHelper::MergeDiagRecs(hdbc, custom_errmsg);
-        *errmsg_ptr = limitless_errmsg.c_str();
+        std::string errmsg = OdbcHelper::MergeDiagRecs(hdbc, custom_errmsg);
+
+        if (errmsg.size() >= final_errmsg_size) {
+            errmsg = StringHelper::MergeStrings("Warning: error string is truncated.", errmsg);
+        }
+
+        if (final_errmsg_c_str != nullptr) {
+            strncpy(final_errmsg_c_str, errmsg.c_str(), final_errmsg_size);
+        }
+
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
+    }
+
+    // should this cluster not be a limitless cluster, this function will still return false, but there were no errors
+    if (final_errmsg_c_str != nullptr) {
+        final_errmsg_c_str[0] = '\0';
     }
 
     bool is_limitess_cluster = LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
