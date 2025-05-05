@@ -186,7 +186,7 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, nullptr, henv, "Could not allocate environment handle during limitless check") ||
         !OdbcHelper::SetHenvToOdbc3(henv, "Could not set henv to odbc3 during limitless check")) {
         // Set error message and clean up
-        limitless_errmsg = StringHelper::MergeStrings(std::string("Could not allocate environment handle."), custom_errmsg);
+        limitless_errmsg = StringHelper::MergeStrings("Could not allocate environment handle.", custom_errmsg);
         *errmsg_ptr = limitless_errmsg.c_str();
         OdbcHelper::Cleanup(henv, SQL_NULL_HANDLE, SQL_NULL_HANDLE);
         return false;
@@ -194,7 +194,7 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_DBC, henv, hdbc, "ERROR: could not allocate connection handle during limitless check")) {
         // Set error message and clean up
-        limitless_errmsg = StringHelper::MergeStrings(std::string("Could not allocate connection handle."), custom_errmsg);
+        limitless_errmsg = StringHelper::MergeStrings("Could not allocate connection handle.", custom_errmsg);
         *errmsg_ptr = limitless_errmsg.c_str();
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
@@ -207,8 +207,6 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
     }
-
-    *errmsg_ptr = nullptr;
 
     bool is_limitess_cluster = LimitlessQueryHelper::CheckLimitlessCluster(hdbc);
     OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);

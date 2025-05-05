@@ -162,19 +162,9 @@ public:
         return std::toupper(c);
     }
 
-    static std::string MergeStrings(const std::string &a, const std::string &b) {
-        if (a.empty() && b.empty()) {
-            return "";
-        }
-
-        if (a.empty() && !b.empty()) {
-            return b;
-        }
-
-        if (!a.empty() && b.empty()) {
-            return a;
-        }
-
+    static std::string MergeStrings(std::string a, std::string b) {
+        if (a.empty()) return b;
+        if (b.empty()) return a;
         return a + '\n' + b;
     }
 };
