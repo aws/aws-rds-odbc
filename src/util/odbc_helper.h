@@ -28,7 +28,6 @@ class OdbcHelper {
 public:
     static const int MAX_STATE_LENGTH = 32;
     static const int MAX_MSG_LENGTH = 1024;
-    static const int SQLSTATE_LENGTH = 6;
     static SQLTCHAR *check_connection_query;
 
     static bool ConnStrConnect(SQLTCHAR* conn_str, SQLHDBC& out_conn);

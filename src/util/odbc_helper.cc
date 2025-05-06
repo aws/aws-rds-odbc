@@ -168,7 +168,7 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
 std::string OdbcHelper::MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg) {
     std::string errmsg;
 
-    SQLTCHAR    sqlstate[SQLSTATE_LENGTH];
+    SQLTCHAR    sqlstate[MAX_STATE_LENGTH];
     SQLTCHAR    message[MAX_MSG_LENGTH];
     SQLINTEGER  nativeerror;
     SQLSMALLINT textlen;
