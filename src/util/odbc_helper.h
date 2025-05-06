@@ -70,7 +70,7 @@ public:
     bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) override { return OdbcHelper::ExecuteQuery(stmt, query, log_message); };
     bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) override { return OdbcHelper::BindColumn(stmt, col_num, type, dest, dest_size, log_message); };
     bool FetchResults(SQLHSTMT stmt, const std::string& log_message) override { return OdbcHelper::FetchResults(stmt, log_message); };
-    std::string MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg) { return OdbcHelper::MergeDiagRecs(handle, handle_type, custom_errmsg); };
+    std::string MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg) override { return OdbcHelper::MergeDiagRecs(handle, handle_type, custom_errmsg); };
 };
 
 #endif // ODBCHELPER_H_
