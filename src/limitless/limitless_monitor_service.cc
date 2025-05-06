@@ -33,7 +33,6 @@
 #include "rds_utils.h"
 
 static LimitlessMonitorService limitless_monitor_service;
-static std::string limitless_errmsg; // used to store the error message returned by CheckLimitlessCluster
 
 LimitlessMonitorService::LimitlessMonitorService() {
     this->services_mutex = std::make_shared<std::mutex>();
@@ -186,14 +185,7 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, nullptr, henv, "Could not allocate environment handle during limitless check") ||
         !OdbcHelper::SetHenvToOdbc3(henv, "Could not set henv to odbc3 during limitless check")) {
         std::string errmsg = StringHelper::MergeStrings("Could not allocate environment handle.", custom_errmsg);
-
-        if (errmsg.size() >= final_errmsg_size) {
-            errmsg = StringHelper::MergeStrings("Warning: error string is truncated.", errmsg);
-        }
-
-        if (final_errmsg_c_str != nullptr) {
-            strncpy(final_errmsg_c_str, errmsg.c_str(), final_errmsg_size);
-        }
+        StringHelper::CopyToCStr(errmsg, final_errmsg_c_str, final_errmsg_size, "Warning: error string is truncated.");
 
         OdbcHelper::Cleanup(henv, SQL_NULL_HANDLE, SQL_NULL_HANDLE);
         return false;
@@ -201,29 +193,15 @@ bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *
 
     if (!OdbcHelper::AllocateHandle(SQL_HANDLE_DBC, henv, hdbc, "ERROR: could not allocate connection handle during limitless check")) {
         std::string errmsg = StringHelper::MergeStrings("Could not allocate connection handle.", custom_errmsg);
-
-        if (errmsg.size() >= final_errmsg_size) {
-            errmsg = StringHelper::MergeStrings("Warning: error string is truncated.", errmsg);
-        }
-
-        if (final_errmsg_c_str != nullptr) {
-            strncpy(final_errmsg_c_str, errmsg.c_str(), final_errmsg_size);
-        }
+        StringHelper::CopyToCStr(errmsg, final_errmsg_c_str, final_errmsg_size, "Warning: error string is truncated.");
 
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;
     }
 
     if (!OdbcHelper::ConnStrConnect(const_cast<SQLTCHAR*>(connection_string_c_str), hdbc)) {
-        std::string errmsg = OdbcHelper::MergeDiagRecs(hdbc, custom_errmsg);
-
-        if (errmsg.size() >= final_errmsg_size) {
-            errmsg = StringHelper::MergeStrings("Warning: error string is truncated.", errmsg);
-        }
-
-        if (final_errmsg_c_str != nullptr) {
-            strncpy(final_errmsg_c_str, errmsg.c_str(), final_errmsg_size);
-        }
+        std::string errmsg = OdbcHelper::MergeDiagRecs(hdbc, SQL_HANDLE_DBC, custom_errmsg);
+        StringHelper::CopyToCStr(errmsg, final_errmsg_c_str, final_errmsg_size, "Warning: error string is truncated.");
 
         OdbcHelper::Cleanup(henv, hdbc, SQL_NULL_HANDLE);
         return false;

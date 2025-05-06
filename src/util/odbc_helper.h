@@ -40,7 +40,7 @@ public:
     static bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message);
     static bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message);
     static bool FetchResults(SQLHSTMT stmt, const std::string& log_message);
-    static std::string MergeDiagRecs(HDBC hdbc, const std::string &custom_errmsg);
+    static std::string MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg);
 
 private:
     static void LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type);     
@@ -57,6 +57,7 @@ public:
     virtual bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) = 0;
     virtual bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) = 0;
     virtual bool FetchResults(SQLHSTMT stmt, const std::string& log_message) = 0;
+    virtual std::string MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg) = 0;
 };
 
 class OdbcHelperWrapper : public IOdbcHelper {
@@ -70,6 +71,7 @@ public:
     bool ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) override { return OdbcHelper::ExecuteQuery(stmt, query, log_message); };
     bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) override { return OdbcHelper::BindColumn(stmt, col_num, type, dest, dest_size, log_message); };
     bool FetchResults(SQLHSTMT stmt, const std::string& log_message) override { return OdbcHelper::FetchResults(stmt, log_message); };
+    std::string MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg) { return OdbcHelper::MergeDiagRecs(handle, handle_type, custom_errmsg); };
 };
 
 #endif // ODBCHELPER_H_

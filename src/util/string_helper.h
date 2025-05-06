@@ -163,12 +163,25 @@ public:
     }
 
     /**
-     * Merges two strings together, separated by a comma, if both aren't empty. Otherwise, returns the non-empty string, or an empty string if both are empty.
+     * Merges two strings together, separated by a new line, if both aren't empty. Otherwise, returns the non-empty string, or an empty string if both are empty
      */
     static std::string MergeStrings(std::string a, std::string b) {
         if (a.empty()) return b;
         if (b.empty()) return a;
         return a + '\n' + b;
+    }
+
+    /**
+     * Copies a string to a character array with an optional warning if it is truncated
+     */
+    void CopyToCStr(std::string str, char *arr, size_t arr_size, std::string truncated_warning) {
+        if (arr == nullptr) return;
+
+        if (str.size() >= arr_size) {
+            str = StringHelper::MergeStrings(truncated_warning, str);
+        }
+
+        strncpy(arr, str.c_str(), arr_size);
     }
 };
 

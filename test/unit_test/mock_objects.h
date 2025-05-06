@@ -132,6 +132,7 @@ public:
     MOCK_METHOD(bool, ExecuteQuery, (SQLHSTMT, SQLTCHAR*, const std::string&), ());
     MOCK_METHOD(bool, BindColumn, (SQLHSTMT, SQLUSMALLINT, SQLSMALLINT, SQLPOINTER, SQLLEN, const std::string&), ());
     MOCK_METHOD(bool, FetchResults, (SQLHSTMT, const std::string&), ());
+    MOCK_METHOD(std::string, MergeDiagRecs, (SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg), ());
 };
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
