@@ -165,7 +165,7 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
     return true;
 }
 
-std::string OdbcHelper::MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, std::string custom_errmsg) {
+std::string OdbcHelper::MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, const std::string& custom_errmsg) {
     std::string errmsg;
 
     SQLTCHAR    sqlstate[MAX_STATE_LENGTH];

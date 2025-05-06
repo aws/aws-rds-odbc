@@ -174,7 +174,7 @@ public:
     /**
      * Copies a string to a character array with an optional warning if it is truncated
      */
-    static void CopyToCStr(std::string str, char *arr, size_t arr_size, std::string truncated_warning) {
+    static void CopyToCStr(std::string str, char *arr, size_t arr_size, const std::string &truncated_warning) {
         if (arr == nullptr) return;
 
         if (str.size() >= arr_size) {
