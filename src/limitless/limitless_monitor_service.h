@@ -75,9 +75,12 @@ typedef struct {
  * by connecting using the ODBC API to connect and check using a query
  *
  * @param connection_string_c_str the connection string to specify the driver and server
+ * @param custom_errmsg_c_str custom error message to append error information when this method fails to check limitless
+ * @param final_errmsg_c_str the final error message string if this method fails to check limitless
+ * @param final_errmsg_size the size of final_errmsg_c_str
  * @return True if the given connection string connects to a Limitless Cluster
  */
-bool CheckLimitlessCluster(SQLHDBC hdbc);
+bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *custom_errmsg_c_str, char *final_errmsg_c_str, size_t final_errmsg_size);
 
 /**
  * Increments a reference count for the given service ID, spinning a transaction router polling thread

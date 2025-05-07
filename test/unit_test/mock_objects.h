@@ -128,9 +128,11 @@ public:
     MOCK_METHOD(bool, CheckConnection, (SQLHDBC), ());
     MOCK_METHOD(void, Cleanup, (SQLHENV, SQLHDBC, SQLHSTMT), ());
     MOCK_METHOD(bool, AllocateHandle, (SQLSMALLINT, SQLHANDLE, SQLHANDLE&, const std::string&), ());
+    MOCK_METHOD(bool, SetHenvToOdbc3, (SQLHENV, const std::string&), ());
     MOCK_METHOD(bool, ExecuteQuery, (SQLHSTMT, SQLTCHAR*, const std::string&), ());
     MOCK_METHOD(bool, BindColumn, (SQLHSTMT, SQLUSMALLINT, SQLSMALLINT, SQLPOINTER, SQLLEN, const std::string&), ());
     MOCK_METHOD(bool, FetchResults, (SQLHSTMT, const std::string&), ());
+    MOCK_METHOD(std::string, MergeDiagRecs, (SQLHANDLE handle, int32_t handle_type, const std::string &custom_errmsg), ());
 };
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {

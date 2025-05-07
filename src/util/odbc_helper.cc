@@ -108,6 +108,11 @@ bool OdbcHelper::AllocateHandle(SQLSMALLINT handle_type, SQLHANDLE input_handle,
     return true;
 }
 
+bool OdbcHelper::SetHenvToOdbc3(SQLHENV henv, const std::string& log_message) {
+    SQLRETURN rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
+    return OdbcHelper::CheckResult(rc, log_message, henv, SQL_HANDLE_ENV);
+}
+
 bool OdbcHelper::ExecuteQuery(SQLHSTMT stmt, SQLTCHAR* query, const std::string& log_message) {
     if (SQL_NULL_HANDLE == stmt) {
         LOG(WARNING) << "Attempted to execute query using null HSTMT";
@@ -160,9 +165,37 @@ bool OdbcHelper::FetchResults(SQLHSTMT stmt, const std::string& log_message) {
     return true;
 }
 
+std::string OdbcHelper::MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, const std::string& custom_errmsg) {
+    std::string errmsg;
+
+    SQLTCHAR    sqlstate[MAX_STATE_LENGTH];
+    SQLTCHAR    message[MAX_MSG_LENGTH];
+    SQLINTEGER  nativeerror;
+    SQLSMALLINT textlen;
+    SQLRETURN   ret;
+    SQLSMALLINT recno = 0;
+
+    // merge all error messages for the failed dbc
+    do {
+        recno++;
+        message[0] = '\0';
+        ret = SQLGetDiagRec(handle_type, handle, recno, sqlstate, &nativeerror, message, sizeof(message), &textlen);
+        if (SQL_SUCCEEDED(ret)) {
+            std::string newmsg = StringHelper::ToString(message);
+            errmsg = StringHelper::MergeStrings(errmsg, newmsg);
+        }
+    } while (ret == SQL_SUCCESS);
+
+    if (custom_errmsg.empty()) {
+        return errmsg;
+    }
+
+    return StringHelper::MergeStrings(errmsg, custom_errmsg);
+}
+
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {
-    SQLTCHAR     sqlstate[MAX_STATE_LENGTH];
-    SQLTCHAR     message[MAX_MSG_LENGTH];
+    SQLTCHAR    sqlstate[MAX_STATE_LENGTH];
+    SQLTCHAR    message[MAX_MSG_LENGTH];
     SQLINTEGER  nativeerror;
     SQLSMALLINT textlen;
     SQLRETURN   ret;
