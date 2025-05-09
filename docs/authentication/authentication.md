@@ -58,6 +58,8 @@ The AWS RDS ODBC Library allows users to authenticate with ADFS and generate a s
 ## Okta Authentication
 The driver supports authentication via an [Okta](https://www.okta.com/) federated identity and then database access via IAM.
 
+However, the driver does not support 2FA. To disable 2FA for specific users or a groups, please read [Okta's article](https://support.okta.com/help/s/article/Exclude-from-OKta-Verify-MFA-user-doesn-t-have-a-phone) on how to do so.
+
 ## Required Okta FederatedAuthConfig
 
 | Field | Description | Example
