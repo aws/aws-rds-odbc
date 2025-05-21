@@ -23,6 +23,7 @@
 
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
+#include "highest_weight_host_selector.h"
 
 typedef struct LimitlessMonitor {
     ~LimitlessMonitor() {
@@ -58,6 +59,7 @@ private:
     std::shared_ptr<std::mutex> services_mutex;
 
     RoundRobinHostSelector round_robin;
+    HighestWeightHostSelector highest_weight;
 };
 
 extern "C" {

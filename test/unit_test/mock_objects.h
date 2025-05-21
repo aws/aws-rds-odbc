@@ -92,6 +92,7 @@ class MOCK_LIMITLESS_ROUTER_MONITOR : public LimitlessRouterMonitor {
 public:
     MOCK_METHOD(void, Open, (bool, const SQLTCHAR *, int, unsigned int, std::shared_ptr<std::vector<HostInfo>>&, std::shared_ptr<std::mutex>&), ());
     MOCK_METHOD(bool, IsStopped, (), ());
+    MOCK_METHOD(bool, TestConnectionToHost, (const std::string&), ());
 
     std::vector<HostInfo> test_limitless_routers;
 
@@ -103,7 +104,7 @@ public:
     }
 
     void MockOpen(
-        bool block_and_query_immediately, // unused
+        bool block_and_query_immediately,
         const SQLTCHAR *conn_str, // unused
         int port, // unused
         unsigned int interval_ms,

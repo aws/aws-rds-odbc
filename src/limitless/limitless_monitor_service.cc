@@ -28,9 +28,9 @@
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
+#include "../util/rds_utils.h"
 #include "../util/string_helper.h"
 #include "limitless_query_helper.h"
-#include "rds_utils.h"
 
 static LimitlessMonitorService limitless_monitor_service;
 
@@ -170,9 +170,35 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
         return nullptr;
     }
 
-    std::unordered_map<std::string, std::string> properties;
-    RoundRobinHostSelector::SetRoundRobinWeight(hosts, properties);
-    std::shared_ptr<HostInfo> host = std::make_shared<HostInfo>(round_robin.GetHost(hosts, true, properties));
+    bool round_robin_host_valid = false;
+    std::shared_ptr<HostInfo> host;
+
+    try {
+        std::unordered_map<std::string, std::string> properties;
+        RoundRobinHostSelector::SetRoundRobinWeight(hosts, properties);
+        host = std::make_shared<HostInfo>(this->round_robin.GetHost(hosts, true, properties));
+
+        // test the connection to selected round robin host; if unable to connect, then the driver likely won't be able to either
+        round_robin_host_valid = service->limitless_router_monitor->TestConnectionToHost(host->GetHost());
+    } catch (const std::runtime_error& error) {
+        // this will happen if there are no writers in host list, or some other runtime error
+        LOG(ERROR) << "Round robin selection threw a runtime error: " << error.what();
+        // don't return yet - give highest weight host selector a chance
+    }
+
+    try {
+        // if round robin host was invalid, attempt to select host by highest weight instead
+        if (!round_robin_host_valid) {
+            std::unordered_map<std::string, std::string> properties;
+            *host = this->highest_weight.GetHost(hosts, true, properties);
+        }
+    } catch (const std::runtime_error& error) {
+        // this will happen if there are no writers in host list, or some other runtime error
+        LOG(ERROR) << "Highest weight host selection threw a runtime error: " << error.what();
+        return nullptr; // no host was selected - return nullptr
+    }
+
+    // return selected host, either by round robin or highest weight
     return host;
 }
 

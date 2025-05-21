@@ -204,3 +204,34 @@ TEST_F(LimitlessMonitorServiceTest, NoMonitorTest) {
     limitless_monitor_service.IncrementReferenceCounter("non_existent");
     limitless_monitor_service.DecrementReferenceCounter("non_existent");
 }
+
+TEST_F(LimitlessMonitorServiceTest, SelectHighestWeightOnBadRoundRobinHost) {
+    std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
+    mock_monitor->test_limitless_routers.push_back(HostInfo("hosta", 5432, UP, true, nullptr, 100)); // round robin choice (alphabetical; a < z)
+    mock_monitor->test_limitless_routers.push_back(HostInfo("hostz", 5432, UP, true, nullptr, 200)); // highest weight choice (200 > 5)
+
+    EXPECT_CALL(*mock_monitor, Open(true, test_connection_string_immediate_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
+        .Times(1)
+        .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
+
+    // there should be a single call testing the connection to the round robin host (hosta), and the mock monitor should return false
+    EXPECT_CALL(*mock_monitor, TestConnectionToHost("hosta"))
+        .Times(1)
+        .WillOnce(Return(false));
+
+    LimitlessMonitorService limitless_monitor_service;
+    std::string test_service_id = "service_1";
+    limitless_monitor_service.NewService(test_service_id, test_connection_string_immediate_c_str, test_host_port, mock_monitor);
+    EXPECT_TRUE(limitless_monitor_service.CheckService(test_service_id));
+
+    // check host immediately, as limitless mode is immediate
+    std::shared_ptr<HostInfo> host_info = limitless_monitor_service.GetHostInfo(test_service_id);
+    EXPECT_TRUE(host_info != nullptr);
+    if (host_info != nullptr) {
+        EXPECT_EQ(host_info->GetHost(), "hostz"); // highest weight host - not round robin choice
+    }
+
+    // clean up monitor service
+    limitless_monitor_service.DecrementReferenceCounter(test_service_id);
+    EXPECT_FALSE(limitless_monitor_service.CheckService(test_service_id));
+}

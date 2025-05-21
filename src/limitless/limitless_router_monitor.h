@@ -46,6 +46,13 @@ public:
         std::shared_ptr<std::mutex>& limitless_routers_mutex
     );
 
+    /*
+     * Connects and disconnects to a given server using already stored connection string, to test its viability as a host.
+     *
+     * @return True if test connection was successful, false otherwise
+     */
+    virtual bool TestConnectionToHost(const std::string &server);
+
     virtual bool IsStopped();
 protected:
     SQLSTR connection_string;
