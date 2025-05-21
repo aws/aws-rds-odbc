@@ -112,7 +112,7 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
     // ensure monitor service believes the round robin hosts are valid
     EXPECT_CALL(*mock_monitor1, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mock_monitor2, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mock_monitor3, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
+    // as mock_monitor3 doesn't have an array of limitless routers by the time GetHostInfo is called, TestConnectionToHost doesn't get called
 
     LimitlessMonitorService limitless_monitor_service;
     std::string mock_monitor1_id = "";
