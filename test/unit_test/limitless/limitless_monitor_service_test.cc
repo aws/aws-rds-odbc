@@ -66,6 +66,9 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
+    // ensure monitor service believes the round robin host is valid
+    EXPECT_CALL(*mock_monitor, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
+
     LimitlessMonitorService limitless_monitor_service;
     std::string test_service_id = "";
 
@@ -105,6 +108,11 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
         .Times(1).WillOnce(Invoke(mock_monitor2.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
     EXPECT_CALL(*mock_monitor3, Open(false, test_connection_string_lazy_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor3.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
+
+    // ensure monitor service believes the round robin hosts are valid
+    EXPECT_CALL(*mock_monitor1, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock_monitor2, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock_monitor3, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
 
     LimitlessMonitorService limitless_monitor_service;
     std::string mock_monitor1_id = "";
@@ -173,6 +181,9 @@ TEST_F(LimitlessMonitorServiceTest, ImmediateMonitorTest) {
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
+    // ensure monitor service believes the round robin host is valid
+    EXPECT_CALL(*mock_monitor, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
+
     LimitlessMonitorService limitless_monitor_service;
     std::string test_service_id = "service_1";
 
@@ -215,9 +226,9 @@ TEST_F(LimitlessMonitorServiceTest, SelectHighestWeightOnBadRoundRobinHost) {
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
     // there should be a single call testing the connection to the round robin host (hosta), and the mock monitor should return false
-    EXPECT_CALL(*mock_monitor, TestConnectionToHost("hosta"))
-        .Times(1)
-        .WillOnce(Return(false));
+    // NOTE: gtest displays a warning as the mocked method will return false by default anyways,
+    //   but this expect call is useful to ensure the round robin host is chosen first
+    EXPECT_CALL(*mock_monitor, TestConnectionToHost("hosta")).Times(1).WillOnce(Return(false));
 
     LimitlessMonitorService limitless_monitor_service;
     std::string test_service_id = "service_1";

@@ -21,9 +21,9 @@
 #include <mutex>
 #include <string>
 
+#include "highest_weight_host_selector.h"
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
-#include "highest_weight_host_selector.h"
 
 typedef struct LimitlessMonitor {
     ~LimitlessMonitor() {

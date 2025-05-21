@@ -23,6 +23,7 @@
 #include <chrono>
 #include <regex>
 
+#include "../util/connection_string_helper.h"
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
@@ -90,6 +91,12 @@ bool LimitlessRouterMonitor::TestConnectionToHost(const std::string &server) {
     SQLHENV henv = nullptr;
     SQLHDBC conn = nullptr;
 
+    // build new connection string, overwriting server to provided server
+    std::map<SQLSTR, SQLSTR> connstr_map;
+    ConnectionStringHelper::ParseConnectionString(this->connection_string, connstr_map);
+    connstr_map[SERVER_HOST_KEY] = StringHelper::ToSQLSTR(server);
+    SQLSTR connstr = ConnectionStringHelper::BuildConnectionString(connstr_map);
+
     // allocate a new henv for the test connection
     SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
     if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed in test connection", henv, SQL_HANDLE_ENV)) {
@@ -110,7 +117,7 @@ bool LimitlessRouterMonitor::TestConnectionToHost(const std::string &server) {
     }
 
     // attempt to connect
-    rc = SQLDriverConnect(conn, nullptr, AS_SQLTCHAR(this->connection_string.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
+    rc = SQLDriverConnect(conn, nullptr, AS_SQLTCHAR(connstr.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
     if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLDriverConnect failed in test connection", conn, SQL_HANDLE_DBC)) {
         OdbcHelper::Cleanup(henv, conn, SQL_NULL_HSTMT);
         return false;
