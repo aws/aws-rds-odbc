@@ -92,7 +92,6 @@ class MOCK_LIMITLESS_ROUTER_MONITOR : public LimitlessRouterMonitor {
 public:
     MOCK_METHOD(void, Open, (bool, const SQLTCHAR *, int, unsigned int, std::shared_ptr<std::vector<HostInfo>>&, std::shared_ptr<std::mutex>&), ());
     MOCK_METHOD(bool, IsStopped, (), ());
-    MOCK_METHOD(bool, TestConnectionToHost, (const std::string&), ());
 
     std::vector<HostInfo> test_limitless_routers;
 
@@ -134,6 +133,7 @@ public:
     MOCK_METHOD(bool, BindColumn, (SQLHSTMT, SQLUSMALLINT, SQLSMALLINT, SQLPOINTER, SQLLEN, const std::string&), ());
     MOCK_METHOD(bool, FetchResults, (SQLHSTMT, const std::string&), ());
     MOCK_METHOD(std::string, MergeDiagRecs, (SQLHANDLE handle, int32_t handle_type, const std::string &custom_errmsg), ());
+    MOCK_METHOD(bool, TestConnectionToServer, (const SQLSTR &in_conn_str, const std::string &server), ());
 };
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {

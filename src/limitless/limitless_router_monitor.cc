@@ -87,48 +87,6 @@ void LimitlessRouterMonitor::Open(
     this->monitor_thread = std::make_shared<std::thread>(&LimitlessRouterMonitor::Run, this, henv, conn, reinterpret_cast<SQLTCHAR *>(this->connection_string.data()), SQL_NTS, host_port);
 }
 
-bool LimitlessRouterMonitor::TestConnectionToHost(const std::string &server) {
-    SQLHENV henv = nullptr;
-    SQLHDBC conn = nullptr;
-
-    // build new connection string, overwriting server to provided server
-    std::map<SQLSTR, SQLSTR> connstr_map;
-    ConnectionStringHelper::ParseConnectionString(this->connection_string, connstr_map);
-    connstr_map[SERVER_HOST_KEY] = StringHelper::ToSQLSTR(server);
-    SQLSTR connstr = ConnectionStringHelper::BuildConnectionString(connstr_map);
-
-    // allocate a new henv for the test connection
-    SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &henv);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed in test connection", henv, SQL_HANDLE_ENV)) {
-        return false;
-    }
-
-    // set odbc version
-    rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLSetEnvAttr failed in test connection", henv, SQL_HANDLE_ENV)) {
-        return false;
-    }
-
-    // allocate connection handle
-    rc = SQLAllocHandle(SQL_HANDLE_DBC, henv, &conn);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLAllocHandle failed in test connection", conn, SQL_HANDLE_DBC)) {
-        OdbcHelper::Cleanup(henv, conn, SQL_NULL_HSTMT);
-        return false;
-    }
-
-    // attempt to connect
-    rc = SQLDriverConnect(conn, nullptr, AS_SQLTCHAR(connstr.c_str()), SQL_NTS, nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT);
-    if (!OdbcHelper::CheckResult(rc, "LimitlessRouterMonitor: SQLDriverConnect failed in test connection", conn, SQL_HANDLE_DBC)) {
-        OdbcHelper::Cleanup(henv, conn, SQL_NULL_HSTMT);
-        return false;
-    }
-
-    // check the connection with a simple query - if successful, connection is OK
-    bool test_query_successful = OdbcHelper::CheckConnection(conn);
-    OdbcHelper::Cleanup(henv, conn, SQL_NULL_HSTMT); // disconnects conn
-    return test_query_successful;
-}
-
 bool LimitlessRouterMonitor::IsStopped() {
     return this->stopped;
 }

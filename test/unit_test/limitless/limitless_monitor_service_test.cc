@@ -58,6 +58,9 @@ class LimitlessMonitorServiceTest : public testing::Test {
 };
 
 TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
+    std::shared_ptr<MOCK_ODBC_HELPER> mock_odbc_helper = std::make_shared<MOCK_ODBC_HELPER>();
+    EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, testing::_)).Times(1).WillOnce(Return(true));
+    
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host1", 5432, UP, true, nullptr, 101)); // round robin should choose this one
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host2", 5432, UP, true, nullptr, 100));
@@ -66,10 +69,7 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
-    // ensure monitor service believes the round robin host is valid
-    EXPECT_CALL(*mock_monitor, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
-
-    LimitlessMonitorService limitless_monitor_service;
+    LimitlessMonitorService limitless_monitor_service(mock_odbc_helper);
     std::string test_service_id = "";
 
     limitless_monitor_service.NewService(test_service_id, test_connection_string_lazy_c_str, test_host_port, mock_monitor);
@@ -93,6 +93,10 @@ TEST_F(LimitlessMonitorServiceTest, SingleMonitorTest) {
 }
 
 TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
+    std::shared_ptr<MOCK_ODBC_HELPER> mock_odbc_helper = std::make_shared<MOCK_ODBC_HELPER>();
+    EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, "correct1")).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, "correct2")).Times(1).WillOnce(Return(true));
+
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor1 = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     mock_monitor1->test_limitless_routers.push_back(HostInfo("correct1", 5432, UP, true, nullptr, 100));
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor2 = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
@@ -109,12 +113,7 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
     EXPECT_CALL(*mock_monitor3, Open(false, test_connection_string_lazy_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1).WillOnce(Invoke(mock_monitor3.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
-    // ensure monitor service believes the round robin hosts are valid
-    EXPECT_CALL(*mock_monitor1, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mock_monitor2, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
-    // as mock_monitor3 doesn't have an array of limitless routers by the time GetHostInfo is called, TestConnectionToHost doesn't get called
-
-    LimitlessMonitorService limitless_monitor_service;
+    LimitlessMonitorService limitless_monitor_service(mock_odbc_helper);
     std::string mock_monitor1_id = "";
     std::string mock_monitor2_id = "monitor2";
     std::string mock_monitor3_id = "monitor3";
@@ -173,6 +172,9 @@ TEST_F(LimitlessMonitorServiceTest, MultipleMonitorTest) {
 }
 
 TEST_F(LimitlessMonitorServiceTest, ImmediateMonitorTest) {
+    std::shared_ptr<MOCK_ODBC_HELPER> mock_odbc_helper = std::make_shared<MOCK_ODBC_HELPER>();
+    EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, testing::_)).Times(1).WillOnce(Return(true));
+
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host1", 5432, UP, true, nullptr, 101)); // round robin should choose this one
     mock_monitor->test_limitless_routers.push_back(HostInfo("test_host2", 5432, UP, true, nullptr, 100));
@@ -181,10 +183,7 @@ TEST_F(LimitlessMonitorServiceTest, ImmediateMonitorTest) {
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
-    // ensure monitor service believes the round robin host is valid
-    EXPECT_CALL(*mock_monitor, TestConnectionToHost(testing::_)).Times(1).WillOnce(Return(true));
-
-    LimitlessMonitorService limitless_monitor_service;
+    LimitlessMonitorService limitless_monitor_service(mock_odbc_helper);
     std::string test_service_id = "service_1";
 
     limitless_monitor_service.NewService(test_service_id, test_connection_string_immediate_c_str, test_host_port, mock_monitor);
@@ -207,7 +206,7 @@ TEST_F(LimitlessMonitorServiceTest, ImmediateMonitorTest) {
 }
 
 TEST_F(LimitlessMonitorServiceTest, NoMonitorTest) {
-    LimitlessMonitorService limitless_monitor_service;
+    LimitlessMonitorService limitless_monitor_service(std::make_shared<MOCK_ODBC_HELPER>());
     EXPECT_FALSE(limitless_monitor_service.CheckService("this_service_does_not_exist"));
     EXPECT_TRUE(limitless_monitor_service.GetHostInfo("this_one_neither") == nullptr);
 
@@ -217,6 +216,12 @@ TEST_F(LimitlessMonitorServiceTest, NoMonitorTest) {
 }
 
 TEST_F(LimitlessMonitorServiceTest, SelectHighestWeightOnBadRoundRobinHost) {
+    std::shared_ptr<MOCK_ODBC_HELPER> mock_odbc_helper = std::make_shared<MOCK_ODBC_HELPER>();
+    // there should be a single call testing the connection to the round robin host (hosta), and the mock monitor should return false
+    // NOTE: gtest displays a warning as the mocked method will return false by default anyways,
+    //   but this expect call is useful to ensure the round robin host is chosen first
+    EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, "hosta")).Times(1).WillOnce(Return(false));
+
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     mock_monitor->test_limitless_routers.push_back(HostInfo("hosta", 5432, UP, true, nullptr, 100)); // round robin choice (alphabetical; a < z)
     mock_monitor->test_limitless_routers.push_back(HostInfo("hostz", 5432, UP, true, nullptr, 200)); // highest weight choice (200 > 5)
@@ -225,12 +230,7 @@ TEST_F(LimitlessMonitorServiceTest, SelectHighestWeightOnBadRoundRobinHost) {
         .Times(1)
         .WillOnce(Invoke(mock_monitor.get(), &MOCK_LIMITLESS_ROUTER_MONITOR::MockOpen));
 
-    // there should be a single call testing the connection to the round robin host (hosta), and the mock monitor should return false
-    // NOTE: gtest displays a warning as the mocked method will return false by default anyways,
-    //   but this expect call is useful to ensure the round robin host is chosen first
-    EXPECT_CALL(*mock_monitor, TestConnectionToHost("hosta")).Times(1).WillOnce(Return(false));
-
-    LimitlessMonitorService limitless_monitor_service;
+    LimitlessMonitorService limitless_monitor_service(mock_odbc_helper);
     std::string test_service_id = "service_1";
     limitless_monitor_service.NewService(test_service_id, test_connection_string_immediate_c_str, test_host_port, mock_monitor);
     EXPECT_TRUE(limitless_monitor_service.CheckService(test_service_id));
