@@ -28,13 +28,14 @@
 #include "../util/connection_string_keys.h"
 #include "../util/logger_wrapper.h"
 #include "../util/odbc_helper.h"
+#include "../util/rds_utils.h"
 #include "../util/string_helper.h"
 #include "limitless_query_helper.h"
-#include "rds_utils.h"
 
-static LimitlessMonitorService limitless_monitor_service;
+static LimitlessMonitorService limitless_monitor_service(std::make_shared<OdbcHelperWrapper>());
 
-LimitlessMonitorService::LimitlessMonitorService() {
+LimitlessMonitorService::LimitlessMonitorService(std::shared_ptr<IOdbcHelper> odbc_wrapper) {
+    this->odbc_wrapper = std::move(odbc_wrapper);
     this->services_mutex = std::make_shared<std::mutex>();
 }
 
@@ -156,24 +157,66 @@ void LimitlessMonitorService::DecrementReferenceCounter(const std::string& servi
 }
 
 std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string& service_id) {
-    std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
-    if (!this->services.contains(service_id)) {
-        LOG(ERROR) << "Attempted to get host info for non-existent monitor with service ID " << service_id;
-        return nullptr;
-    }
+    std::vector<HostInfo> hosts;
+    SQLSTR connection_string;
 
-    std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
+    {
+        std::lock_guard<std::mutex> services_guard(*(this->services_mutex));
+        if (!this->services.contains(service_id)) {
+            LOG(ERROR) << "Attempted to lock and get hosts for non-existent monitor with service ID " << service_id;
+            return nullptr;
+        }
 
-    std::lock_guard<std::mutex> limitless_routers_guard(*(service->limitless_routers_mutex));
-    std::vector<HostInfo> hosts = *(service->limitless_routers);
-    if (hosts.empty()) {
-        return nullptr;
+        std::shared_ptr<LimitlessMonitor> service = this->services[service_id];
+        std::lock_guard<std::mutex> limitless_routers_guard(*(service->limitless_routers_mutex));
+
+        if (service->limitless_routers == nullptr || service->limitless_routers->empty())
+            return nullptr;
+
+        // copy hosts
+        hosts = *(service->limitless_routers);
+        connection_string = service->limitless_router_monitor->GetConnectionString();
     }
 
     std::unordered_map<std::string, std::string> properties;
-    RoundRobinHostSelector::SetRoundRobinWeight(hosts, properties);
-    std::shared_ptr<HostInfo> host = std::make_shared<HostInfo>(round_robin.GetHost(hosts, true, properties));
-    return host;
+
+    try {
+        RoundRobinHostSelector::SetRoundRobinWeight(hosts, properties);
+        HostInfo host = this->round_robin.GetHost(hosts, true, properties);
+        if (this->odbc_wrapper->TestConnectionToServer(connection_string, host.GetHost())) {
+            // the round robin host successfully connected
+            return std::make_shared<HostInfo>(host);
+        }
+    } catch (std::runtime_error& error) {
+        LOG(INFO) << "Got runtime error while getting round robin host for limitless (trying for highest weight host next): " << error.what();
+        // proceed and attempt to connect to highest weight host
+    }
+
+    // five retries going by order of least loaded (highest weight)
+    for (int i = 0; i < DEFAULT_LIMITLESS_CONNECT_RETRY_ATTEMPTS; i++) {
+        try {
+            HostInfo host = this->highest_weight.GetHost(hosts, true, properties);
+
+            if (this->odbc_wrapper->TestConnectionToServer(connection_string, host.GetHost())) {
+                // the highest weight host successfully connected
+                return std::make_shared<HostInfo>(host);
+            } else {
+                // update this host in hosts list to have down state so it's not selected again
+                for (HostInfo& host_in_list : hosts) {
+                    if (host_in_list.GetHost() == host.GetHost()) {
+                        host_in_list.SetHostState(DOWN);
+                    }
+                }
+            }
+        } catch (std::runtime_error &error) {
+            // no more hosts
+            LOG(INFO) << "Got runtime error while getting highest weight host for limitless (no host found): " << error.what();
+            break;
+        }
+    }
+
+    // no host was successfully connected to
+    return nullptr;
 }
 
 bool CheckLimitlessCluster(const SQLTCHAR *connection_string_c_str, const char *custom_errmsg_c_str, char *final_errmsg_c_str, size_t final_errmsg_size) {

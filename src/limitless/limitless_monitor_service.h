@@ -21,6 +21,8 @@
 #include <mutex>
 #include <string>
 
+#include "../util/odbc_helper.h"
+#include "highest_weight_host_selector.h"
 #include "limitless_router_monitor.h"
 #include "round_robin_host_selector.h"
 
@@ -39,7 +41,7 @@ typedef struct LimitlessMonitor {
 
 class LimitlessMonitorService {
 public:
-    LimitlessMonitorService();
+    explicit LimitlessMonitorService(std::shared_ptr<IOdbcHelper> odbc_wrapper);
 
     ~LimitlessMonitorService();
 
@@ -53,17 +55,21 @@ public:
 
     std::shared_ptr<HostInfo> GetHostInfo(const std::string& service_id);
 private:
+    std::shared_ptr<IOdbcHelper> odbc_wrapper;
+
     std::map<std::string, std::shared_ptr<LimitlessMonitor>> services;
 
     std::shared_ptr<std::mutex> services_mutex;
 
     RoundRobinHostSelector round_robin;
+    HighestWeightHostSelector highest_weight;
 };
 
 extern "C" {
 #endif
 
-#define DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS 7500
+#define DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS       7500
+#define DEFAULT_LIMITLESS_CONNECT_RETRY_ATTEMPTS    5
 
 typedef struct {
     char *server;

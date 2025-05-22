@@ -47,6 +47,10 @@ public:
     );
 
     virtual bool IsStopped();
+
+    SQLSTR GetConnectionString() {
+        return this->connection_string;
+    }
 protected:
     SQLSTR connection_string;
 

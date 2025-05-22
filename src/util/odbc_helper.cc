@@ -18,6 +18,8 @@
 
 #include <glog/logging.h>
 
+#include "connection_string_helper.h"
+#include "connection_string_keys.h"
 #include "string_helper.h"
 
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));
@@ -191,6 +193,32 @@ std::string OdbcHelper::MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, con
     }
 
     return StringHelper::MergeStrings(errmsg, custom_errmsg);
+}
+
+bool OdbcHelper::TestConnectionToServer(const SQLSTR &in_conn_str, const std::string &server) {
+    SQLHENV henv = nullptr;
+    SQLHDBC conn = nullptr;
+
+    // build new connection string, overwriting server to provided server, and disabling limitless to prevent infinite loop
+    std::map<SQLSTR, SQLSTR> connstr_map;
+    ConnectionStringHelper::ParseConnectionString(in_conn_str, connstr_map);
+    connstr_map[SERVER_HOST_KEY] = StringHelper::ToSQLSTR(server);
+    connstr_map[LIMITLESS_ENABLED_KEY] = BOOL_FALSE;
+    SQLSTR connstr = ConnectionStringHelper::BuildConnectionString(connstr_map);
+
+    // allocate environment and connection handles
+    if (!OdbcHelper::AllocateHandle(SQL_HANDLE_ENV, nullptr, henv, "Couldn't allocate environment handle in LimitlessRouterMonitor::TestConnectionToHost") ||
+        !OdbcHelper::SetHenvToOdbc3(henv, "Couldn't set environment handle's ODBC version to 3.0 in LimitlessRouterMonitor::TestConnectionToHost") ||
+        !OdbcHelper::AllocateHandle(SQL_HANDLE_DBC, henv, conn, "Couldn't allocate connection handle in LimitlessRouterMonitor::TestConnectionToHost")) {
+        OdbcHelper::Cleanup(henv, conn, nullptr);
+        return false;
+    }
+
+    // connect and check connection
+    bool result = OdbcHelper::ConnStrConnect(AS_SQLTCHAR(connstr.c_str()), conn) && OdbcHelper::CheckConnection(conn);
+
+    OdbcHelper::Cleanup(henv, conn, nullptr);
+    return result;
 }
 
 void OdbcHelper::LogMessage(const std::string& log_message, SQLHANDLE handle, int32_t handle_type) {

@@ -103,7 +103,7 @@ public:
     }
 
     void MockOpen(
-        bool block_and_query_immediately, // unused
+        bool block_and_query_immediately,
         const SQLTCHAR *conn_str, // unused
         int port, // unused
         unsigned int interval_ms,
@@ -133,6 +133,7 @@ public:
     MOCK_METHOD(bool, BindColumn, (SQLHSTMT, SQLUSMALLINT, SQLSMALLINT, SQLPOINTER, SQLLEN, const std::string&), ());
     MOCK_METHOD(bool, FetchResults, (SQLHSTMT, const std::string&), ());
     MOCK_METHOD(std::string, MergeDiagRecs, (SQLHANDLE handle, int32_t handle_type, const std::string &custom_errmsg), ());
+    MOCK_METHOD(bool, TestConnectionToServer, (const SQLSTR &in_conn_str, const std::string &server), ());
 };
 
 class MOCK_CLUSTER_TOPOLOGY_QUERY_HELPER : public ClusterTopologyQueryHelper {
