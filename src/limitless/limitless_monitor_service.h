@@ -41,7 +41,7 @@ typedef struct LimitlessMonitor {
 
 class LimitlessMonitorService {
 public:
-    LimitlessMonitorService(std::shared_ptr<IOdbcHelper> odbc_wrapper);
+    explicit LimitlessMonitorService(std::shared_ptr<IOdbcHelper> odbc_wrapper);
 
     ~LimitlessMonitorService();
 

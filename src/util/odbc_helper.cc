@@ -18,8 +18,8 @@
 
 #include <glog/logging.h>
 
-#include "connection_string_keys.h"
 #include "connection_string_helper.h"
+#include "connection_string_keys.h"
 #include "string_helper.h"
 
 SQLTCHAR *OdbcHelper::check_connection_query = AS_SQLTCHAR(TEXT("SELECT 1"));

@@ -35,7 +35,7 @@
 static LimitlessMonitorService limitless_monitor_service(std::make_shared<OdbcHelperWrapper>());
 
 LimitlessMonitorService::LimitlessMonitorService(std::shared_ptr<IOdbcHelper> odbc_wrapper) {
-    this->odbc_wrapper = odbc_wrapper;
+    this->odbc_wrapper = std::move(odbc_wrapper);
     this->services_mutex = std::make_shared<std::mutex>();
 }
 
@@ -188,8 +188,8 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
             return std::make_shared<HostInfo>(host);
         }
     } catch (std::runtime_error& error) {
-        // no hosts available - just return nullptr
-        return nullptr;
+        LOG(INFO) << "Got runtime error while getting round robin host for limitless (trying for highest weight host next): " << error.what();
+        // proceed and attempt to connect to highest weight host
     }
 
     // five retries going by order of least loaded (highest weight)
@@ -210,6 +210,7 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
             }
         } catch (std::runtime_error &error) {
             // no more hosts
+            LOG(INFO) << "Got runtime error while getting highest weight host for limitless (no host found): " << error.what();
             break;
         }
     }
