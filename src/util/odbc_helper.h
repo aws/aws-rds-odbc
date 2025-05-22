@@ -73,7 +73,7 @@ public:
     bool BindColumn(SQLHSTMT stmt, SQLUSMALLINT col_num, SQLSMALLINT type, SQLPOINTER dest, SQLLEN dest_size, const std::string& log_message) override { return OdbcHelper::BindColumn(stmt, col_num, type, dest, dest_size, log_message); };
     bool FetchResults(SQLHSTMT stmt, const std::string& log_message) override { return OdbcHelper::FetchResults(stmt, log_message); };
     std::string MergeDiagRecs(SQLHANDLE handle, int32_t handle_type, const std::string& custom_errmsg) override { return OdbcHelper::MergeDiagRecs(handle, handle_type, custom_errmsg); };
-    bool TestConnectionToServer(const SQLSTR &in_conn_str, const std::string &server) { return OdbcHelper::TestConnectionToServer(in_conn_str, server); }
+    bool TestConnectionToServer(const SQLSTR &in_conn_str, const std::string &server) override { return OdbcHelper::TestConnectionToServer(in_conn_str, server); }
 };
 
 #endif // ODBCHELPER_H_

@@ -68,7 +68,8 @@ private:
 extern "C" {
 #endif
 
-#define DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS 7500
+#define DEFAULT_LIMITLESS_MONITOR_INTERVAL_MS       7500
+#define DEFAULT_LIMITLESS_CONNECT_RETRY_ATTEMPTS    5
 
 typedef struct {
     char *server;

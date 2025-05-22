@@ -199,10 +199,11 @@ bool OdbcHelper::TestConnectionToServer(const SQLSTR &in_conn_str, const std::st
     SQLHENV henv = nullptr;
     SQLHDBC conn = nullptr;
 
-    // build new connection string, overwriting server to provided server
+    // build new connection string, overwriting server to provided server, and disabling limitless to prevent infinite loop
     std::map<SQLSTR, SQLSTR> connstr_map;
     ConnectionStringHelper::ParseConnectionString(in_conn_str, connstr_map);
     connstr_map[SERVER_HOST_KEY] = StringHelper::ToSQLSTR(server);
+    connstr_map[LIMITLESS_ENABLED_KEY] = BOOL_FALSE;
     SQLSTR connstr = ConnectionStringHelper::BuildConnectionString(connstr_map);
 
     // allocate environment and connection handles

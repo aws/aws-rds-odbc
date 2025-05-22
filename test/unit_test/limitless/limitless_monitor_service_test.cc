@@ -221,10 +221,11 @@ TEST_F(LimitlessMonitorServiceTest, SelectHighestWeightOnBadRoundRobinHost) {
     // NOTE: gtest displays a warning as the mocked method will return false by default anyways,
     //   but this expect call is useful to ensure the round robin host is chosen first
     EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, "hosta")).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mock_odbc_helper, TestConnectionToServer(testing::_, "hostz")).Times(1).WillOnce(Return(true));
 
     std::shared_ptr<MOCK_LIMITLESS_ROUTER_MONITOR> mock_monitor = std::make_shared<MOCK_LIMITLESS_ROUTER_MONITOR>();
     mock_monitor->test_limitless_routers.push_back(HostInfo("hosta", 5432, UP, true, nullptr, 100)); // round robin choice (alphabetical; a < z)
-    mock_monitor->test_limitless_routers.push_back(HostInfo("hostz", 5432, UP, true, nullptr, 200)); // highest weight choice (200 > 5)
+    mock_monitor->test_limitless_routers.push_back(HostInfo("hostz", 5432, UP, true, nullptr, 200)); // highest weight choice (200 > 100)
 
     EXPECT_CALL(*mock_monitor, Open(true, test_connection_string_immediate_c_str, test_host_port, TEST_LIMITLESS_MONITOR_INTERVAL_MS, testing::_, testing::_))
         .Times(1)

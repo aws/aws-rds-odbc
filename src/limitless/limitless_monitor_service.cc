@@ -193,11 +193,10 @@ std::shared_ptr<HostInfo> LimitlessMonitorService::GetHostInfo(const std::string
     }
 
     // five retries going by order of least loaded (highest weight)
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < DEFAULT_LIMITLESS_CONNECT_RETRY_ATTEMPTS; i++) {
         try {
             HostInfo host = this->highest_weight.GetHost(hosts, true, properties);
 
-            // will store conn str for this, pretend it's here
             if (this->odbc_wrapper->TestConnectionToServer(connection_string, host.GetHost())) {
                 // the highest weight host successfully connected
                 return std::make_shared<HostInfo>(host);
