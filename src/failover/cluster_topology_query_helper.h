@@ -41,11 +41,16 @@ private:
     // Query & Template to be passed in from caller, below are examples of APG
     // ?.cluster-<Cluster-ID>.<Region>.rds.amazonaws.com
     std::string endpoint_template_;
-    // SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) FROM aurora_replica_status() WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' OR LAST_UPDATE_TIMESTAMP IS NULL
+    // SELECT SERVER_ID, CASE WHEN SESSION_ID OPERATOR(pg_catalog.=) 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, \
+    // CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) \
+    // FROM pg_catalog.aurora_replica_status() \
+    // WHERE EXTRACT(EPOCH FROM(NOW() OPERATOR(pg_catalog.-) LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID OPERATOR(pg_catalog.=) 'MASTER_SESSION_ID' \
+    // OR LAST_UPDATE_TIMESTAMP IS NULL
     SQLSTR topology_query_;
-    // SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' AND SERVER_ID = aurora_db_instance_identifier()
+    // SELECT SERVER_ID FROM pg_catalog.aurora_replica_status() WHERE SESSION_ID OPERATOR(pg_catalog.=) 'MASTER_SESSION_ID' \
+    // AND SERVER_ID OPERATOR(pg_catalog.=) pg_catalog.aurora_db_instance_identifier()
     SQLSTR writer_id_query_;
-    // SELECT aurora_db_instance_identifier()
+    // SELECT pg_catalog.aurora_db_instance_identifier()
     SQLSTR node_id_query_;
 
     static constexpr char REPLACE_CHAR = '?';

@@ -30,14 +30,14 @@ SQLTCHAR* LimitlessQueryHelper::check_limitless_cluster_query = AS_SQLTCHAR(TEXT
     "SELECT EXISTS ("\
     "   SELECT 1"\
     "   FROM pg_catalog.pg_class c"\
-    "   JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid"\
-    "   WHERE c.relname = 'limitless_subclusters'"\
-    "   AND n.nspname = 'rds_aurora'"\
+    "   JOIN pg_catalog.pg_namespace n ON c.relnamespace OPERATOR(pg_catalog.=) n.oid"\
+    "   WHERE c.relname OPERATOR(pg_catalog.=) 'limitless_subclusters'"\
+    "   AND n.nspname OPERATOR(pg_catalog.=) 'rds_aurora'"\
     ");"\
 ));
 
 SQLTCHAR* LimitlessQueryHelper::limitless_router_endpoint_query = \
-    AS_SQLTCHAR(TEXT("SELECT router_endpoint, load FROM aurora_limitless_router_endpoints()"));
+    AS_SQLTCHAR(TEXT("SELECT router_endpoint, load FROM pg_catalog.aurora_limitless_router_endpoints()"));
 
 bool LimitlessQueryHelper::CheckLimitlessCluster(SQLHDBC conn) {
     HSTMT hstmt = SQL_NULL_HSTMT;
