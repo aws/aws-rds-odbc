@@ -28,19 +28,19 @@ class DialectAuroraPostgres : public Dialect {
    private:
     const int DEFAULT_POSTGRES_PORT = 5432;
     const SQLSTR TOPOLOGY_QUERY = CONSTRUCT_SQLSTR(
-        "SELECT SERVER_ID, CASE WHEN SESSION_ID = 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, \
+        "SELECT SERVER_ID, CASE WHEN SESSION_ID OPERATOR(pg_catalog.=) 'MASTER_SESSION_ID' THEN TRUE ELSE FALSE END, \
         CPU, COALESCE(REPLICA_LAG_IN_MSEC, 0) \
-        FROM aurora_replica_status() \
-        WHERE EXTRACT(EPOCH FROM(NOW() - LAST_UPDATE_TIMESTAMP)) <= 300 OR SESSION_ID = 'MASTER_SESSION_ID' \
+        FROM pg_catalog.aurora_replica_status() \
+        WHERE EXTRACT(EPOCH FROM(pg_catalog.NOW() OPERATOR(pg_catalog.-) LAST_UPDATE_TIMESTAMP)) OPERATOR(pg_catalog.<=) 300 OR SESSION_ID OPERATOR(pg_catalog.=) 'MASTER_SESSION_ID' \
         OR LAST_UPDATE_TIMESTAMP IS NULL");
 
     const SQLSTR WRITER_ID_QUERY = CONSTRUCT_SQLSTR(
-        "SELECT SERVER_ID FROM aurora_replica_status() WHERE SESSION_ID = 'MASTER_SESSION_ID' \
-        AND SERVER_ID = aurora_db_instance_identifier()");
+        "SELECT SERVER_ID FROM pg_catalog.aurora_replica_status() WHERE SESSION_ID OPERATOR(pg_catalog.=) 'MASTER_SESSION_ID' \
+        AND SERVER_ID OPERATOR(pg_catalog.=) pg_catalog.aurora_db_instance_identifier()");
 
-    const SQLSTR NODE_ID_QUERY = CONSTRUCT_SQLSTR("SELECT aurora_db_instance_identifier()");
+    const SQLSTR NODE_ID_QUERY = CONSTRUCT_SQLSTR("SELECT pg_catalog.aurora_db_instance_identifier()");
 
-    const SQLSTR IS_READER_QUERY = CONSTRUCT_SQLSTR("SELECT pg_is_in_recovery()");
+    const SQLSTR IS_READER_QUERY = CONSTRUCT_SQLSTR("SELECT pg_catalog.pg_is_in_recovery()");
 };
 
 #endif  // DIALECT_AURORA_POSTGRES_H
