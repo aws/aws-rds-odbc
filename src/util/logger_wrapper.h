@@ -21,6 +21,7 @@
 #define GOOGLE_STRIP_LOG 4
 #endif /* XCODE_BUILD */
 
+#include <atomic>
 #include <filesystem>
 
 namespace logger_config {
@@ -46,7 +47,7 @@ public:
 
 private:
     static void set_log_directory(const std::string& directory_path);
-    bool init = false;
+    static inline std::atomic<int> logger_init_count = 0;
 };
 
 #endif // LOGGER_WRAPPER_H_
