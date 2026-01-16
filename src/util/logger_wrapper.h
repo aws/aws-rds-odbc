@@ -23,6 +23,7 @@
 
 #include <atomic>
 #include <filesystem>
+#include <mutex>
 
 namespace logger_config {
     const std::string PROGRAM_NAME = "aws-rds-odbc";
@@ -36,6 +37,12 @@ public:
 
     static void Initialize();
     static void Initialize(std::string log_location, int threshold);
+    
+    // Initialize glog with minimal settings (suppresses all output)
+    static void InitializeMinimal();
+    
+    // Check if glog has been initialized
+    static bool IsInitialized();
 
     static void Shutdown();
 
@@ -47,7 +54,10 @@ public:
 
 private:
     static void set_log_directory(const std::string& directory_path);
-    static inline std::atomic<int> logger_init_count = 0;
+    
+    static inline int logger_init_count = 0;
+    static inline std::atomic<bool> glog_initialized = false;
+    static inline std::mutex logger_mutex;
 };
 
 #endif // LOGGER_WRAPPER_H_
