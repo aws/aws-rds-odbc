@@ -26,6 +26,20 @@ extern "C" {
 void InitializeRdsLogger(const char* log_dir, int threshold);
 
 /**
+ * Initialize the logger with minimal settings (suppresses all output).
+ * This should be called if logging is not enabled but we want to prevent
+ * "Logging before InitGoogleLogging()" warnings.
+ */
+void InitializeRdsLoggerMinimal();
+
+/**
+ * Check if the RDS logger has been initialized.
+ * 
+ * @return true if the logger has been initialized, false otherwise.
+ */
+bool IsRdsLoggerInitialized();
+
+/**
  * Shutdown the logger for the AWS RDS ODBC library.
  */
 void ShutdownRdsLogger();

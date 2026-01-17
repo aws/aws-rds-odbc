@@ -29,21 +29,55 @@ void LoggerWrapper::Initialize() {
 }
 
 void LoggerWrapper::Initialize(std::string log_location, int threshold) {
+    std::lock_guard<std::mutex> lock(logger_mutex);
+    
     threshold = threshold >= 0 ? threshold : 4; // Set to 4 to disable console output.
+    
     if (0 == logger_init_count++) {
+        if (glog_initialized.load()) {
+            // Shutdown and reinitialize with new settings
+            google::ShutdownGoogleLogging();
+        }
+
+        FLAGS_logtostderr = false; // Re-enable file logging if it was previously disabled
         FLAGS_stderrthreshold = threshold;
         FLAGS_timestamp_in_logfile_name = false;
+        FLAGS_minloglevel = 0;
         if (log_location.empty()) {
             log_location = logger_config::LOG_LOCATION;
         }
         set_log_directory(log_location);
         google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
+        glog_initialized.store(true);
     }
 }
 
+void LoggerWrapper::InitializeMinimal() {
+    std::lock_guard<std::mutex> lock(logger_mutex);
+    
+    if (!glog_initialized.load()) {
+        // Initialize glog with minimal settings to suppress all output
+        FLAGS_minloglevel = 4;
+        FLAGS_stderrthreshold = 4; // Suppress stderr
+        FLAGS_logtostderr = true; // Suppress file logging
+        google::InitGoogleLogging(logger_config::PROGRAM_NAME.c_str());
+        glog_initialized.store(true);
+    }
+}
+
+bool LoggerWrapper::IsInitialized() {
+    return glog_initialized.load();
+}
+
 void LoggerWrapper::Shutdown() {
-    if (--logger_init_count == 0) {
+    std::lock_guard<std::mutex> lock(logger_mutex);
+    
+    if (logger_init_count > 0 && --logger_init_count == 0) {
         google::ShutdownGoogleLogging();
+        glog_initialized.store(false, std::memory_order_release);
+        // Reset to suppress stderr output when no logging is active
+        FLAGS_stderrthreshold = 4;
+        FLAGS_minloglevel = 4;
     }
 }
 

@@ -20,6 +20,14 @@ void InitializeRdsLogger(const char* log_dir, int threshold) {
     LoggerWrapper::Initialize(log_dir, threshold);
 }
 
+void InitializeRdsLoggerMinimal() {
+    LoggerWrapper::InitializeMinimal();
+}
+
+bool IsRdsLoggerInitialized() {
+    return LoggerWrapper::IsInitialized();
+}
+
 void ShutdownRdsLogger() {
     LoggerWrapper::Shutdown();
 }
